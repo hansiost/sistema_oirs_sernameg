@@ -24,7 +24,14 @@ export default function Home() {
       </header>
       
       <main className="flex-grow w-full max-w-4xl mx-auto px-4 py-8 md:py-12 -mt-20 md:-mt-24 z-10">
-        <div className="bg-background/80 backdrop-blur-sm p-6 md:p-8 rounded-xl shadow-lg text-center">
+        <div className="bg-background/80 backdrop-blur-sm p-6 md:p-8 rounded-xl shadow-lg text-center flex flex-col items-center">
+          <Image
+            src="https://www.sernameg.gob.cl/wp-content/uploads/2021/07/logo-sernameg-barra.svg"
+            alt="Logo SERNAMEG"
+            width={300}
+            height={80}
+            className="mb-6"
+          />
           <h1 className="font-headline text-4xl md:text-5xl font-bold text-primary leading-tight">
             Portal Ciudadano SERNAMEG
           </h1>
