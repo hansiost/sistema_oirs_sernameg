@@ -5,7 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 
 export default function SolicitudPage() {
   return (
-    <div className="w-full min-h-screen flex flex-col items-center py-8 px-4">
+    <div className="w-full min-h-screen flex flex-col items-center bg-background py-8 px-4">
       <header className="w-full max-w-4xl mb-6">
         <Button variant="ghost" asChild>
           <Link href="/">
@@ -16,7 +16,7 @@ export default function SolicitudPage() {
       </header>
       <main className="w-full max-w-4xl">
         <div className="text-center mb-8">
-          <h1 className="font-headline text-4xl font-bold text-primary-foreground/90">
+          <h1 className="font-headline text-4xl font-bold text-primary">
             Formulario de Solicitud
           </h1>
           <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
