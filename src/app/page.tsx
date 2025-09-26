@@ -40,9 +40,18 @@ export default function Home() {
               </Link>
             </Button>
           </div>
-          <p className="mt-4 text-xs text-muted-foreground/80">
-            Será dirigida al formulario de solicitud para completar su trámite.
-          </p>
+          <div className="mt-4 text-center">
+            <p className="text-xs text-muted-foreground/80">
+              Será dirigida al formulario de solicitud para completar su trámite.
+            </p>
+            <Link
+              href="/registro"
+              className="mt-2 inline-flex items-center text-sm font-medium text-primary hover:underline"
+            >
+              <Icons.Register className="mr-2 h-4 w-4" />
+              O regístrese aquí con su RUT
+            </Link>
+          </div>
         </div>
       </main>
 
