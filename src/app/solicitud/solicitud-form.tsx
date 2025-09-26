@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useActionState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useFormState } from 'react-dom';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -39,6 +38,7 @@ import { getHints, submitSolicitud } from './actions';
 import { Icons } from '@/components/icons';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
 
 // Mocked user data from "Registro Civil"
 const mockUserData = {
@@ -102,8 +102,7 @@ export default function SolicitudForm() {
   const descriptionText = form.watch('description');
   const [availableTopics, setAvailableTopics] = useState<string[]>([]);
   
-  const [hintState, hintFormAction] = useFormState(getHints, { suggestions: [] });
-  const [isHintLoading, startHintTransition] = useTransition();
+  const [hintState, hintFormAction, isHintLoading] = useActionState(getHints, { suggestions: [] });
 
   const handleRequestTypeChange = (value: string) => {
     const newType = value as RequestType;
@@ -116,7 +115,7 @@ export default function SolicitudForm() {
     const formData = new FormData();
     formData.append('requestType', requestType);
     formData.append('inputText', descriptionText);
-    startHintTransition(() => hintFormAction(formData));
+    hintFormAction(formData);
   };
 
   const onSubmit = (values: FormValues) => {
