@@ -26,7 +26,7 @@ export default function SolicitudPage() {
         <SolicitudForm />
       </main>
       <footer className="w-full max-w-4xl mt-8 text-center text-xs text-muted-foreground">
-        <p>© 2024 SERNAMEG. Todos los derechos reservados.</p>
+        <p>© 2025 SERNAMEG. Todos los derechos reservados.</p>
       </footer>
     </div>
   );

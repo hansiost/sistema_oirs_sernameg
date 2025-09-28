@@ -56,7 +56,7 @@ export default function Home() {
       </main>
 
       <footer className="w-full text-center p-6 text-sm text-muted-foreground">
-        <p>© 2024 SERNAMEG. Todos los derechos reservados.</p>
+        <p>© 2025 SERNAMEG. Todos los derechos reservados.</p>
       </footer>
     </div>
   );
