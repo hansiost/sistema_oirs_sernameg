@@ -19,6 +19,8 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, PlusCircle } from 'lucide-react';
 import { CheckCircle } from 'lucide-react';
 import { REQUEST_TYPES } from '@/lib/constants';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
 const mockSolicitudes = [
   {
@@ -50,6 +52,15 @@ const mockSolicitudes = [
     estado: 'Respondida',
   },
 ];
+
+// Mocked user data from "Registro Civil"
+const mockUserData = {
+  rut: '12.345.678-9',
+  nombres: 'Juana Andrea',
+  apellidoPaterno: 'Pérez',
+  apellidoMaterno: 'González',
+};
+
 
 const getStatusVariant = (estado: string) => {
   switch (estado) {
@@ -96,9 +107,9 @@ export default function EstadoSolicitudesPage({ searchParams }: { searchParams?:
           </Link>
         </Button>
       </header>
-      <main className="w-full max-w-4xl">
+      <main className="w-full max-w-4xl space-y-8">
         {newFolio && (
-          <div className="mb-8 p-4 bg-green-50 text-green-900 rounded-lg flex items-start space-x-3 border border-green-200">
+          <div className="p-4 bg-green-50 text-green-900 rounded-lg flex items-start space-x-3 border border-green-200">
              <CheckCircle className="h-5 w-5 flex-shrink-0 mt-0.5 text-green-500" />
              <div className="flex-1">
                <h3 className="font-bold">¡Solicitud enviada con éxito!</h3>
@@ -108,6 +119,34 @@ export default function EstadoSolicitudesPage({ searchParams }: { searchParams?:
              </div>
           </div>
         )}
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Mis Datos</CardTitle>
+            <CardDescription>
+              Esta información es obtenida del Registro Civil y no puede ser modificada.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid sm:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <Label>RUT</Label>
+              <Input value={mockUserData.rut} disabled />
+            </div>
+            <div className="space-y-1">
+              <Label>Nombres</Label>
+              <Input value={mockUserData.nombres} disabled />
+            </div>
+            <div className="space-y-1">
+              <Label>Apellido Paterno</Label>
+              <Input value={mockUserData.apellidoPaterno} disabled />
+            </div>
+            <div className="space-y-1">
+              <Label>Apellido Materno</Label>
+              <Input value={mockUserData.apellidoMaterno} disabled />
+            </div>
+          </CardContent>
+        </Card>
+
 
         <Card>
           <CardHeader>
