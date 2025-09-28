@@ -88,13 +88,21 @@ const mockUserApi = (rut: string) => {
     apellidoMaterno: string;
   } | null>((resolve) => {
     setTimeout(() => {
-      if (cleanRut(rut).startsWith('12345678')) {
+      const cleanedRut = cleanRut(rut);
+      if (cleanedRut.startsWith('12345678')) {
         resolve({
           nombres: 'Juana Andrea',
           apellidoPaterno: 'Pérez',
           apellidoMaterno: 'González',
         });
-      } else {
+      } else if (cleanedRut.startsWith('11478406')) {
+        resolve({
+          nombres: 'Ana María',
+          apellidoPaterno: 'López',
+          apellidoMaterno: 'Soto',
+        });
+      }
+       else {
         resolve(null);
       }
     }, 1000);
@@ -105,11 +113,12 @@ const mockUserApi = (rut: string) => {
 const checkExistingRegistration = (rut: string) => {
   return new Promise<boolean>((resolve) => {
     setTimeout(() => {
-      // For simulation, let's pretend any RUT other than the main one is new
-      if (cleanRut(rut) === '123456789') {
-        resolve(false); // Not registered
-      } else {
+      const cleanedRut = cleanRut(rut);
+      // '11.478.406-0' is the existing user
+      if (cleanedRut.startsWith('11478406')) {
         resolve(true); // Already registered
+      } else {
+        resolve(false); // Not registered
       }
     }, 800)
   })
@@ -173,7 +182,7 @@ export default function RegistroForm() {
         if (isRegistered) {
            toast({
             title: 'Usuario Ya Registrado',
-            description: 'Usted ya tiene una cuenta. Puede iniciar sesión directamente.',
+            description: 'El RUT ingresado ya tiene una cuenta. Puede iniciar sesión directamente.',
             variant: 'destructive',
           });
         } else {
@@ -187,10 +196,11 @@ export default function RegistroForm() {
         toast({
           title: 'Usuario No Encontrado',
           description:
-            'No se encontró un usuario con el RUT proporcionado. Intente con "12.345.678-9".',
+            'No se encontró un usuario con el RUT proporcionado. Pruebe con un RUT de ejemplo.',
           variant: 'destructive',
         });
         setUserFound(false);
+        setIsAlreadyRegistered(null);
       }
     });
   };
@@ -251,7 +261,7 @@ export default function RegistroForm() {
                   className={formError ? 'border-destructive' : ''}
                 />
                  {formError && <p className="text-sm font-medium text-destructive">{formError.message}</p>}
-                 {!formError && <FormDescription>Para la simulación, use el RUT 12.345.678-9.</FormDescription>}
+                 {!formError && <FormDescription>Para la simulación, use RUT nuevo (12.345.678-9) o registrado (11.478.406-0).</FormDescription>}
               </div>
               <div className='pt-2 sm:pt-8'>
                 <Button
@@ -268,18 +278,18 @@ export default function RegistroForm() {
                 </Button>
               </div>
             </div>
-             {isAlreadyRegistered && (
+             {isAlreadyRegistered === true && (
                 <Alert variant="destructive" className="mt-4">
                     <AlertTitle>Usuario ya registrado</AlertTitle>
                     <AlertDescription>
-                        El RUT ingresado ya tiene una cuenta. Por favor, <a href="/login" className="font-bold underline">inicie sesión</a>.
+                        El RUT ingresado ya tiene una cuenta. Por favor, <a href="/solicitud/estado" className="font-bold underline">inicie sesión</a> para ver sus solicitudes.
                     </AlertDescription>
                 </Alert>
             )}
           </CardContent>
         </Card>
 
-        {userFound && !isAlreadyRegistered && (
+        {userFound && isAlreadyRegistered === false && (
           <>
             <Card>
               <CardHeader>
@@ -456,3 +466,5 @@ export default function RegistroForm() {
     </Form>
   );
 }
+
+    
