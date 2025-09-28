@@ -67,7 +67,7 @@ export function LoginDialog({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader className="items-center text-center">
           <Image
-            src="https://www.sernameg.gob.cl/wp-content/uploads/2021/07/logo-gob-horizontal.svg"
+            src="https://www.sernameg.gob.cl/wp-content/uploads/2018/03/logo-gob-horizontal-e1521743034336.png"
             alt="Logo Gobierno de Chile"
             width={180}
             height={40}
