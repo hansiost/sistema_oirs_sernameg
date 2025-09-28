@@ -13,7 +13,13 @@ const RegistroSchema = z.object({
   region: z.string().min(1, 'La región es obligatoria.'),
   telefono: z.string().min(8, 'El teléfono es obligatorio.'),
   email: z.string().email('El e-mail no es válido.'),
+  password: z.string().min(8, 'La clave debe tener al menos 8 caracteres.'),
+  confirmPassword: z.string(),
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Las claves no coinciden.",
+  path: ["confirmPassword"],
 });
+
 
 export async function submitRegistro(
   prevState: any,

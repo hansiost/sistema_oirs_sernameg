@@ -68,7 +68,13 @@ const formSchema = z.object({
   region: z.string().min(3, 'La región es obligatoria.'),
   telefono: z.string().min(9, 'El teléfono debe tener al menos 9 dígitos.'),
   email: z.string().email('El e-mail no es válido.'),
+  password: z.string().min(8, 'La clave debe tener al menos 8 caracteres.'),
+  confirmPassword: z.string(),
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Las claves no coinciden.",
+  path: ["confirmPassword"], // path of error
 });
+
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -95,6 +101,21 @@ const mockUserApi = (rut: string) => {
   });
 };
 
+// Simulate checking if user is already registered in our DB
+const checkExistingRegistration = (rut: string) => {
+  return new Promise<boolean>((resolve) => {
+    setTimeout(() => {
+      // For simulation, let's pretend any RUT other than the main one is new
+      if (cleanRut(rut) === '123456789') {
+        resolve(false); // Not registered
+      } else {
+        resolve(true); // Already registered
+      }
+    }, 800)
+  })
+}
+
+
 // --- Component ---
 
 export default function RegistroForm() {
@@ -102,6 +123,7 @@ export default function RegistroForm() {
   const [isVerifying, startVerifyingTransition] = useTransition();
   const [isSubmitting, startSubmitTransition] = useTransition();
   const [userFound, setUserFound] = useState(false);
+  const [isAlreadyRegistered, setIsAlreadyRegistered] = useState<boolean|null>(null);
   const [rutInput, setRutInput] = useState('');
 
   const form = useForm<FormValues>({
@@ -117,6 +139,8 @@ export default function RegistroForm() {
       region: '',
       telefono: '',
       email: '',
+      password: '',
+      confirmPassword: '',
     },
   });
 
@@ -142,11 +166,23 @@ export default function RegistroForm() {
         form.setValue('apellidoPaterno', userData.apellidoPaterno);
         form.setValue('apellidoMaterno', userData.apellidoMaterno);
         setUserFound(true);
-        toast({
-          title: 'Usuario Encontrado',
-          description:
-            'Sus datos personales han sido cargados. Por favor, complete su información de contacto.',
-        });
+
+        const isRegistered = await checkExistingRegistration(result.data);
+        setIsAlreadyRegistered(isRegistered);
+
+        if (isRegistered) {
+           toast({
+            title: 'Usuario Ya Registrado',
+            description: 'Usted ya tiene una cuenta. Puede iniciar sesión directamente.',
+            variant: 'destructive',
+          });
+        } else {
+           toast({
+            title: 'Usuario Encontrado',
+            description:
+              'Sus datos personales han sido cargados. Por favor, cree una clave y complete su información de contacto.',
+          });
+        }
       } else {
         toast({
           title: 'Usuario No Encontrado',
@@ -185,6 +221,7 @@ export default function RegistroForm() {
         form.reset();
         setRutInput('');
         setUserFound(false);
+        setIsAlreadyRegistered(null);
       }
     });
   };
@@ -231,10 +268,18 @@ export default function RegistroForm() {
                 </Button>
               </div>
             </div>
+             {isAlreadyRegistered && (
+                <Alert variant="destructive" className="mt-4">
+                    <AlertTitle>Usuario ya registrado</AlertTitle>
+                    <AlertDescription>
+                        El RUT ingresado ya tiene una cuenta. Por favor, <a href="/login" className="font-bold underline">inicie sesión</a>.
+                    </AlertDescription>
+                </Alert>
+            )}
           </CardContent>
         </Card>
 
-        {userFound && (
+        {userFound && !isAlreadyRegistered && (
           <>
             <Card>
               <CardHeader>
@@ -262,10 +307,47 @@ export default function RegistroForm() {
                 </div>
               </CardContent>
             </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>3. Cree su Clave</CardTitle>
+                 <CardDescription>
+                  Esta será su clave para ingresar al portal en el futuro.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="grid sm:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Clave *</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="********" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirmar Clave *</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="********" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+              </CardContent>
+            </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle>3. Datos de Contacto</CardTitle>
+                <CardTitle>4. Datos de Contacto</CardTitle>
                 <CardDescription>
                   Por favor, complete su información de contacto.
                 </CardDescription>
