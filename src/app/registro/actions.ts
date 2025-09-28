@@ -1,6 +1,7 @@
 'use server';
 
 import { z } from 'zod';
+import { redirect } from 'next/navigation';
 
 const RegistroSchema = z.object({
   rut: z.string(),
@@ -40,5 +41,5 @@ export async function submitRegistro(
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 1000));
 
-  return { message: '¡Se ha registrado exitosamente! Ahora puede iniciar su solicitud.' };
+  redirect('/solicitud/estado');
 }

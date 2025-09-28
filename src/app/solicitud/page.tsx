@@ -1,16 +1,22 @@
 import Link from 'next/link';
 import SolicitudForm from './solicitud-form';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, BookUser } from 'lucide-react';
 
 export default function SolicitudPage() {
   return (
     <div className="w-full min-h-screen flex flex-col items-center bg-background py-8 px-4">
-      <header className="w-full max-w-4xl mb-6">
+      <header className="w-full max-w-4xl mb-6 flex justify-between items-center">
         <Button variant="ghost" asChild>
           <Link href="/">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Volver al Inicio
+          </Link>
+        </Button>
+         <Button variant="outline" asChild>
+          <Link href="/solicitud/estado">
+            <BookUser className="mr-2 h-4 w-4" />
+            Ver mis solicitudes
           </Link>
         </Button>
       </header>

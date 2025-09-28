@@ -2,7 +2,6 @@
 
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import Link from 'next/link';
 import { Icons } from '@/components/icons';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { LoginDialog } from '@/components/login-dialog';
@@ -40,7 +39,7 @@ export default function Home() {
             <LoginDialog open={showLogin} onOpenChange={setShowLogin}>
               <Button onClick={() => setShowLogin(true)} size="lg" className="font-bold text-lg">
                 <Icons.Login />
-                Ingresar con Clave Única
+                Ingresar
               </Button>
             </LoginDialog>
           </div>
@@ -48,13 +47,6 @@ export default function Home() {
             <p className="text-xs text-muted-foreground/80">
               Será dirigida al formulario de solicitud para completar su trámite.
             </p>
-            <Link
-              href="/registro"
-              className="mt-2 inline-flex items-center text-sm font-medium text-primary hover:underline"
-            >
-              <Icons.Register className="mr-2 h-4 w-4" />
-              O regístrese aquí con su RUT
-            </Link>
           </div>
         </div>
       </main>
