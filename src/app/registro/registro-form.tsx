@@ -31,14 +31,31 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 // --- Validation Schemas ---
 
-// Simple RUT validation for format, not for validity of the digit.
+const cleanRut = (rut: string) => rut.replace(/[^0-9kK]/g, '').toUpperCase();
+
 const rutSchema = z
   .string()
   .min(8, 'El RUT debe tener al menos 8 caracteres.')
-  .regex(
-    /^[0-9]{1,2}\.?[0-9]{3}\.?[0-9]{3}-?[0-9kK]$/,
+  .refine(
+    (value) => {
+      const cleaned = cleanRut(value);
+      if (cleaned.length < 2) return false;
+      const body = cleaned.slice(0, -1);
+      const dv = cleaned.slice(-1);
+      if (!/^[0-9]+$/.test(body)) return false;
+      return /^[0-9K]$/.test(dv);
+    },
     'Formato de RUT no válido (ej: 12.345.678-9).'
   );
+
+const formatRut = (rut: string) => {
+  const cleaned = cleanRut(rut);
+  if (cleaned.length < 2) return cleaned;
+  const body = cleaned.slice(0, -1);
+  const dv = cleaned.slice(-1);
+  let formattedBody = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return `${formattedBody}-${dv}`;
+};
 
 const formSchema = z.object({
   rut: rutSchema,
@@ -65,7 +82,7 @@ const mockUserApi = (rut: string) => {
     apellidoMaterno: string;
   } | null>((resolve) => {
     setTimeout(() => {
-      if (rut.startsWith('12.345.678')) {
+      if (cleanRut(rut).startsWith('12345678')) {
         resolve({
           nombres: 'Juana Andrea',
           apellidoPaterno: 'Pérez',
@@ -108,7 +125,8 @@ export default function RegistroForm() {
     if (!result.success) {
       form.setError('rut', {
         type: 'manual',
-        message: result.error.flatten().fieldErrors.rut?.[0] || 'RUT inválido.',
+        message:
+          result.error.flatten().fieldErrors._errors?.[0] || 'RUT inválido.',
       });
       return;
     }
@@ -117,19 +135,23 @@ export default function RegistroForm() {
     startVerifyingTransition(async () => {
       const userData = await mockUserApi(result.data);
       if (userData) {
-        form.setValue('rut', result.data);
+        const formatted = formatRut(result.data);
+        form.setValue('rut', formatted);
+        setRutInput(formatted); // Show formatted RUT in input
         form.setValue('nombres', userData.nombres);
         form.setValue('apellidoPaterno', userData.apellidoPaterno);
         form.setValue('apellidoMaterno', userData.apellidoMaterno);
         setUserFound(true);
         toast({
           title: 'Usuario Encontrado',
-          description: 'Sus datos personales han sido cargados. Por favor, complete su información de contacto.',
+          description:
+            'Sus datos personales han sido cargados. Por favor, complete su información de contacto.',
         });
       } else {
         toast({
           title: 'Usuario No Encontrado',
-          description: 'No se encontró un usuario con el RUT proporcionado. Intente con "12.345.678-9".',
+          description:
+            'No se encontró un usuario con el RUT proporcionado. Intente con "12.345.678-9".',
           variant: 'destructive',
         });
         setUserFound(false);
