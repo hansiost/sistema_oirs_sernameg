@@ -3,26 +3,30 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Icons } from '@/components/icons';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function Home() {
+  const heroImage = PlaceHolderImages.find(img => img.id === 'hero-landing');
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <header className="relative w-full text-center py-6 bg-primary/10">
-        <div className="inline-block">
-          <Image
-            src="https://www.sernameg.gob.cl/wp-content/uploads/2021/07/logo-sernameg-barra.svg"
-            alt="Logo SERNAMEG"
-            width={300}
-            height={50}
+      <header className="relative w-full h-64 md:h-80">
+        {heroImage && (
+           <Image
+            src={heroImage.imageUrl}
+            alt={heroImage.description}
+            fill
+            style={{ objectFit: 'cover' }}
             priority
-            className="h-12 w-auto"
+            data-ai-hint={heroImage.imageHint}
           />
-        </div>
+        )}
+        <div className="absolute inset-0 bg-primary/30" />
       </header>
 
-      <main className="flex-grow w-full max-w-4xl mx-auto px-4 py-8 md:py-12 z-10">
+      <main className="flex-grow w-full max-w-4xl mx-auto px-4 py-8 md:py-12 -mt-24 z-10">
         <div className="bg-background/80 backdrop-blur-sm p-6 md:p-8 rounded-xl shadow-lg text-center flex flex-col items-center">
-          <h1 className="font-headline text-4xl md:text-5xl font-bold text-primary leading-tight mt-6">
+           <h1 className="font-headline text-4xl md:text-5xl font-bold text-primary leading-tight">
             Portal Ciudadano SERNAMEG
           </h1>
           <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-prose mx-auto">
@@ -38,7 +42,7 @@ export default function Home() {
           </div>
           <div className="mt-4 text-center">
             <p className="text-xs text-muted-foreground/80">
-              Será dirigida al portal para revisar y crear solicitudes.
+              Será dirigida al formulario de solicitud para completar su trámite.
             </p>
             <Link
               href="/registro"
