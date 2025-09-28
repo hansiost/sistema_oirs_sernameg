@@ -41,18 +41,16 @@ export default function Home() {
           <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-prose mx-auto">
             Bienvenida a nuestro portal de solicitudes. Aquí puede ingresar sus reclamos, consultas, sugerencias y felicitaciones de forma segura y directa.
           </p>
-          <LoginDialog open={showLogin} onOpenChange={setShowLogin} type={loginType}>
-            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                <Button onClick={() => handleLoginClick('claveUnica')} size="lg" className="font-bold text-lg bg-blue-600 hover:bg-blue-700">
-                  <Icons.Login />
-                  Ingresar con ClaveÚnica
-                </Button>
-                <Button onClick={() => handleLoginClick('rut')} size="lg" className="font-bold text-lg" variant="secondary">
-                  <Icons.Login />
-                  Ingresar con RUT
-                </Button>
-            </div>
-          </LoginDialog>
+          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+              <Button onClick={() => handleLoginClick('claveUnica')} size="lg" className="font-bold text-lg bg-blue-600 hover:bg-blue-700">
+                <Icons.Login />
+                Ingresar con ClaveÚnica
+              </Button>
+              <Button onClick={() => handleLoginClick('rut')} size="lg" className="font-bold text-lg" variant="secondary">
+                <Icons.Login />
+                Ingresar con RUT
+              </Button>
+          </div>
           <div className="mt-4 text-center">
             <p className="text-xs text-muted-foreground/80">
               Seleccione un método de ingreso para continuar.
@@ -60,6 +58,8 @@ export default function Home() {
           </div>
         </div>
       </main>
+
+      <LoginDialog open={showLogin} onOpenChange={setShowLogin} type={loginType} />
 
       <footer className="w-full text-center p-6 text-sm text-muted-foreground">
         <p>© 2025 SERNAMEG. Todos los derechos reservados.</p>

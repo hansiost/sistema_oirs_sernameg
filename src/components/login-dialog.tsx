@@ -31,7 +31,6 @@ export function LoginDialog({
   onOpenChange,
   type = 'claveUnica'
 }: {
-  children?: React.ReactNode;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   type: 'claveUnica' | 'rut';
@@ -46,7 +45,7 @@ export function LoginDialog({
     e.preventDefault();
     const rutValidation = rutSchema.safeParse(rut);
     if (!rutValidation.success) {
-      setError(rutValidation.error.flatten().fieldErrors.rut?.[0] || 'RUT inválido.');
+      setError('RUT inválido.');
       return;
     }
     if (password.length < 4) {
@@ -68,20 +67,21 @@ export function LoginDialog({
   
   const title = type === 'claveUnica' ? 'Ingreso con ClaveÚnica' : 'Ingreso con RUT';
   const buttonText = type === 'claveUnica' ? 'Ingresar con ClaveÚnica' : 'Ingresar';
-  const buttonVariant = type === 'claveUnica' ? 'default' : 'secondary';
   const buttonClass = type === 'claveUnica' ? 'bg-blue-600 hover:bg-blue-700' : '';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="items-center text-center">
-          <Image
-            src="https://www.sernameg.gob.cl/wp-content/uploads/2018/03/logo-gob-horizontal-e1521743034336.png"
-            alt="Logo Gobierno de Chile"
-            width={180}
-            height={40}
-            className="mb-4"
-          />
+          {type === 'claveUnica' && (
+            <Image
+              src="https://www.sernameg.gob.cl/wp-content/uploads/2018/03/logo-gob-horizontal-e1521743034336.png"
+              alt="Logo Gobierno de Chile"
+              width={180}
+              height={40}
+              className="mb-4"
+            />
+          )}
           <DialogTitle className="text-2xl">
             {title}
           </DialogTitle>
@@ -115,7 +115,7 @@ export function LoginDialog({
           {error && <p className="text-sm text-destructive text-center">{error}</p>}
         </div>
         <div className='flex flex-col gap-2'>
-           <Button onClick={handleLogin} disabled={isLoggingIn} size="lg" className={buttonClass} variant={buttonVariant}>
+           <Button onClick={handleLogin} disabled={isLoggingIn} size="lg" className={buttonClass}>
               {isLoggingIn ? (
                 <Icons.Loading className="mr-2 h-4 w-4 animate-spin" />
               ) : (
