@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition, useActionState } from 'react';
+import { useTransition, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -32,15 +32,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 import { REQUEST_TYPES, TOPICS, type RequestType } from '@/lib/constants';
-import { getHints, submitSolicitud } from './actions';
+import { submitSolicitud } from './actions';
 import { Icons } from '@/components/icons';
 import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
 import { Label } from '@/components/ui/label';
-import { useState } from 'react';
 
 // Mocked user data from "Registro Civil"
 const mockUserData = {
@@ -84,7 +81,6 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function SolicitudForm() {
   const { toast } = useToast();
-  const router = useRouter();
   const [isSubmitting, startSubmitTransition] = useTransition();
 
   const form = useForm<FormValues>({
@@ -102,23 +98,13 @@ export default function SolicitudForm() {
   });
 
   const requestType = form.watch('requestType');
-  const descriptionText = form.watch('description');
   const [availableTopics, setAvailableTopics] = useState<string[]>([]);
   
-  const [hintState, hintFormAction, isHintLoading] = useActionState(getHints, { suggestions: [] });
-
   const handleRequestTypeChange = (value: string) => {
     const newType = value as RequestType;
     form.setValue('requestType', newType);
     setAvailableTopics(TOPICS[newType] || []);
     form.setValue('topic', '');
-  };
-
-  const handleGetHints = () => {
-    const formData = new FormData();
-    formData.append('requestType', requestType);
-    formData.append('inputText', descriptionText);
-    hintFormAction(formData);
   };
 
   const onSubmit = (values: FormValues) => {
@@ -365,47 +351,6 @@ export default function SolicitudForm() {
               )}
             />
             
-            {requestType && requestType !== 'Felicitacion' && (
-              <div className="space-y-4 rounded-lg bg-muted/50 p-4">
-                <div className='flex items-center justify-between'>
-                  <div className='space-y-1'>
-                    <h4 className="font-semibold text-accent-foreground">Asistente de Redacción</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Obtenga sugerencias de nuestra IA para mejorar su solicitud.
-                    </p>
-                  </div>
-                  <Button
-                    type="button"
-                    onClick={handleGetHints}
-                    disabled={isHintLoading || !requestType || descriptionText.length < 10}
-                  >
-                    {isHintLoading ? (
-                      <Icons.Loading className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <Icons.Sparkles className="mr-2 h-4 w-4" />
-                    )}
-                    Obtener Sugerencias
-                  </Button>
-                </div>
-                {isHintLoading && <p className="text-sm text-muted-foreground animate-pulse">Generando sugerencias...</p>}
-                {hintState?.error && <p className="text-sm text-destructive">{hintState.error}</p>}
-                {hintState?.suggestions && hintState.suggestions.length > 0 && (
-                   <Alert variant="default" className="bg-background">
-                     <Icons.Sparkles className="h-4 w-4" />
-                     <AlertTitle>Sugerencias para mejorar su texto:</AlertTitle>
-                     <AlertDescription>
-                       <ul className="list-disc pl-5 space-y-1 mt-2">
-                         {hintState.suggestions.map((suggestion, index) => (
-                           <li key={index}>{suggestion}</li>
-                         ))}
-                       </ul>
-                     </AlertDescription>
-                   </Alert>
-                )}
-              </div>
-            )}
-
-
             <FormField
               control={form.control}
               name="attachment"

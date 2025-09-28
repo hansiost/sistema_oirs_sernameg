@@ -1,41 +1,8 @@
 'use server';
 
 import { z } from 'zod';
-import { getHelpfulHintSuggestions } from '@/ai/flows/helpful-hint-suggestions';
 import { REQUEST_TYPES } from '@/lib/constants';
 import { redirect } from 'next/navigation';
-
-const HintSchema = z.object({
-  requestType: z.enum(['Reclamo', 'Consulta', 'Sugerencia', 'Queja']),
-  inputText: z.string().min(10, 'Se requieren al menos 10 caracteres.'),
-});
-
-export async function getHints(
-  prevState: any,
-  formData: FormData
-): Promise<{ suggestions?: string[]; error?: string }> {
-  const validatedFields = HintSchema.safeParse({
-    requestType: formData.get('requestType'),
-    inputText: formData.get('inputText'),
-  });
-
-  if (!validatedFields.success) {
-    return {
-      error: validatedFields.error.flatten().fieldErrors.inputText?.[0],
-    };
-  }
-
-  try {
-    const result = await getHelpfulHintSuggestions(validatedFields.data);
-    if (result.suggestions && result.suggestions.length > 0) {
-      return { suggestions: result.suggestions };
-    }
-    return { error: 'No se pudieron generar sugerencias en este momento.' };
-  } catch (error) {
-    console.error('AI Error:', error);
-    return { error: 'Hubo un error al comunicarse con el asistente de IA.' };
-  }
-}
 
 const fileSchema = z
   .instanceof(File)
