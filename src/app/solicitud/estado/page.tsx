@@ -19,28 +19,33 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, PlusCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { CheckCircle } from 'lucide-react';
+import { REQUEST_TYPES } from '@/lib/constants';
 
 const mockSolicitudes = [
   {
     folio: '98765',
+    tipo: 'Queja',
     fecha: '2024-07-20',
     descripcion: 'Demora excesiva en la atención telefónica del centro de la mujer...',
     estado: 'Respondida',
   },
   {
     folio: '98123',
+    tipo: 'Consulta',
     fecha: '2024-07-15',
     descripcion: 'Consulta sobre los requisitos para postular al programa Mujeres Jefas de Hogar...',
     estado: 'En proceso',
   },
   {
     folio: '97543',
+    tipo: 'Sugerencia',
     fecha: '2024-06-28',
     descripcion: 'Sugerencia para implementar talleres de alfabetización digital para adultas mayores...',
     estado: 'Enviada',
   },
   {
     folio: '96881',
+    tipo: 'Reclamo',
     fecha: '2024-06-10',
     descripcion: 'Reclamo por falta de accesibilidad en edificio de la dirección regional...',
     estado: 'Respondida',
@@ -64,6 +69,7 @@ export default function EstadoSolicitudesPage() {
   const newFolio = Math.floor(Math.random() * 90000 + 10000);
   const newRequest = {
     folio: newFolio.toString(),
+    tipo: REQUEST_TYPES[Math.floor(Math.random() * REQUEST_TYPES.length)],
     fecha: new Date().toISOString().split('T')[0],
     descripcion: 'Nueva solicitud recién enviada...',
     estado: 'Enviada'
@@ -108,6 +114,7 @@ export default function EstadoSolicitudesPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[100px]">Folio</TableHead>
+                  <TableHead>Tipo</TableHead>
                   <TableHead>Fecha de Envío</TableHead>
                   <TableHead>Descripción</TableHead>
                   <TableHead className="text-right">Estado</TableHead>
@@ -117,6 +124,7 @@ export default function EstadoSolicitudesPage() {
                 {allSolicitudes.map((solicitud) => (
                   <TableRow key={solicitud.folio}>
                     <TableCell className="font-medium">{solicitud.folio}</TableCell>
+                    <TableCell>{solicitud.tipo}</TableCell>
                     <TableCell>{new Date(solicitud.fecha).toLocaleDateString('es-CL')}</TableCell>
                     <TableCell>{solicitud.descripcion.substring(0, 30)}...</TableCell>
                     <TableCell className="text-right">
