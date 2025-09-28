@@ -1,30 +1,26 @@
 
 import { Button } from '@/components/ui/button';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Icons } from '@/components/icons';
 
 export default function Home() {
-  const heroImage = PlaceHolderImages.find((img) => img.id === 'hero-landing');
-
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <header className="relative w-full h-[30vh] md:h-[40vh]">
-        {heroImage && (
+      <header className="relative w-full text-center py-6 bg-primary/10">
+        <div className="inline-block">
           <Image
-            src={heroImage.imageUrl}
-            alt={heroImage.description}
-            data-ai-hint={heroImage.imageHint}
-            fill
-            className="object-cover"
+            src="https://www.sernameg.gob.cl/wp-content/uploads/2021/07/logo-sernameg-barra.svg"
+            alt="Logo SERNAMEG"
+            width={300}
+            height={50}
             priority
+            className="h-12 w-auto"
           />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
+        </div>
       </header>
-      
-      <main className="flex-grow w-full max-w-4xl mx-auto px-4 py-8 md:py-12 -mt-20 md:-mt-24 z-10">
+
+      <main className="flex-grow w-full max-w-4xl mx-auto px-4 py-8 md:py-12 z-10">
         <div className="bg-background/80 backdrop-blur-sm p-6 md:p-8 rounded-xl shadow-lg text-center flex flex-col items-center">
           <h1 className="font-headline text-4xl md:text-5xl font-bold text-primary leading-tight mt-6">
             Portal Ciudadano SERNAMEG
@@ -34,7 +30,7 @@ export default function Home() {
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="font-bold text-lg">
-              <Link href="/solicitud">
+              <Link href="/solicitud/estado">
                 <Icons.Login />
                 Ingresar con Clave Única
               </Link>
@@ -42,7 +38,7 @@ export default function Home() {
           </div>
           <div className="mt-4 text-center">
             <p className="text-xs text-muted-foreground/80">
-              Será dirigida al formulario de solicitud para completar su trámite.
+              Será dirigida al portal para revisar y crear solicitudes.
             </p>
             <Link
               href="/registro"

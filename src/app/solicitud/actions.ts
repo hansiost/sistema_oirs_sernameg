@@ -103,7 +103,9 @@ export async function submitSolicitud(
 
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  const newFolio = Math.floor(Math.random() * 90000 + 10000);
 
   // Redirect to status page instead of returning a message
-  redirect('/solicitud/estado');
+  redirect(`/solicitud/estado?folio=${newFolio}&tipo=${validatedFields.data.requestType}`);
 }

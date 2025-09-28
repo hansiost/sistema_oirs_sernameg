@@ -17,7 +17,6 @@ import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, PlusCircle } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { CheckCircle } from 'lucide-react';
 import { REQUEST_TYPES } from '@/lib/constants';
 
@@ -65,25 +64,29 @@ const getStatusVariant = (estado: string) => {
   }
 };
 
-export default function EstadoSolicitudesPage() {
-  const newFolio = Math.floor(Math.random() * 90000 + 10000);
-  const newRequest = {
-    folio: newFolio.toString(),
-    tipo: REQUEST_TYPES[Math.floor(Math.random() * REQUEST_TYPES.length)],
-    fecha: new Date().toISOString().split('T')[0],
-    descripcion: 'Nueva solicitud recién enviada...',
-    estado: 'Enviada'
+export default function EstadoSolicitudesPage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+  const newFolio = searchParams?.folio;
+  let allSolicitudes = [...mockSolicitudes];
+
+  if (newFolio) {
+    const newRequest = {
+      folio: newFolio as string,
+      tipo: (searchParams.tipo as (typeof REQUEST_TYPES)[number]) || 'Consulta',
+      fecha: new Date().toISOString().split('T')[0],
+      descripcion: 'Nueva solicitud recién enviada...',
+      estado: 'Enviada'
+    }
+    allSolicitudes = [newRequest, ...mockSolicitudes];
   }
-  const allSolicitudes = [newRequest, ...mockSolicitudes]
 
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center bg-background py-8 px-4">
       <header className="w-full max-w-4xl mb-6 flex justify-between items-center">
         <Button variant="ghost" asChild>
-          <Link href="/solicitud">
+          <Link href="/">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Volver al Formulario
+            Volver al Inicio
           </Link>
         </Button>
         <Button asChild>
@@ -94,13 +97,17 @@ export default function EstadoSolicitudesPage() {
         </Button>
       </header>
       <main className="w-full max-w-4xl">
-        <Alert className="mb-8 border-green-500 bg-green-50 text-green-900">
-           <CheckCircle className="h-4 w-4 !text-green-500" />
-           <AlertTitle className="font-bold">¡Solicitud enviada con éxito!</AlertTitle>
-           <AlertDescription>
-             Su solicitud ha sido registrada con el folio <strong>N° {newFolio}</strong>. Puede revisar el estado de todas sus solicitudes a continuación.
-           </AlertDescription>
-        </Alert>
+        {newFolio && (
+          <div className="mb-8 p-4 bg-green-50 text-green-900 rounded-lg flex items-start space-x-3 border border-green-200">
+             <CheckCircle className="h-5 w-5 flex-shrink-0 mt-0.5 text-green-500" />
+             <div className="flex-1">
+               <h3 className="font-bold">¡Solicitud enviada con éxito!</h3>
+               <p>
+                 Su solicitud ha sido registrada con el folio <strong>N° {newFolio}</strong>. Puede revisar el estado de todas sus solicitudes a continuación.
+               </p>
+             </div>
+          </div>
+        )}
 
         <Card>
           <CardHeader>
