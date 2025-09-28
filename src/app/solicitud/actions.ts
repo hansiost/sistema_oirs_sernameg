@@ -3,6 +3,7 @@
 import { z } from 'zod';
 import { getHelpfulHintSuggestions } from '@/ai/flows/helpful-hint-suggestions';
 import { REQUEST_TYPES } from '@/lib/constants';
+import { redirect } from 'next/navigation';
 
 const HintSchema = z.object({
   requestType: z.enum(['Reclamo', 'Consulta', 'Sugerencia', 'Queja']),
@@ -103,5 +104,6 @@ export async function submitSolicitud(
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 1000));
 
-  return { message: '¡Solicitud enviada con éxito! Se ha registrado con el folio N° ' + Math.floor(Math.random() * 90000 + 10000) };
+  // Redirect to status page instead of returning a message
+  redirect('/solicitud/estado');
 }

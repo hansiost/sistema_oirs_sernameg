@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useTransition, useActionState } from 'react';
+import { useTransition, useActionState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -39,6 +40,7 @@ import { Icons } from '@/components/icons';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Label } from '@/components/ui/label';
+import { useState } from 'react';
 
 // Mocked user data from "Registro Civil"
 const mockUserData = {
@@ -82,6 +84,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function SolicitudForm() {
   const { toast } = useToast();
+  const router = useRouter();
   const [isSubmitting, startSubmitTransition] = useTransition();
 
   const form = useForm<FormValues>({
@@ -137,19 +140,12 @@ export default function SolicitudForm() {
 
       const result = await submitSolicitud(null, formData);
 
-      if (result.error) {
+      if (result?.error) {
         toast({
           title: 'Error al enviar',
           description: result.error,
           variant: 'destructive',
         });
-      }
-      if (result.message) {
-        toast({
-          title: 'Solicitud Enviada',
-          description: result.message,
-        });
-        form.reset();
       }
     });
   };
