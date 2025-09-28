@@ -10,6 +10,12 @@ import { useState } from 'react';
 export default function Home() {
   const heroImage = PlaceHolderImages.find(img => img.id === 'hero-landing');
   const [showLogin, setShowLogin] = useState(false);
+  const [loginType, setLoginType] = useState<'claveUnica' | 'rut'>('claveUnica');
+
+  const handleLoginClick = (type: 'claveUnica' | 'rut') => {
+    setLoginType(type);
+    setShowLogin(true);
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -35,17 +41,21 @@ export default function Home() {
           <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-prose mx-auto">
             Bienvenida a nuestro portal de solicitudes. Aquí puede ingresar sus reclamos, consultas, sugerencias y felicitaciones de forma segura y directa.
           </p>
-          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-            <LoginDialog open={showLogin} onOpenChange={setShowLogin}>
-              <Button onClick={() => setShowLogin(true)} size="lg" className="font-bold text-lg">
-                <Icons.Login />
-                Ingresar
-              </Button>
-            </LoginDialog>
-          </div>
+          <LoginDialog open={showLogin} onOpenChange={setShowLogin} type={loginType}>
+            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                <Button onClick={() => handleLoginClick('claveUnica')} size="lg" className="font-bold text-lg bg-blue-600 hover:bg-blue-700">
+                  <Icons.Login />
+                  Ingresar con ClaveÚnica
+                </Button>
+                <Button onClick={() => handleLoginClick('rut')} size="lg" className="font-bold text-lg" variant="secondary">
+                  <Icons.Login />
+                  Ingresar con RUT
+                </Button>
+            </div>
+          </LoginDialog>
           <div className="mt-4 text-center">
             <p className="text-xs text-muted-foreground/80">
-              Será dirigida al formulario de solicitud para completar su trámite.
+              Seleccione un método de ingreso para continuar.
             </p>
           </div>
         </div>

@@ -6,7 +6,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,13 +27,14 @@ const rutSchema = z
   );
 
 export function LoginDialog({
-  children,
   open,
   onOpenChange,
+  type = 'claveUnica'
 }: {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  type: 'claveUnica' | 'rut';
 }) {
   const router = useRouter();
   const [rut, setRut] = useState('');
@@ -55,40 +55,24 @@ export function LoginDialog({
     }
     setError('');
     setIsLoggingIn(true);
+    
     // Simulate API call
     setTimeout(() => {
-      // On successful login, redirect to status page
-      router.push('/solicitud');
+      // On successful login, redirect based on login type
+      const destination = type === 'claveUnica' ? '/solicitud' : '/solicitud/estado';
+      router.push(destination);
       setIsLoggingIn(false);
       onOpenChange(false);
     }, 1500);
   };
   
-  const handleLoginRut = (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-     const rutValidation = rutSchema.safeParse(rut);
-    if (!rutValidation.success) {
-      setError('RUT inválido para ingreso con clave registrada.');
-      return;
-    }
-    if (password.length < 4) {
-      setError('La clave es obligatoria.');
-      return;
-    }
-    setError('');
-    setIsLoggingIn(true);
-    // Simulate API call
-    setTimeout(() => {
-      // On successful login, redirect to status page
-      router.push('/solicitud/estado');
-      setIsLoggingIn(false);
-      onOpenChange(false);
-    }, 1500);
-  }
+  const title = type === 'claveUnica' ? 'Ingreso con ClaveÚnica' : 'Ingreso con RUT';
+  const buttonText = type === 'claveUnica' ? 'Ingresar con ClaveÚnica' : 'Ingresar';
+  const buttonVariant = type === 'claveUnica' ? 'default' : 'secondary';
+  const buttonClass = type === 'claveUnica' ? 'bg-blue-600 hover:bg-blue-700' : '';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="items-center text-center">
           <Image
@@ -99,10 +83,10 @@ export function LoginDialog({
             className="mb-4"
           />
           <DialogTitle className="text-2xl">
-            Iniciar sesión
+            {title}
           </DialogTitle>
           <DialogDescription>
-            Seleccione su método de ingreso.
+            Ingrese su RUT y su clave para continuar.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -131,21 +115,13 @@ export function LoginDialog({
           {error && <p className="text-sm text-destructive text-center">{error}</p>}
         </div>
         <div className='flex flex-col gap-2'>
-           <Button onClick={handleLogin} disabled={isLoggingIn} size="lg" className='bg-blue-600 hover:bg-blue-700'>
+           <Button onClick={handleLogin} disabled={isLoggingIn} size="lg" className={buttonClass} variant={buttonVariant}>
               {isLoggingIn ? (
                 <Icons.Loading className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <Icons.Login className="mr-2 h-4 w-4" />
               )}
-              Ingresar con ClaveÚnica
-            </Button>
-            <Button onClick={handleLoginRut} disabled={isLoggingIn} size="lg" variant='secondary'>
-              {isLoggingIn ? (
-                <Icons.Loading className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Icons.Login className="mr-2 h-4 w-4" />
-              )}
-              Ingresar con clave registrada
+              {buttonText}
             </Button>
         </div>
 
@@ -159,7 +135,7 @@ export function LoginDialog({
                 onClick={() => onOpenChange(false)}
               >
                 <Icons.Register className="mr-2 h-4 w-4" />
-                Regístrese aquí con su RUT
+                Regístrese aquí
               </Link>
            </Button>
         </div>
