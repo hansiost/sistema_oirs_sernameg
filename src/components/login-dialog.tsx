@@ -75,10 +75,10 @@ export function LoginDialog({
         <DialogHeader className="items-center text-center">
           {type === 'claveUnica' && (
             <Image
-              src="https://www.sernameg.gob.cl/wp-content/uploads/2018/03/logo-gob-horizontal-e1521743034336.png"
-              alt="Logo Gobierno de Chile"
+              src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Logotipo_Clave_%C3%9Anica.svg"
+              alt="Logo ClaveÚnica"
               width={180}
-              height={40}
+              height={45}
               className="mb-4"
             />
           )}
