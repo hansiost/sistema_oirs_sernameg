@@ -423,7 +423,7 @@ export default function SolicitudForm() {
                 name="oficinaRegional"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Oficina Regional *</FormLabel>
+                    <FormLabel>Oficina Regional a la que dirige la solicitud *</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
