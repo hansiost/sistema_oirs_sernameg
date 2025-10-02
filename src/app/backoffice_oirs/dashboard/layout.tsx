@@ -89,7 +89,7 @@ export default function BackofficeLayout({
       <SidebarInset>
         <header className="flex h-14 items-center justify-between gap-4 border-b bg-background px-4 lg:px-6">
              <div className="flex items-center gap-4">
-                <SidebarTrigger className="md:hidden" />
+                <SidebarTrigger />
                 <h1 className="text-lg font-semibold md:text-xl">Backoffice OIRS - SERNAMEG</h1>
              </div>
              <div className="flex items-center gap-4">

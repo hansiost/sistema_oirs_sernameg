@@ -1,6 +1,7 @@
 
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 import {
   Table,
   TableBody,
@@ -26,6 +27,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
+import { PlusCircle } from 'lucide-react';
 
 const mockSolicitudes = [
   {
@@ -168,11 +170,19 @@ export default function BackofficeDashboard() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Bandeja de Entrada de Solicitudes</CardTitle>
-        <CardDescription>
-          Aquí se muestran las últimas solicitudes ciudadanas recibidas.
-        </CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+            <CardTitle>Bandeja de Entrada de Solicitudes</CardTitle>
+            <CardDescription>
+            Aquí se muestran las últimas solicitudes ciudadanas recibidas.
+            </CardDescription>
+        </div>
+        <Button asChild>
+            <Link href="/solicitud">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Crear Solicitud
+            </Link>
+        </Button>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
