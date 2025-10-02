@@ -33,7 +33,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { X } from 'lucide-react';
+import { X, Save } from 'lucide-react';
 
 import { REQUEST_TYPES, TOPICS, REGIONES_CHILE, type RequestType } from '@/lib/constants';
 import { GENDER_OPTIONS, INDIGENOUS_PEOPLES } from '@/lib/constants-gender-ethnicity';
@@ -118,7 +118,12 @@ const formSchema = z.object({
     .min(20, 'La descripción debe tener al menos 20 caracteres.')
     .max(2000, 'La descripción no puede exceder los 2000 caracteres.'),
   attachments: z.array(fileSchema).optional()
-    .refine(files => !files || files.reduce((acc, file) => acc + file.size, 0) <= MAX_TOTAL_SIZE, `El tamaño total de los archivos no debe exceder los 25MB.`)
+    .refine(files => !files || files.reduce((acc, file) => acc + file.size, 0) <= MAX_TOTAL_SIZE, `El tamaño total de los archivos no debe exceder los 25MB.`),
+  observacionesOficina: z.string().optional(),
+  seguimientoOIRS: z.string().optional(),
+  resultadoAtencion: z.string().optional(),
+  tipoResolucion: z.string().optional(),
+  descripcionRespuesta: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -160,13 +165,17 @@ const mockUserApi = (rut: string) => {
   });
 };
 
+const RESULTADO_ATENCION_OPTIONS = ['Respuesta directa', 'Derivación a programa', 'Derivación a otra institución', 'No aplica', 'Otro'];
+const TIPO_RESOLUCION_OPTIONS = ['Resolución favorable', 'Resolución no favorable', 'Sin resolución', 'No aplica'];
+
+
 export default function SolicitudOirsForm() {
   const { toast } = useToast();
   const [isVerifying, startVerifyingTransition] = useTransition();
   const [isSubmitting, startSubmitTransition] = useTransition();
   const [userFound, setUserFound] = useState(false);
   const [rutInput, setRutInput] = useState('');
-
+  const [isRequestCreated, setIsRequestCreated] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -187,6 +196,11 @@ export default function SolicitudOirsForm() {
       subject: '',
       description: '',
       attachments: [],
+      observacionesOficina: '',
+      seguimientoOIRS: '',
+      resultadoAtencion: '',
+      tipoResolucion: '',
+      descripcionRespuesta: '',
     },
   });
   
@@ -257,6 +271,12 @@ export default function SolicitudOirsForm() {
           description: result.error,
           variant: 'destructive',
         });
+      } else if (result?.message) {
+        toast({
+          title: 'Solicitud Creada',
+          description: result.message,
+        });
+        setIsRequestCreated(true);
       }
     });
   };
@@ -557,6 +577,7 @@ export default function SolicitudOirsForm() {
                         <Select
                           onValueChange={handleRequestTypeChange}
                           defaultValue={field.value}
+                          disabled={isRequestCreated}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -590,7 +611,7 @@ export default function SolicitudOirsForm() {
                         <Select
                           onValueChange={field.onChange}
                           value={field.value}
-                          disabled={!requestType || availableTopics.length === 0}
+                          disabled={!requestType || availableTopics.length === 0 || isRequestCreated}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -619,6 +640,7 @@ export default function SolicitudOirsForm() {
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
+                          disabled={isRequestCreated}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -647,6 +669,7 @@ export default function SolicitudOirsForm() {
                         <Input
                           placeholder="Ej: Problema con atención en oficina"
                           {...field}
+                          disabled={isRequestCreated}
                         />
                       </FormControl>
                       <FormMessage />
@@ -664,6 +687,7 @@ export default function SolicitudOirsForm() {
                           placeholder="Explique aquí la situación de la forma más clara posible..."
                           className="min-h-[150px]"
                           {...field}
+                          disabled={isRequestCreated}
                         />
                       </FormControl>
                       <div className="flex justify-between items-center">
@@ -695,6 +719,7 @@ export default function SolicitudOirsForm() {
                           onBlur={onBlur}
                           name={name}
                           ref={ref}
+                          disabled={isRequestCreated}
                         />
                       </FormControl>
                       <FormDescription>
@@ -717,6 +742,7 @@ export default function SolicitudOirsForm() {
                                     newFiles.splice(index, 1);
                                     form.setValue('attachments', newFiles, { shouldValidate: true });
                                   }}
+                                  disabled={isRequestCreated}
                                 >
                                   <X className="h-4 w-4" />
                                 </Button>
@@ -735,23 +761,142 @@ export default function SolicitudOirsForm() {
               </CardContent>
             </Card>
 
-            <div className="flex justify-end">
-              <Button type="submit" size="lg" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <Icons.Loading className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Icons.Submit className="mr-2 h-4 w-4" />
-                )}
-                Enviar Solicitud
-              </Button>
-            </div>
+            {!isRequestCreated && (
+              <div className="flex justify-end">
+                <Button type="submit" size="lg" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <Icons.Loading className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Icons.Submit className="mr-2 h-4 w-4" />
+                  )}
+                  Crear Solicitud
+                </Button>
+              </div>
+            )}
+            
+            {isRequestCreated && (
+              <>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>5. Gestión de la Solicitud</CardTitle>
+                    <CardDescription>
+                      Complete los campos para gestionar y dar respuesta a la solicitud.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="observacionesOficina"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Observaciones de la Oficina Regional</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Añadir observaciones internas sobre el caso..."
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="seguimientoOIRS"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Seguimiento OIRS</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Detalle del seguimiento realizado por OIRS..."
+                              rows={4}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="grid sm:grid-cols-2 gap-4">
+                        <FormField
+                        control={form.control}
+                        name="resultadoAtencion"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Resultado de la atención</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Seleccione un resultado" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {RESULTADO_ATENCION_OPTIONS.map((option) => (
+                                    <SelectItem key={option} value={option}>
+                                    {option}
+                                    </SelectItem>
+                                ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                        <FormField
+                        control={form.control}
+                        name="tipoResolucion"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Tipo de Resolución</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Seleccione un tipo" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {TIPO_RESOLUCION_OPTIONS.map((option) => (
+                                    <SelectItem key={option} value={option}>
+                                    {option}
+                                    </SelectItem>
+                                ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                    </div>
+                     <FormField
+                      control={form.control}
+                      name="descripcionRespuesta"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Descripción de la respuesta</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Redacte aquí la respuesta final que se entregará al ciudadano..."
+                              className="min-h-[150px]"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
+                 <div className="flex justify-end">
+                    <Button type="button" size="lg" onClick={() => toast({ title: 'Gestión Guardada', description: 'Los detalles de la gestión han sido guardados.'})}>
+                        <Save className="mr-2 h-4 w-4" />
+                        Guardar Gestión
+                    </Button>
+                </div>
+              </>
+            )}
           </>
         )}
       </form>
     </Form>
   );
 }
-
-    
-
-    

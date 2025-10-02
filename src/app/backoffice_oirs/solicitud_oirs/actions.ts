@@ -111,9 +111,8 @@ export async function submitOirsSolicitud(
   
   // Here you would save and get a real ID.
   const newId = `OIRS-${Math.floor(Math.random() * 90000 + 10000)}`;
-
-  // Redirect to dashboard, maybe with a success message in the future.
-  redirect(`/backoffice_oirs/dashboard`);
+  
+  return {
+    message: `La solicitud ha sido creada con éxito con el N° ${newId}. Ya puede proceder con la gestión.`,
+  };
 }
-
-    
