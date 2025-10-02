@@ -34,12 +34,6 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
-      {
-        protocol: 'https',
-        hostname: 'www.sernameg.gob.cl',
-        port: '',
-        pathname: '/**',
-      },
     ],
   },
 };
