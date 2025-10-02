@@ -8,11 +8,10 @@ export default function RootPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
        <header className="w-full p-4 border-b flex justify-center">
-         <Image
+         <img
             src="https://www.sernameg.gob.cl/wp-content/uploads/2021/11/logo-sernameg-2021-horizontal-1.png"
             alt="Logo SERNAMEG"
-            width={200}
-            height={50}
+            style={{ width: '200px', height: 'auto' }}
           />
       </header>
       <main className="flex-grow flex items-center justify-center p-4">
