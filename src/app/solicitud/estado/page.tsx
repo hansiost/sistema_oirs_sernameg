@@ -42,7 +42,7 @@ const mockSolicitudes = [
     tipo: 'Sugerencia',
     fecha: '2024-06-28',
     descripcion: 'Sugerencia para implementar talleres de alfabetización digital para adultas mayores...',
-    estado: 'Enviada',
+    estado: 'Solicitud Enviada',
   },
   {
     folio: '96881',
@@ -68,7 +68,7 @@ const getStatusVariant = (estado: string) => {
       return 'default';
     case 'En proceso':
       return 'secondary';
-    case 'Enviada':
+    case 'Solicitud Enviada':
       return 'outline';
     default:
       return 'outline';
@@ -85,7 +85,7 @@ export default function EstadoSolicitudesPage({ searchParams }: { searchParams?:
       tipo: (searchParams.tipo as (typeof REQUEST_TYPES)[number]) || 'Consulta',
       fecha: new Date().toISOString().split('T')[0],
       descripcion: 'Nueva solicitud recién enviada...',
-      estado: 'Enviada'
+      estado: 'Solicitud Enviada'
     }
     allSolicitudes = [newRequest, ...mockSolicitudes];
   }
