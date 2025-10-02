@@ -20,8 +20,8 @@ import { Building2 } from 'lucide-react';
 
 export default function BackofficeLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('admin@sernameg.gob.cl');
+  const [password, setPassword] = useState('admin');
   const [error, setError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
@@ -66,7 +66,7 @@ export default function BackofficeLoginPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="ej: admin@sernameg.gob.cl"
+                  placeholder="admin@sernameg.gob.cl"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
