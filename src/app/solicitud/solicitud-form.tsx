@@ -1,7 +1,7 @@
 'use client';
 
 import { useTransition, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
@@ -31,6 +31,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { X } from 'lucide-react';
 
 import { REQUEST_TYPES, TOPICS, type RequestType } from '@/lib/constants';
 import { GENDER_OPTIONS, INDIGENOUS_PEOPLES } from '@/lib/constants-gender-ethnicity';
@@ -49,17 +51,28 @@ const mockUserData = {
   estadoCivil: 'Soltera',
 };
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_TOTAL_SIZE = 25 * 1024 * 1024; // 25MB
+const ALLOWED_FILE_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'audio/mpeg',
+  'audio/wav',
+  'video/mp4',
+  'video/quicktime',
+];
+
 const fileSchema = z
   .instanceof(File)
+  .refine((file) => file.size <= MAX_FILE_SIZE, `El tamaño máximo por archivo es 5MB.`)
   .refine(
-    (file) => file.size === 0 || file.type.startsWith('image/'),
-    'Solo se permiten imágenes.'
-  )
-  .refine(
-    (file) => file.size < 5 * 1024 * 1024,
-    'El archivo debe ser menor a 5MB.'
-  )
-  .optional();
+    (file) => ALLOWED_FILE_TYPES.includes(file.type),
+    'Tipo de archivo no válido. Permitidos: Imágenes, PDF, Word, Audio, Video.'
+  );
 
 const formSchema = z.object({
   calle: z.string().min(3, 'La calle es obligatoria.'),
@@ -79,7 +92,8 @@ const formSchema = z.object({
     .string()
     .min(20, 'La descripción debe tener al menos 20 caracteres.')
     .max(2000, 'La descripción no puede exceder los 2000 caracteres.'),
-  attachment: fileSchema,
+  attachments: z.array(fileSchema).optional()
+    .refine(files => !files || files.reduce((acc, file) => acc + file.size, 0) <= MAX_TOTAL_SIZE, `El tamaño total de los archivos no debe exceder los 25MB.`)
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -100,11 +114,13 @@ export default function SolicitudForm() {
       topic: '',
       subject: '',
       description: '',
+      attachments: [],
     },
   });
 
   const requestType = form.watch('requestType');
   const descriptionValue = form.watch('description');
+  const attachmentsValue = form.watch('attachments') || [];
   const [availableTopics, setAvailableTopics] = useState<string[]>([]);
   
   const handleRequestTypeChange = (value: string) => {
@@ -118,17 +134,17 @@ export default function SolicitudForm() {
     startSubmitTransition(async () => {
       const formData = new FormData();
       
-      // Append user and form data
       Object.entries(mockUserData).forEach(([key, value]) => formData.append(key, value));
       Object.entries(values).forEach(([key, value]) => {
-        if (key !== 'attachment' && value) {
+        if (key !== 'attachments' && value) {
           formData.append(key, value as string);
         }
       });
       
-      // Append file if it exists
-      if (values.attachment) {
-        formData.append('attachment', values.attachment);
+      if (values.attachments) {
+        values.attachments.forEach(file => {
+          formData.append('attachments', file);
+        });
       }
 
       const result = await submitSolicitud(null, formData);
@@ -433,34 +449,66 @@ export default function SolicitudForm() {
                    <div className="flex justify-between items-center">
                     <FormMessage />
                     <div className="text-xs text-muted-foreground ml-auto">
-                      {descriptionValue.length} / 2000
+                      {descriptionValue?.length || 0} / 2000
                     </div>
                   </div>
                 </FormItem>
               )}
             />
             
-            <FormField
+            <Controller
               control={form.control}
-              name="attachment"
-              render={({ field: { onChange, value, ...rest } }) => (
+              name="attachments"
+              render={({ field: { onChange, onBlur, name, ref }, fieldState }) => (
                 <FormItem>
-                  <FormLabel>Adjuntar Archivo (Opcional)</FormLabel>
+                  <FormLabel>Adjuntar Archivos (Opcional)</FormLabel>
                   <FormControl>
                     <Input
                       type="file"
-                      accept="image/*"
+                      multiple
+                      accept={ALLOWED_FILE_TYPES.join(',')}
                       onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        onChange(file);
+                        const files = e.target.files ? Array.from(e.target.files) : [];
+                        const currentFiles = form.getValues('attachments') || [];
+                        onChange([...currentFiles, ...files]);
                       }}
-                      {...rest}
+                      onBlur={onBlur}
+                      name={name}
+                      ref={ref}
                     />
                   </FormControl>
                   <FormDescription>
-                    Puede adjuntar una imagen (JPG, PNG) de hasta 5MB.
+                    Puede adjuntar múltiples archivos (imágenes, PDF, Word, audio, video). Tamaño máx. por archivo: 5MB. Total: 25MB.
                   </FormDescription>
-                  <FormMessage />
+                  {attachmentsValue.length > 0 && (
+                    <div className="space-y-2 mt-2">
+                      <p className="text-sm font-medium">Archivos seleccionados:</p>
+                      <ul className="list-disc pl-5 space-y-1">
+                        {attachmentsValue.map((file, index) => (
+                          <li key={index} className="text-sm flex items-center justify-between">
+                            <span>{file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 w-6 p-0"
+                              onClick={() => {
+                                const newFiles = [...attachmentsValue];
+                                newFiles.splice(index, 1);
+                                form.setValue('attachments', newFiles, { shouldValidate: true });
+                              }}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <FormMessage>{fieldState.error?.message}</FormMessage>
+                   {fieldState.error?.root?.message && (
+                     <FormMessage>{fieldState.error.root.message}</FormMessage>
+                   )}
                 </FormItem>
               )}
             />

@@ -5,10 +5,27 @@ import { REQUEST_TYPES } from '@/lib/constants';
 import { redirect } from 'next/navigation';
 import { GENDER_OPTIONS, INDIGENOUS_PEOPLES } from '@/lib/constants-gender-ethnicity';
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ALLOWED_FILE_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'audio/mpeg',
+  'audio/wav',
+  'video/mp4',
+  'video/quicktime',
+];
+
 const fileSchema = z
   .instanceof(File)
-  .refine((file) => file.size < 5 * 1024 * 1024, 'El archivo debe ser menor a 5MB.')
-  .optional();
+  .refine((file) => file.size <= MAX_FILE_SIZE, `El tamaño máximo por archivo es 5MB.`)
+  .refine(
+    (file) => ALLOWED_FILE_TYPES.includes(file.type),
+    'Tipo de archivo no válido.'
+  );
 
 const SolicitudSchema = z.object({
   rut: z.string(),
@@ -32,13 +49,16 @@ const SolicitudSchema = z.object({
     .string()
     .min(20, 'La descripción debe tener al menos 20 caracteres.')
     .max(2000, 'La descripción no puede exceder los 2000 caracteres.'),
-  attachment: fileSchema,
+  attachments: z.array(fileSchema).optional(),
 });
 
 export async function submitSolicitud(
   prevState: any,
   formData: FormData
 ): Promise<{ message?: string; error?: string }> {
+  
+  const attachments = formData.getAll('attachments') as File[];
+
   const validatedFields = SolicitudSchema.safeParse({
     rut: formData.get('rut'),
     nombres: formData.get('nombres'),
@@ -58,9 +78,9 @@ export async function submitSolicitud(
     topic: formData.get('topic'),
     subject: formData.get('subject'),
     description: formData.get('description'),
-    attachment: formData.get('attachment'),
+    attachments: attachments.filter(file => file.size > 0),
   });
-
+  
   if (!validatedFields.success) {
     console.log(validatedFields.error.flatten().fieldErrors);
     return {
@@ -72,11 +92,14 @@ export async function submitSolicitud(
   // and upload the file to a storage service.
   console.log('Solicitud Recibida:', validatedFields.data);
   
-  if (validatedFields.data.attachment && validatedFields.data.attachment.size > 0) {
-    console.log('Archivo adjunto:', {
-      name: validatedFields.data.attachment.name,
-      size: validatedFields.data.attachment.size,
-      type: validatedFields.data.attachment.type,
+  if (validatedFields.data.attachments && validatedFields.data.attachments.length > 0) {
+    console.log('Archivos adjuntos:');
+    validatedFields.data.attachments.forEach(file => {
+      console.log({
+        name: file.name,
+        size: file.size,
+        type: file.type,
+      });
     });
   }
 
