@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useTransition, useState } from 'react';
@@ -31,7 +32,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { X, Save } from 'lucide-react';
 
 import { REQUEST_TYPES, TOPICS, REGIONES_CHILE, type RequestType } from '@/lib/constants';
