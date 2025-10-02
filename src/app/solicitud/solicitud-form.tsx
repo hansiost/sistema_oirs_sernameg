@@ -104,6 +104,7 @@ export default function SolicitudForm() {
   });
 
   const requestType = form.watch('requestType');
+  const descriptionValue = form.watch('description');
   const [availableTopics, setAvailableTopics] = useState<string[]>([]);
   
   const handleRequestTypeChange = (value: string) => {
@@ -429,7 +430,12 @@ export default function SolicitudForm() {
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                   <div className="flex justify-between items-center">
+                    <FormMessage />
+                    <div className="text-xs text-muted-foreground ml-auto">
+                      {descriptionValue.length} / 2000
+                    </div>
+                  </div>
                 </FormItem>
               )}
             />

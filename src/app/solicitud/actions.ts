@@ -30,7 +30,8 @@ const SolicitudSchema = z.object({
   subject: z.string().min(5, 'El asunto debe tener al menos 5 caracteres.'),
   description: z
     .string()
-    .min(20, 'La descripción debe tener al menos 20 caracteres.'),
+    .min(20, 'La descripción debe tener al menos 20 caracteres.')
+    .max(2000, 'La descripción no puede exceder los 2000 caracteres.'),
   attachment: fileSchema,
 });
 
