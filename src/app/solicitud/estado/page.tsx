@@ -159,11 +159,11 @@ export default function EstadoSolicitudesPage({ searchParams }: { searchParams?:
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[100px]">Folio</TableHead>
-                  <TableHead>Tipo</TableHead>
+                  <TableHead className="w-[100px]">N° de Caso</TableHead>
+                  <TableHead>Tipo Solicitud</TableHead>
                   <TableHead>Fecha de Envío</TableHead>
                   <TableHead>Descripción</TableHead>
-                  <TableHead className="text-right">Estado</TableHead>
+                  <TableHead className="text-right">Estado Solicitud</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
