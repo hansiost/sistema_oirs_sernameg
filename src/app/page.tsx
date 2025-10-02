@@ -7,7 +7,7 @@ import Image from 'next/image';
 export default function RootPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
-       <header className="w-full p-4 border-b">
+       <header className="w-full p-4 border-b flex justify-center">
          <Image
             src="https://www.sernameg.gob.cl/wp-content/uploads/2021/11/logo-sernameg-2021-horizontal-1.png"
             alt="Logo SERNAMEG"
