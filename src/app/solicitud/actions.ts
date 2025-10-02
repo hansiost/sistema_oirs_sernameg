@@ -3,6 +3,7 @@
 import { z } from 'zod';
 import { REQUEST_TYPES } from '@/lib/constants';
 import { redirect } from 'next/navigation';
+import { GENDER_OPTIONS, INDIGENOUS_PEOPLES } from '@/lib/constants-gender-ethnicity';
 
 const fileSchema = z
   .instanceof(File)
@@ -14,12 +15,16 @@ const SolicitudSchema = z.object({
   nombres: z.string(),
   apellidoPaterno: z.string(),
   apellidoMaterno: z.string(),
+  sexo: z.string(),
+  estadoCivil: z.string(),
   calle: z.string().min(1, 'La calle es obligatoria.'),
   numero: z.string().min(1, 'El número es obligatorio.'),
   comuna: z.string().min(1, 'La comuna es obligatoria.'),
   region: z.string().min(1, 'La región es obligatoria.'),
   telefono: z.string().min(8, 'El teléfono es obligatorio.'),
   email: z.string().email('El e-mail no es válido.'),
+  genero: z.enum(GENDER_OPTIONS, { required_error: 'Debe seleccionar un género.' }),
+  puebloOriginario: z.enum(INDIGENOUS_PEOPLES, { required_error: 'Debe seleccionar una opción.' }),
   requestType: z.enum(REQUEST_TYPES),
   topic: z.string().min(1, 'Debe seleccionar un tema.'),
   description: z
@@ -37,12 +42,16 @@ export async function submitSolicitud(
     nombres: formData.get('nombres'),
     apellidoPaterno: formData.get('apellidoPaterno'),
     apellidoMaterno: formData.get('apellidoMaterno'),
+    sexo: formData.get('sexo'),
+    estadoCivil: formData.get('estadoCivil'),
     calle: formData.get('calle'),
     numero: formData.get('numero'),
     comuna: formData.get('comuna'),
     region: formData.get('region'),
     telefono: formData.get('telefono'),
     email: formData.get('email'),
+    genero: formData.get('genero'),
+    puebloOriginario: formData.get('puebloOriginario'),
     requestType: formData.get('requestType'),
     topic: formData.get('topic'),
     description: formData.get('description'),

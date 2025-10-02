@@ -4,7 +4,6 @@ import { useTransition, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -34,6 +33,7 @@ import {
 } from '@/components/ui/card';
 
 import { REQUEST_TYPES, TOPICS, type RequestType } from '@/lib/constants';
+import { GENDER_OPTIONS, INDIGENOUS_PEOPLES } from '@/lib/constants-gender-ethnicity';
 import { submitSolicitud } from './actions';
 import { Icons } from '@/components/icons';
 import { useToast } from '@/hooks/use-toast';
@@ -45,6 +45,8 @@ const mockUserData = {
   nombres: 'Juana Andrea',
   apellidoPaterno: 'Pérez',
   apellidoMaterno: 'González',
+  sexo: 'Mujer',
+  estadoCivil: 'Soltera',
 };
 
 const fileSchema = z
@@ -66,6 +68,8 @@ const formSchema = z.object({
   region: z.string().min(3, 'La región es obligatoria.'),
   telefono: z.string().min(9, 'El teléfono debe tener al menos 9 dígitos.'),
   email: z.string().email('El e-mail no es válido.'),
+  genero: z.enum(GENDER_OPTIONS, { required_error: 'Debe seleccionar un género.' }),
+  puebloOriginario: z.enum(INDIGENOUS_PEOPLES, { required_error: 'Debe seleccionar una opción.' }),
   requestType: z.enum(REQUEST_TYPES, {
     required_error: 'Debe seleccionar un tipo de solicitud.',
   }),
@@ -115,7 +119,7 @@ export default function SolicitudForm() {
       Object.entries(mockUserData).forEach(([key, value]) => formData.append(key, value));
       Object.entries(values).forEach(([key, value]) => {
         if (key !== 'attachment' && value) {
-          formData.append(key, value);
+          formData.append(key, value as string);
         }
       });
       
@@ -143,11 +147,10 @@ export default function SolicitudForm() {
           <CardHeader>
             <CardTitle>1. Datos Personales</CardTitle>
             <CardDescription>
-              Esta información es obtenida del Registro Civil y no puede ser
-              modificada.
+              Revise su información personal. Los campos con * son editables.
             </CardDescription>
           </CardHeader>
-          <CardContent className="grid sm:grid-cols-2 gap-4">
+          <CardContent className="grid sm:grid-cols-2 gap-x-4 gap-y-6">
             <div className="space-y-1">
               <Label>RUT</Label>
               <Input value={mockUserData.rut} disabled />
@@ -164,6 +167,68 @@ export default function SolicitudForm() {
               <Label>Apellido Materno</Label>
               <Input value={mockUserData.apellidoMaterno} disabled />
             </div>
+             <div className="space-y-1">
+              <Label>Sexo</Label>
+              <Input value={mockUserData.sexo} disabled />
+            </div>
+            <div className="space-y-1">
+              <Label>Estado Civil</Label>
+              <Input value={mockUserData.estadoCivil} disabled />
+            </div>
+            <FormField
+              control={form.control}
+              name="genero"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Género *</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccione su género" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {GENDER_OPTIONS.map((gender) => (
+                        <SelectItem key={gender} value={gender}>
+                          {gender}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="puebloOriginario"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Pueblo Originario *</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccione una opción" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {INDIGENOUS_PEOPLES.map((people) => (
+                        <SelectItem key={people} value={people}>
+                          {people}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </CardContent>
         </Card>
 
@@ -171,7 +236,7 @@ export default function SolicitudForm() {
           <CardHeader>
             <CardTitle>2. Datos de Contacto</CardTitle>
             <CardDescription>
-              Por favor, complete su información de contacto.
+              Por favor, complete su información de contacto. Todos los campos son obligatorios.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -181,7 +246,7 @@ export default function SolicitudForm() {
                 name="calle"
                 render={({ field }) => (
                   <FormItem className="sm:col-span-2">
-                    <FormLabel>Calle *</FormLabel>
+                    <FormLabel>Calle</FormLabel>
                     <FormControl>
                       <Input placeholder="Ej: Av. Libertador" {...field} />
                     </FormControl>
@@ -194,7 +259,7 @@ export default function SolicitudForm() {
                 name="numero"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Número *</FormLabel>
+                    <FormLabel>Número</FormLabel>
                     <FormControl>
                       <Input placeholder="Ej: 123" {...field} />
                     </FormControl>
@@ -209,7 +274,7 @@ export default function SolicitudForm() {
                 name="comuna"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Comuna *</FormLabel>
+                    <FormLabel>Comuna</FormLabel>
                     <FormControl>
                       <Input placeholder="Ej: Santiago" {...field} />
                     </FormControl>
@@ -222,7 +287,7 @@ export default function SolicitudForm() {
                 name="region"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Región *</FormLabel>
+                    <FormLabel>Región</FormLabel>
                     <FormControl>
                       <Input placeholder="Ej: Metropolitana" {...field} />
                     </FormControl>
@@ -237,7 +302,7 @@ export default function SolicitudForm() {
                 name="telefono"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Teléfono *</FormLabel>
+                    <FormLabel>Teléfono</FormLabel>
                     <FormControl>
                       <Input placeholder="+56 9 1234 5678" {...field} />
                     </FormControl>
@@ -250,7 +315,7 @@ export default function SolicitudForm() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>E-mail *</FormLabel>
+                    <FormLabel>E-mail</FormLabel>
                     <FormControl>
                       <Input placeholder="juana.perez@email.com" {...field} />
                     </FormControl>
