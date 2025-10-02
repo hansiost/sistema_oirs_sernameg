@@ -3,15 +3,13 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function RootPage() {
-  const heroImage = PlaceHolderImages.find(img => img.id === 'hero-landing');
   return (
     <div className="flex flex-col min-h-screen bg-background">
        <header className="w-full p-4 border-b flex justify-center">
          <Image
-            src={heroImage?.imageUrl || "https://www.sernameg.gob.cl/wp-content/uploads/2021/11/logo-sernameg-2021-horizontal-1.png"}
+            src="https://sgp.sernameg.gob.cl/images/fondo-login/logo_sernameg.jpg"
             alt="Logo SERNAMEG"
             width={200}
             height={48}
