@@ -34,7 +34,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
 
-import { REQUEST_TYPES, TOPICS, type RequestType } from '@/lib/constants';
+import { REQUEST_TYPES, TOPICS, REGIONES_CHILE, type RequestType } from '@/lib/constants';
 import { GENDER_OPTIONS, INDIGENOUS_PEOPLES } from '@/lib/constants-gender-ethnicity';
 import { submitSolicitud } from './actions';
 import { Icons } from '@/components/icons';
@@ -86,6 +86,7 @@ const formSchema = z.object({
   requestType: z.enum(REQUEST_TYPES, {
     required_error: 'Debe seleccionar un tipo de solicitud.',
   }),
+  oficinaRegional: z.enum(REGIONES_CHILE, { required_error: 'Debe seleccionar una oficina regional.' }),
   topic: z.string().min(1, 'Debe seleccionar un tema específico.'),
   subject: z.string().min(5, 'El asunto debe tener al menos 5 caracteres.'),
   description: z
@@ -417,6 +418,33 @@ export default function SolicitudForm() {
                 )}
               />
             </div>
+            <FormField
+                control={form.control}
+                name="oficinaRegional"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Oficina Regional *</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccione la oficina regional" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {REGIONES_CHILE.map((region) => (
+                          <SelectItem key={region} value={region}>
+                            {region}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
              <FormField
               control={form.control}
               name="subject"
