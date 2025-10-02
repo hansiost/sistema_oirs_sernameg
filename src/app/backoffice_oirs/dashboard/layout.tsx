@@ -74,16 +74,7 @@ export default function BackofficeLayout({
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
-           <SidebarMenu>
-             <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Cerrar Sesión">
-                    <Link href="/backoffice_oirs">
-                        <LogOut />
-                        <span>Cerrar Sesión</span>
-                    </Link>
-                </SidebarMenuButton>
-             </SidebarMenuItem>
-           </SidebarMenu>
+           {/* El botón de cerrar sesión se ha movido al menú de usuario */}
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>

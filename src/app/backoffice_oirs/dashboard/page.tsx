@@ -1,6 +1,6 @@
 
 'use client';
-import { useState } from 'react';
+import { useState, useMemo, ChangeEvent } from 'react';
 import Link from 'next/link';
 import {
   Table,
@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Card,
   CardContent,
@@ -27,9 +28,21 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, ArrowUpDown } from 'lucide-react';
 
-const mockSolicitudes = [
+type Solicitud = {
+    id: string;
+    fechaEnvio: string;
+    tipo: string;
+    tema: string;
+    oficina: string;
+    ciudadano: string;
+    estado: string;
+    fechaRespuesta: string | null;
+    tiempoRestante: string;
+}
+
+const mockSolicitudes: Solicitud[] = [
   {
     id: 'AB-12345',
     fechaEnvio: '2024-07-28',
@@ -144,6 +157,11 @@ const mockSolicitudes = [
 
 const ITEMS_PER_PAGE = 10;
 
+type SortConfig = {
+  key: keyof Solicitud;
+  direction: 'ascending' | 'descending';
+} | null;
+
 const getStatusVariant = (estado: string) => {
   if (estado.includes('Urgente')) return 'destructive';
   if (estado === 'Ingresada') return 'outline';
@@ -153,18 +171,63 @@ const getStatusVariant = (estado: string) => {
 };
 
 const formatDate = (dateString: string | null) => {
-  if (!dateString) return '-';
-  const [year, month, day] = dateString.split('-');
-  return `${day}-${month}-${year}`;
+    if (!dateString) return '-';
+    // Check if the date string is in 'YYYY-MM-DD' format
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
+    const [year, month, day] = dateString.split('-');
+    return `${day}-${month}-${year}`;
 };
+
 
 export default function BackofficeDashboard() {
     const [currentPage, setCurrentPage] = useState(1);
+    const [filters, setFilters] = useState<Partial<Record<keyof Solicitud, string>>>({});
+    const [sortConfig, setSortConfig] = useState<SortConfig>(null);
 
-    const totalPages = Math.ceil(mockSolicitudes.length / ITEMS_PER_PAGE);
+    const handleFilterChange = (e: ChangeEvent<HTMLInputElement>, key: keyof Solicitud) => {
+        setFilters(prev => ({...prev, [key]: e.target.value }));
+        setCurrentPage(1);
+    };
+
+    const requestSort = (key: keyof Solicitud) => {
+        let direction: 'ascending' | 'descending' = 'ascending';
+        if (sortConfig && sortConfig.key === key && sortConfig.direction === 'ascending') {
+            direction = 'descending';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const filteredSolicitudes = useMemo(() => {
+        let filtered = [...mockSolicitudes];
+
+        Object.entries(filters).forEach(([key, value]) => {
+            if (value) {
+                filtered = filtered.filter(solicitud => {
+                    const solValue = solicitud[key as keyof Solicitud];
+                    return solValue?.toString().toLowerCase().includes(value.toLowerCase());
+                });
+            }
+        });
+        
+        if (sortConfig !== null) {
+            filtered.sort((a, b) => {
+                if (a[sortConfig.key]! < b[sortConfig.key]!) {
+                    return sortConfig.direction === 'ascending' ? -1 : 1;
+                }
+                if (a[sortConfig.key]! > b[sortConfig.key]!) {
+                    return sortConfig.direction === 'ascending' ? 1 : -1;
+                }
+                return 0;
+            });
+        }
+
+        return filtered;
+    }, [filters, sortConfig]);
+
+    const totalPages = Math.ceil(filteredSolicitudes.length / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
-    const currentSolicitudes = mockSolicitudes.slice(startIndex, endIndex);
+    const currentSolicitudes = filteredSolicitudes.slice(startIndex, endIndex);
 
     const handlePreviousPage = () => {
         setCurrentPage((prev) => Math.max(prev - 1, 1));
@@ -173,6 +236,32 @@ export default function BackofficeDashboard() {
     const handleNextPage = () => {
         setCurrentPage((prev) => Math.min(prev + 1, totalPages));
     };
+
+    const renderHeaderWithSort = (key: keyof Solicitud, label: string) => (
+        <TableHead>
+            <Button variant="ghost" onClick={() => requestSort(key)}>
+                {label}
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+            <Input
+                placeholder={`Filtrar ${label}...`}
+                value={filters[key] || ''}
+                onChange={(e) => handleFilterChange(e, key)}
+                className="mt-1 h-8"
+            />
+        </TableHead>
+    );
+     const renderHeader = (key: keyof Solicitud, label: string) => (
+        <TableHead>
+            {label}
+            <Input
+                placeholder={`Filtrar ${label}...`}
+                value={filters[key] || ''}
+                onChange={(e) => handleFilterChange(e, key)}
+                className="mt-1 h-8"
+            />
+        </TableHead>
+    );
 
   return (
     <Card>
@@ -195,20 +284,20 @@ export default function BackofficeDashboard() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>N° Solicitud</TableHead>
-                <TableHead>Fecha envío</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Tema</TableHead>
-                <TableHead>Oficina Regional</TableHead>
-                <TableHead>Nombre Ciudadano</TableHead>
-                <TableHead>Estado</TableHead>
+                {renderHeaderWithSort('id', 'N° Solicitud')}
+                {renderHeaderWithSort('fechaEnvio', 'Fecha envío')}
+                {renderHeader('tipo', 'Tipo')}
+                {renderHeader('tema', 'Tema')}
+                {renderHeader('oficina', 'Oficina Regional')}
+                {renderHeader('ciudadano', 'Nombre Ciudadano')}
+                {renderHeader('estado', 'Estado')}
                 <TableHead>Fecha Respuesta</TableHead>
                 <TableHead>Tiempo Restante</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {currentSolicitudes.map((solicitud) => (
-                <TableRow key={solicitud.id}>
+                <TableRow key={solicitud.id} className="text-sm">
                   <TableCell className="font-medium">{solicitud.id}</TableCell>
                   <TableCell>{formatDate(solicitud.fechaEnvio)}</TableCell>
                   <TableCell>{solicitud.tipo}</TableCell>
@@ -231,7 +320,7 @@ export default function BackofficeDashboard() {
        <CardFooter>
         <div className="flex justify-between w-full items-center">
             <div className="text-xs text-muted-foreground">
-                Página {currentPage} de {totalPages}
+                Mostrando {currentSolicitudes.length} de {filteredSolicitudes.length} solicitudes. Página {currentPage} de {totalPages}.
             </div>
             <Pagination>
                 <PaginationContent>
@@ -248,3 +337,4 @@ export default function BackofficeDashboard() {
     </Card>
   );
 }
+
