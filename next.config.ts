@@ -34,12 +34,6 @@ const nextConfig: NextConfig = {
         hostname: 'upload.wikimedia.org',
         port: '',
         pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'sgp.sernameg.gob.cl',
-        port: '',
-        pathname: '/**',
       }
     ],
   },
