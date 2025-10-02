@@ -33,11 +33,8 @@ export default function BackofficeLoginPage() {
     // Simulate API call for backoffice login
     setTimeout(() => {
       if (email === 'admin@sernameg.gob.cl' && password === 'admin') {
-        // On successful login, you would redirect to the backoffice dashboard
-        // For now, let's just log it and reset.
-        console.log('Backoffice login successful');
-        // router.push('/backoffice_oirs/dashboard');
-        alert('Inicio de sesión de Backoffice exitoso (simulado).');
+        // On successful login, redirect to the backoffice dashboard
+        router.push('/backoffice_oirs/dashboard');
       } else {
         setError('Usuario o clave incorrectos.');
       }
