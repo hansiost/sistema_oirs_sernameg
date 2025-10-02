@@ -1,71 +1,64 @@
-'use client';
 
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { ArrowRight, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
-import { Icons } from '@/components/icons';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { LoginDialog } from '@/components/login-dialog';
-import { useState } from 'react';
 
-export default function Home() {
-  const heroImage = PlaceHolderImages.find(img => img.id === 'hero-landing');
-  const [showLogin, setShowLogin] = useState(false);
-  const [loginType, setLoginType] = useState<'claveUnica' | 'rut'>('claveUnica');
-
-  const handleLoginClick = (type: 'claveUnica' | 'rut') => {
-    setLoginType(type);
-    setShowLogin(true);
-  };
-
+export default function RootPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <header className="relative w-full h-64 md:h-80">
-        {heroImage && (
-           <Image
-            src={heroImage.imageUrl}
-            alt={heroImage.description}
-            fill
-            style={{ objectFit: 'cover' }}
-            priority
-            data-ai-hint={heroImage.imageHint}
+       <header className="w-full p-4 border-b">
+         <Image
+            src="https://www.sernameg.gob.cl/wp-content/uploads/2021/11/logo-sernameg-2021-horizontal-1.png"
+            alt="Logo SERNAMEG"
+            width={200}
+            height={50}
           />
-        )}
-        <div className="absolute inset-0 bg-primary/30" />
       </header>
-
-      <main className="flex-grow w-full max-w-4xl mx-auto px-4 py-8 md:py-12 -mt-24 z-10">
-        <div className="bg-background/80 backdrop-blur-sm p-6 md:p-8 rounded-xl shadow-lg text-center flex flex-col items-center">
-          <h1 className="font-headline text-4xl md:text-5xl font-bold text-primary leading-tight">
-            Portal Ciudadano SERNAMEG
-          </h1>
-          <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-prose mx-auto">
-            Bienvenida a nuestro portal de solicitudes. Aquí puede ingresar sus reclamos, consultas, sugerencias y felicitaciones de forma segura y directa.
-          </p>
-          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-              <Button onClick={() => handleLoginClick('claveUnica')} size="lg" className="font-bold text-lg bg-blue-600 hover:bg-blue-700">
-                <Icons.Login />
-                Ingresar con ClaveÚnica
-              </Button>
-              <Button onClick={() => handleLoginClick('rut')} size="lg" className="font-bold text-lg" variant="secondary">
-                <Icons.Login />
-                Ingresar con RUT
-              </Button>
-          </div>
-          <div className="mt-4 text-center">
-            <p className="text-xs text-muted-foreground/80">
-              Seleccione un método de ingreso para continuar.
+      <main className="flex-grow flex items-center justify-center p-4">
+        <div className="w-full max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h1 className="font-headline text-5xl md:text-6xl font-bold text-primary leading-tight">
+              Bienvenidas y Bienvenidos
+            </h1>
+            <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+              Seleccione el portal al que desea ingresar.
             </p>
           </div>
-          <div className="mt-6 text-center border-t border-border pt-4 max-w-2xl mx-auto">
-            <p className="text-sm text-muted-foreground">
-              Si eres de nacionalidad extranjera y no posees RUT chileno, puedes revisar la página Web de las Oficinas de Información, Reclamos y Sugerencias de SERNAMEG acá: <a href="https://www.sernameg.gob.cl/oirs/" className="text-primary underline hover:text-primary/80" target="_blank" rel="noopener noreferrer">https://www.sernameg.gob.cl/oirs/</a>.
-            </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="border rounded-lg p-8 flex flex-col items-center text-center shadow-lg transition-transform hover:scale-105">
+               <div className="bg-primary/10 p-4 rounded-full mb-4">
+                 <ArrowRight className="h-10 w-10 text-primary" />
+              </div>
+              <h2 className="text-3xl font-bold font-headline text-primary mb-4">Portal Ciudadano</h2>
+              <p className="text-muted-foreground mb-6">
+                Para ingresar reclamos, consultas, sugerencias y felicitaciones de forma segura y directa.
+              </p>
+              <Button asChild size="lg" className="w-full font-bold text-lg">
+                <Link href="/portal_ciudadano">
+                  Ingresar al Portal
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+            </div>
+            <div className="border rounded-lg p-8 flex flex-col items-center text-center shadow-lg transition-transform hover:scale-105">
+               <div className="bg-accent/10 p-4 rounded-full mb-4">
+                <ShieldCheck className="h-10 w-10 text-accent" />
+              </div>
+              <h2 className="text-3xl font-bold font-headline text-accent mb-4">Backoffice OIRS</h2>
+              <p className="text-muted-foreground mb-6">
+                Para la gestión interna de solicitudes, casos y estadísticas por parte de funcionarios/as.
+              </p>
+              <Button asChild size="lg" className="w-full font-bold text-lg" variant="outline">
+                <Link href="/backoffice_oirs">
+                  Ingresar al Backoffice
+                   <ShieldCheck className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </main>
-
-      <LoginDialog open={showLogin} onOpenChange={setShowLogin} type={loginType} />
-
       <footer className="w-full text-center p-6 text-sm text-muted-foreground">
         <p>© 2025 SERNAMEG. Todos los derechos reservados.</p>
       </footer>

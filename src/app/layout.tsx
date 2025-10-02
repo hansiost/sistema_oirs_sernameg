@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'SERNAMEG Ciudadano',
+  title: 'SERNAMEG',
   description: 'Portal de solicitudes para el Servicio Nacional de la Mujer y la Equidad de Género',
 };
 

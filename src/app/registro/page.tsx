@@ -9,7 +9,7 @@ export default function RegistroPage() {
     <div className="w-full min-h-screen flex flex-col items-center bg-background py-8 px-4">
       <header className="w-full max-w-4xl mb-6">
         <Button variant="ghost" asChild>
-          <Link href="/">
+          <Link href="/portal_ciudadano">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Volver al Inicio
           </Link>
