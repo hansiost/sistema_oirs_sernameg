@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useTransition, useState } from 'react';
@@ -235,7 +236,7 @@ export default function SolicitudOirsForm() {
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Seleccione una opción" />
-                      </Trigger>
+                      </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       {INDIGENOUS_PEOPLES.map((people) => (
@@ -557,3 +558,5 @@ export default function SolicitudOirsForm() {
     </Form>
   );
 }
+
+    
