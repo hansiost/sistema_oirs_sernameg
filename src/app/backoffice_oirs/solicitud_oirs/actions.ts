@@ -29,10 +29,10 @@ const fileSchema = z
   );
 
 const SolicitudSchema = z.object({
-  rut: z.string(),
-  nombres: z.string(),
-  apellidoPaterno: z.string(),
-  apellidoMaterno: z.string(),
+  rut: z.string().min(1, 'El RUT es obligatorio.'),
+  nombres: z.string().min(1, 'Los nombres son obligatorios.'),
+  apellidoPaterno: z.string().min(1, 'El apellido paterno es obligatorio.'),
+  apellidoMaterno: z.string().min(1, 'El apellido materno es obligatorio.'),
   sexo: z.string(),
   estadoCivil: z.string(),
   calle: z.string().min(1, 'La calle es obligatoria.'),
@@ -115,3 +115,5 @@ export async function submitOirsSolicitud(
   // Redirect to dashboard, maybe with a success message in the future.
   redirect(`/backoffice_oirs/dashboard`);
 }
+
+    

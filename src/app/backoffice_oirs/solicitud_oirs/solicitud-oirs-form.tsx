@@ -42,14 +42,31 @@ import { Icons } from '@/components/icons';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
 
-// Mocked user data from "Registro Civil"
-const mockUserData = {
-  rut: '12.345.678-9',
-  nombres: 'Juana Andrea',
-  apellidoPaterno: 'Pérez',
-  apellidoMaterno: 'González',
-  sexo: 'Mujer',
-  estadoCivil: 'Soltera',
+// --- Validation Schemas ---
+const cleanRut = (rut: string) => rut.replace(/[^0-9kK]/g, '').toUpperCase();
+
+const rutSchema = z
+  .string()
+  .min(8, 'El RUT debe tener al menos 8 caracteres.')
+  .refine(
+    (value) => {
+      const cleaned = cleanRut(value);
+      if (cleaned.length < 2) return false;
+      const body = cleaned.slice(0, -1);
+      const dv = cleaned.slice(-1);
+      if (!/^[0-9]+$/.test(body)) return false;
+      return /^[0-9K]$/.test(dv);
+    },
+    'Formato de RUT no válido (ej: 12.345.678-9).'
+  );
+
+const formatRut = (rut: string) => {
+  const cleaned = cleanRut(rut);
+  if (cleaned.length < 2) return cleaned;
+  const body = cleaned.slice(0, -1);
+  const dv = cleaned.slice(-1);
+  let formattedBody = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return `${formattedBody}-${dv}`;
 };
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -76,6 +93,12 @@ const fileSchema = z
   );
 
 const formSchema = z.object({
+  rut: z.string(),
+  nombres: z.string(),
+  apellidoPaterno: z.string(),
+  apellidoMaterno: z.string(),
+  sexo: z.string(),
+  estadoCivil: z.string(),
   calle: z.string().min(3, 'La calle es obligatoria.'),
   numero: z.string().min(1, 'El número es obligatorio.'),
   comuna: z.string().min(3, 'La comuna es obligatoria.'),
@@ -100,13 +123,60 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+// Mocked user data from "Registro Civil"
+const mockUserApi = (rut: string) => {
+  return new Promise<{
+    rut: string;
+    nombres: string;
+    apellidoPaterno: string;
+    apellidoMaterno: string;
+    sexo: string;
+    estadoCivil: string;
+  } | null>((resolve) => {
+    setTimeout(() => {
+      const cleanedRut = cleanRut(rut);
+      if (cleanedRut.startsWith('12345678')) {
+        resolve({
+          rut: formatRut(rut),
+          nombres: 'Juana Andrea',
+          apellidoPaterno: 'Pérez',
+          apellidoMaterno: 'González',
+          sexo: 'Mujer',
+          estadoCivil: 'Soltera',
+        });
+      } else if (cleanedRut.startsWith('11478406')) {
+        resolve({
+          rut: formatRut(rut),
+          nombres: 'Ana María',
+          apellidoPaterno: 'López',
+          apellidoMaterno: 'Soto',
+          sexo: 'Mujer',
+          estadoCivil: 'Casada',
+        });
+      } else {
+        resolve(null);
+      }
+    }, 1000);
+  });
+};
+
 export default function SolicitudOirsForm() {
   const { toast } = useToast();
+  const [isVerifying, startVerifyingTransition] = useTransition();
   const [isSubmitting, startSubmitTransition] = useTransition();
+  const [userFound, setUserFound] = useState(false);
+  const [rutInput, setRutInput] = useState('');
+
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      rut: '',
+      nombres: '',
+      apellidoPaterno: '',
+      apellidoMaterno: '',
+      sexo: '',
+      estadoCivil: '',
       calle: '',
       numero: '',
       comuna: '',
@@ -119,6 +189,37 @@ export default function SolicitudOirsForm() {
       attachments: [],
     },
   });
+  
+  const handleVerificarRut = () => {
+    const result = rutSchema.safeParse(rutInput);
+    if (!result.success) {
+      form.setError('rut', { type: 'manual', message: result.error.flatten().fieldErrors._errors?.[0] || 'RUT inválido.' });
+      return;
+    }
+    form.clearErrors('rut');
+
+    startVerifyingTransition(async () => {
+      const userData = await mockUserApi(result.data);
+      if (userData) {
+        Object.entries(userData).forEach(([key, value]) => {
+          form.setValue(key as keyof FormValues, value);
+        });
+        setRutInput(userData.rut);
+        setUserFound(true);
+        toast({
+          title: 'Ciudadano Encontrado',
+          description: 'Los datos personales han sido cargados. Complete el resto del formulario.',
+        });
+      } else {
+        toast({
+          title: 'Ciudadano No Encontrado',
+          description: 'No se encontró un usuario con el RUT proporcionado.',
+          variant: 'destructive',
+        });
+        setUserFound(false);
+      }
+    });
+  };
 
   const requestType = form.watch('requestType');
   const descriptionValue = form.watch('description');
@@ -136,7 +237,6 @@ export default function SolicitudOirsForm() {
     startSubmitTransition(async () => {
       const formData = new FormData();
       
-      Object.entries(mockUserData).forEach(([key, value]) => formData.append(key, value));
       Object.entries(values).forEach(([key, value]) => {
         if (key !== 'attachments' && value) {
           formData.append(key, value as string);
@@ -160,403 +260,498 @@ export default function SolicitudOirsForm() {
       }
     });
   };
+  
+  const formError = form.formState.errors.rut;
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <Card>
           <CardHeader>
-            <CardTitle>1. Datos Personales</CardTitle>
+            <CardTitle>1. Identificación del Ciudadano</CardTitle>
             <CardDescription>
-              Revise su información personal. Los campos con * son editables.
+              Ingrese el RUT del ciudadano para buscar y autocompletar sus datos.
             </CardDescription>
           </CardHeader>
-          <CardContent className="grid sm:grid-cols-2 gap-x-4 gap-y-6">
-            <div className="space-y-1">
-              <Label>RUT</Label>
-              <Input value={mockUserData.rut} disabled />
-            </div>
-            <div className="space-y-1">
-              <Label>Nombres</Label>
-              <Input value={mockUserData.nombres} disabled />
-            </div>
-            <div className="space-y-1">
-              <Label>Apellido Paterno</Label>
-              <Input value={mockUserData.apellidoPaterno} disabled />
-            </div>
-            <div className="space-y-1">
-              <Label>Apellido Materno</Label>
-              <Input value={mockUserData.apellidoMaterno} disabled />
-            </div>
-             <div className="space-y-1">
-              <Label>Sexo</Label>
-              <Input value={mockUserData.sexo} disabled />
-            </div>
-            <div className="space-y-1">
-              <Label>Estado Civil</Label>
-              <Input value={mockUserData.estadoCivil} disabled />
-            </div>
-            <FormField
-              control={form.control}
-              name="genero"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Género *</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Seleccione su género" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {GENDER_OPTIONS.map((gender) => (
-                        <SelectItem key={gender} value={gender}>
-                          {gender}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="puebloOriginario"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Pueblo Originario *</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Seleccione una opción" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {INDIGENOUS_PEOPLES.map((people) => (
-                        <SelectItem key={people} value={people}>
-                          {people}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>2. Datos de Contacto</CardTitle>
-            <CardDescription>
-              Por favor, complete su información de contacto. Todos los campos son obligatorios.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid sm:grid-cols-3 gap-4">
-              <FormField
-                control={form.control}
-                name="calle"
-                render={({ field }) => (
-                  <FormItem className="sm:col-span-2">
-                    <FormLabel>Calle</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ej: Av. Libertador" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="numero"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Número</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ej: 123" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="comuna"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Comuna</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ej: Santiago" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="region"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Región</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ej: Metropolitana" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="telefono"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Teléfono</FormLabel>
-                    <FormControl>
-                      <Input placeholder="+56 9 1234 5678" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>E-mail</FormLabel>
-                    <FormControl>
-                      <Input placeholder="juana.perez@email.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>3. Detalle de la Solicitud</CardTitle>
-            <CardDescription>
-              Seleccione el tipo de solicitud y describa su requerimiento.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid sm:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="requestType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tipo de Solicitud *</FormLabel>
-                    <Select
-                      onValueChange={handleRequestTypeChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccione un tipo" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {REQUEST_TYPES.map((type) => (
-                          <SelectItem key={type} value={type}>
-                            <div className="flex items-center gap-2">
-                               {(() => {
-                                const Icon = Icons[type as keyof typeof Icons];
-                                return Icon ? <Icon className="h-4 w-4 text-muted-foreground" /> : null;
-                               })()}
-                               <span>{type}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="topic"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tema Específico *</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      disabled={!requestType || availableTopics.length === 0}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccione un tema" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {availableTopics.map((topic) => (
-                          <SelectItem key={topic} value={topic}>
-                            {topic}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <FormField
-                control={form.control}
-                name="oficinaRegional"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Oficina Regional a la que dirige la solicitud *</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccione la oficina regional" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {REGIONES_CHILE.map((region) => (
-                          <SelectItem key={region} value={region}>
-                            {region}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-             <FormField
-              control={form.control}
-              name="subject"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Asunto o título *</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Ej: Problema con atención en oficina"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Descripción de la solicitud *</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Explique aquí su situación de la forma más clara posible..."
-                      className="min-h-[150px]"
-                      {...field}
-                    />
-                  </FormControl>
-                   <div className="flex justify-between items-center">
-                    <FormMessage />
-                    <div className="text-xs text-muted-foreground ml-auto">
-                      {descriptionValue?.length || 0} / 2000
-                    </div>
-                  </div>
-                </FormItem>
-              )}
-            />
-            
-            <Controller
-              control={form.control}
-              name="attachments"
-              render={({ field: { onChange, onBlur, name, ref }, fieldState }) => (
-                <FormItem>
-                  <FormLabel>Adjuntar Archivos (Opcional)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="file"
-                      multiple
-                      accept={ALLOWED_FILE_TYPES.join(',')}
-                      onChange={(e) => {
-                        const files = e.target.files ? Array.from(e.target.files) : [];
-                        const currentFiles = form.getValues('attachments') || [];
-                        onChange([...currentFiles, ...files]);
-                      }}
-                      onBlur={onBlur}
-                      name={name}
-                      ref={ref}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Puede adjuntar múltiples archivos (imágenes, PDF, Word, audio, video). Tamaño máx. por archivo: 5MB. Total: 25MB.
-                  </FormDescription>
-                  {attachmentsValue.length > 0 && (
-                    <div className="space-y-2 mt-2">
-                      <p className="text-sm font-medium">Archivos seleccionados:</p>
-                      <ul className="list-disc pl-5 space-y-1">
-                        {attachmentsValue.map((file, index) => (
-                          <li key={index} className="text-sm flex items-center justify-between">
-                            <span>{file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              className="h-6 w-6 p-0"
-                              onClick={() => {
-                                const newFiles = [...attachmentsValue];
-                                newFiles.splice(index, 1);
-                                form.setValue('attachments', newFiles, { shouldValidate: true });
-                              }}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+          <CardContent>
+            <div className="flex flex-col sm:flex-row items-start gap-4">
+              <div className="w-full sm:w-auto flex-grow space-y-2">
+                <Label htmlFor="rut">RUT del Ciudadano *</Label>
+                <Input
+                  id="rut"
+                  placeholder="12.345.678-9"
+                  value={rutInput}
+                  onChange={(e) => setRutInput(e.target.value)}
+                  disabled={isVerifying || userFound}
+                  className={formError ? 'border-destructive' : ''}
+                />
+                 {formError && <p className="text-sm font-medium text-destructive">{formError.message}</p>}
+              </div>
+              <div className='pt-2 sm:pt-8'>
+                <Button
+                  type="button"
+                  onClick={handleVerificarRut}
+                  disabled={isVerifying || userFound || !rutInput}
+                >
+                  {isVerifying ? (
+                    <Icons.Loading className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Icons.Login className="mr-2 h-4 w-4" />
                   )}
-                  <FormMessage>{fieldState.error?.message}</FormMessage>
-                   {fieldState.error?.root?.message && (
-                     <FormMessage>{fieldState.error.root.message}</FormMessage>
-                   )}
-                </FormItem>
-              )}
-            />
+                  Verificar RUT
+                </Button>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        <div className="flex justify-end">
-          <Button type="submit" size="lg" disabled={isSubmitting}>
-             {isSubmitting ? (
-              <Icons.Loading className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Icons.Submit className="mr-2 h-4 w-4" />
-            )}
-            Enviar Solicitud
-          </Button>
-        </div>
+        {userFound && (
+          <>
+            <Card>
+              <CardHeader>
+                <CardTitle>2. Datos Personales</CardTitle>
+                <CardDescription>
+                  Revise la información del ciudadano. Los campos con * son editables.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="grid sm:grid-cols-2 gap-x-4 gap-y-6">
+                <FormField
+                  control={form.control}
+                  name="rut"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>RUT</FormLabel>
+                      <FormControl>
+                        <Input {...field} disabled />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="nombres"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nombres</FormLabel>
+                      <FormControl>
+                        <Input {...field} disabled />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="apellidoPaterno"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Apellido Paterno</FormLabel>
+                      <FormControl>
+                        <Input {...field} disabled />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="apellidoMaterno"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Apellido Materno</FormLabel>
+                      <FormControl>
+                        <Input {...field} disabled />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="sexo"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Sexo</FormLabel>
+                      <FormControl>
+                        <Input {...field} disabled />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="estadoCivil"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Estado Civil</FormLabel>
+                      <FormControl>
+                        <Input {...field} disabled />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="genero"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Género *</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccione su género" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {GENDER_OPTIONS.map((gender) => (
+                            <SelectItem key={gender} value={gender}>
+                              {gender}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="puebloOriginario"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Pueblo Originario *</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccione una opción" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {INDIGENOUS_PEOPLES.map((people) => (
+                            <SelectItem key={people} value={people}>
+                              {people}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>3. Datos de Contacto</CardTitle>
+                <CardDescription>
+                  Por favor, complete la información de contacto del ciudadano.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid sm:grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="calle"
+                    render={({ field }) => (
+                      <FormItem className="sm:col-span-2">
+                        <FormLabel>Calle</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ej: Av. Libertador" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="numero"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Número</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ej: 123" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="comuna"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Comuna</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ej: Santiago" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="region"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Región</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ej: Metropolitana" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="telefono"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Teléfono</FormLabel>
+                        <FormControl>
+                          <Input placeholder="+56 9 1234 5678" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>E-mail</FormLabel>
+                        <FormControl>
+                          <Input placeholder="juana.perez@email.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>4. Detalle de la Solicitud</CardTitle>
+                <CardDescription>
+                  Seleccione el tipo de solicitud y describa el requerimiento.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="requestType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tipo de Solicitud *</FormLabel>
+                        <Select
+                          onValueChange={handleRequestTypeChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccione un tipo" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {REQUEST_TYPES.map((type) => (
+                              <SelectItem key={type} value={type}>
+                                <div className="flex items-center gap-2">
+                                  {(() => {
+                                    const Icon = Icons[type as keyof typeof Icons];
+                                    return Icon ? <Icon className="h-4 w-4 text-muted-foreground" /> : null;
+                                  })()}
+                                  <span>{type}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="topic"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tema Específico *</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={!requestType || availableTopics.length === 0}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccione un tema" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {availableTopics.map((topic) => (
+                              <SelectItem key={topic} value={topic}>
+                                {topic}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <FormField
+                    control={form.control}
+                    name="oficinaRegional"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Oficina Regional a la que dirige la solicitud *</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccione la oficina regional" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {REGIONES_CHILE.map((region) => (
+                              <SelectItem key={region} value={region}>
+                                {region}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                <FormField
+                  control={form.control}
+                  name="subject"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Asunto o título *</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Ej: Problema con atención en oficina"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Descripción de la solicitud *</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Explique aquí la situación de la forma más clara posible..."
+                          className="min-h-[150px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <div className="flex justify-between items-center">
+                        <FormMessage />
+                        <div className="text-xs text-muted-foreground ml-auto">
+                          {descriptionValue?.length || 0} / 2000
+                        </div>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+                
+                <Controller
+                  control={form.control}
+                  name="attachments"
+                  render={({ field: { onChange, onBlur, name, ref }, fieldState }) => (
+                    <FormItem>
+                      <FormLabel>Adjuntar Archivos (Opcional)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="file"
+                          multiple
+                          accept={ALLOWED_FILE_TYPES.join(',')}
+                          onChange={(e) => {
+                            const files = e.target.files ? Array.from(e.target.files) : [];
+                            const currentFiles = form.getValues('attachments') || [];
+                            onChange([...currentFiles, ...files]);
+                          }}
+                          onBlur={onBlur}
+                          name={name}
+                          ref={ref}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Puede adjuntar múltiples archivos (imágenes, PDF, Word, audio, video). Tamaño máx. por archivo: 5MB. Total: 25MB.
+                      </FormDescription>
+                      {attachmentsValue.length > 0 && (
+                        <div className="space-y-2 mt-2">
+                          <p className="text-sm font-medium">Archivos seleccionados:</p>
+                          <ul className="list-disc pl-5 space-y-1">
+                            {attachmentsValue.map((file, index) => (
+                              <li key={index} className="text-sm flex items-center justify-between">
+                                <span>{file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-6 w-6 p-0"
+                                  onClick={() => {
+                                    const newFiles = [...attachmentsValue];
+                                    newFiles.splice(index, 1);
+                                    form.setValue('attachments', newFiles, { shouldValidate: true });
+                                  }}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      <FormMessage>{fieldState.error?.message}</FormMessage>
+                      {fieldState.error?.root?.message && (
+                        <FormMessage>{fieldState.error.root.message}</FormMessage>
+                      )}
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            <div className="flex justify-end">
+              <Button type="submit" size="lg" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <Icons.Loading className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Icons.Submit className="mr-2 h-4 w-4" />
+                )}
+                Enviar Solicitud
+              </Button>
+            </div>
+          </>
+        )}
       </form>
     </Form>
   );
 }
+
+    
 
     

@@ -18,10 +18,10 @@ export default function SolicitudOirsPage() {
       <main className="w-full max-w-4xl">
         <div className="text-center mb-8">
           <h1 className="font-headline text-4xl font-bold text-primary">
-            Formulario de Solicitud (OIRS)
+            Formulario de Ingreso de Solicitud (OIRS)
           </h1>
           <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
-            Complete los siguientes campos para ingresar una nueva solicitud desde el backoffice.
+            Ingrese el RUT del ciudadano para comenzar. Sus datos se cargarán y luego podrá completar la solicitud.
           </p>
         </div>
         <SolicitudOirsForm />
@@ -32,3 +32,5 @@ export default function SolicitudOirsPage() {
     </div>
   );
 }
+
+    
