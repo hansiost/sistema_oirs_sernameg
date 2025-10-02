@@ -27,6 +27,7 @@ const SolicitudSchema = z.object({
   puebloOriginario: z.enum(INDIGENOUS_PEOPLES, { required_error: 'Debe seleccionar una opción.' }),
   requestType: z.enum(REQUEST_TYPES),
   topic: z.string().min(1, 'Debe seleccionar un tema.'),
+  subject: z.string().min(5, 'El asunto debe tener al menos 5 caracteres.'),
   description: z
     .string()
     .min(20, 'La descripción debe tener al menos 20 caracteres.'),
@@ -54,6 +55,7 @@ export async function submitSolicitud(
     puebloOriginario: formData.get('puebloOriginario'),
     requestType: formData.get('requestType'),
     topic: formData.get('topic'),
+    subject: formData.get('subject'),
     description: formData.get('description'),
     attachment: formData.get('attachment'),
   });

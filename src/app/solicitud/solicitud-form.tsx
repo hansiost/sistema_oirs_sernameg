@@ -74,6 +74,7 @@ const formSchema = z.object({
     required_error: 'Debe seleccionar un tipo de solicitud.',
   }),
   topic: z.string().min(1, 'Debe seleccionar un tema específico.'),
+  subject: z.string().min(5, 'El asunto debe tener al menos 5 caracteres.'),
   description: z
     .string()
     .min(20, 'La descripción debe tener al menos 20 caracteres.')
@@ -97,6 +98,7 @@ export default function SolicitudForm() {
       telefono: '',
       email: '',
       topic: '',
+      subject: '',
       description: '',
     },
   });
@@ -398,6 +400,22 @@ export default function SolicitudForm() {
                 )}
               />
             </div>
+             <FormField
+              control={form.control}
+              name="subject"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Asunto o título *</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Ej: Problema con atención en oficina"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="description"
