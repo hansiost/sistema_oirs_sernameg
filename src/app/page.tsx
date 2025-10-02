@@ -56,6 +56,11 @@ export default function Home() {
               Seleccione un método de ingreso para continuar.
             </p>
           </div>
+          <div className="mt-6 text-center border-t border-border pt-4 max-w-2xl mx-auto">
+            <p className="text-sm text-muted-foreground">
+              Si eres de nacionalidad extranjera y no posees RUT chileno, puedes revisar la página Web de las Oficinas de Información, Reclamos y Sugerencias de SERNAMEG acá: <a href="https://www.sernameg.gob.cl/oirs/" className="text-primary underline hover:text-primary/80" target="_blank" rel="noopener noreferrer">https://www.sernameg.gob.cl/oirs/</a>.
+            </p>
+          </div>
         </div>
       </main>
 
