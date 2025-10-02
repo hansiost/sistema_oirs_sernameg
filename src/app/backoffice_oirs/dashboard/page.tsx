@@ -182,7 +182,7 @@ const formatDate = (dateString: string | null) => {
 export default function BackofficeDashboard() {
     const [currentPage, setCurrentPage] = useState(1);
     const [filters, setFilters] = useState<Partial<Record<keyof Solicitud, string>>>({});
-    const [sortConfig, setSortConfig] = useState<SortConfig>(null);
+    const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'fechaEnvio', direction: 'descending' });
 
     const handleFilterChange = (e: ChangeEvent<HTMLInputElement>, key: keyof Solicitud) => {
         setFilters(prev => ({...prev, [key]: e.target.value }));
@@ -236,32 +236,19 @@ export default function BackofficeDashboard() {
     const handleNextPage = () => {
         setCurrentPage((prev) => Math.min(prev + 1, totalPages));
     };
+    
+    const tableHeaders: { key: keyof Solicitud, label: string, sortable: boolean }[] = [
+        { key: 'id', label: 'N° Solicitud', sortable: true },
+        { key: 'fechaEnvio', label: 'Fecha envío', sortable: true },
+        { key: 'tipo', label: 'Tipo', sortable: false },
+        { key: 'tema', label: 'Tema', sortable: false },
+        { key: 'oficina', label: 'Oficina Regional', sortable: false },
+        { key: 'ciudadano', label: 'Nombre Ciudadano', sortable: false },
+        { key: 'estado', label: 'Estado', sortable: false },
+        { key: 'fechaRespuesta', label: 'Fecha Respuesta', sortable: false },
+        { key: 'tiempoRestante', label: 'Tiempo Restante', sortable: false },
+    ];
 
-    const renderHeaderWithSort = (key: keyof Solicitud, label: string) => (
-        <TableHead>
-            <Button variant="ghost" onClick={() => requestSort(key)}>
-                {label}
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-            <Input
-                placeholder={`Filtrar ${label}...`}
-                value={filters[key] || ''}
-                onChange={(e) => handleFilterChange(e, key)}
-                className="mt-1 h-8"
-            />
-        </TableHead>
-    );
-     const renderHeader = (key: keyof Solicitud, label: string) => (
-        <TableHead>
-            {label}
-            <Input
-                placeholder={`Filtrar ${label}...`}
-                value={filters[key] || ''}
-                onChange={(e) => handleFilterChange(e, key)}
-                className="mt-1 h-8"
-            />
-        </TableHead>
-    );
 
   return (
     <Card>
@@ -284,20 +271,37 @@ export default function BackofficeDashboard() {
           <Table>
             <TableHeader>
               <TableRow>
-                {renderHeaderWithSort('id', 'N° Solicitud')}
-                {renderHeaderWithSort('fechaEnvio', 'Fecha envío')}
-                {renderHeader('tipo', 'Tipo')}
-                {renderHeader('tema', 'Tema')}
-                {renderHeader('oficina', 'Oficina Regional')}
-                {renderHeader('ciudadano', 'Nombre Ciudadano')}
-                {renderHeader('estado', 'Estado')}
-                <TableHead>Fecha Respuesta</TableHead>
-                <TableHead>Tiempo Restante</TableHead>
+                {tableHeaders.map(header => (
+                    <TableHead key={header.key}>
+                        {header.sortable ? (
+                            <Button variant="ghost" onClick={() => requestSort(header.key)}>
+                                {header.label}
+                                <ArrowUpDown className="ml-2 h-4 w-4" />
+                            </Button>
+                        ) : (
+                            header.label
+                        )}
+                    </TableHead>
+                ))}
+              </TableRow>
+              <TableRow>
+                {tableHeaders.map(header => (
+                    <TableHead key={`${header.key}-filter`}>
+                       {header.key !== 'fechaRespuesta' && header.key !== 'tiempoRestante' ? (
+                            <Input
+                                placeholder={`Filtrar...`}
+                                value={filters[header.key] || ''}
+                                onChange={(e) => handleFilterChange(e, header.key)}
+                                className="h-8"
+                            />
+                        ) : (<div />)}
+                    </TableHead>
+                ))}
               </TableRow>
             </TableHeader>
             <TableBody>
               {currentSolicitudes.map((solicitud) => (
-                <TableRow key={solicitud.id} className="text-sm">
+                <TableRow key={solicitud.id} className="text-xs">
                   <TableCell className="font-medium">{solicitud.id}</TableCell>
                   <TableCell>{formatDate(solicitud.fechaEnvio)}</TableCell>
                   <TableCell>{solicitud.tipo}</TableCell>
@@ -337,4 +341,3 @@ export default function BackofficeDashboard() {
     </Card>
   );
 }
-
