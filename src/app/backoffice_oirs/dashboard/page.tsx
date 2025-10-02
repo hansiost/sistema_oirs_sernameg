@@ -152,6 +152,12 @@ const getStatusVariant = (estado: string) => {
   return 'default';
 };
 
+const formatDate = (dateString: string | null) => {
+  if (!dateString) return '-';
+  const [year, month, day] = dateString.split('-');
+  return `${day}-${month}-${year}`;
+};
+
 export default function BackofficeDashboard() {
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -204,7 +210,7 @@ export default function BackofficeDashboard() {
               {currentSolicitudes.map((solicitud) => (
                 <TableRow key={solicitud.id}>
                   <TableCell className="font-medium">{solicitud.id}</TableCell>
-                  <TableCell>{new Date(solicitud.fechaEnvio).toLocaleDateString('es-CL')}</TableCell>
+                  <TableCell>{formatDate(solicitud.fechaEnvio)}</TableCell>
                   <TableCell>{solicitud.tipo}</TableCell>
                   <TableCell>{solicitud.tema}</TableCell>
                   <TableCell>{solicitud.oficina}</TableCell>
@@ -214,7 +220,7 @@ export default function BackofficeDashboard() {
                       {solicitud.estado}
                     </Badge>
                   </TableCell>
-                  <TableCell>{solicitud.fechaRespuesta ? new Date(solicitud.fechaRespuesta).toLocaleDateString('es-CL') : '-'}</TableCell>
+                  <TableCell>{formatDate(solicitud.fechaRespuesta)}</TableCell>
                   <TableCell>{solicitud.tiempoRestante}</TableCell>
                 </TableRow>
               ))}
