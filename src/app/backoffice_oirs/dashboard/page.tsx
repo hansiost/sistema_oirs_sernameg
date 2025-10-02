@@ -476,7 +476,7 @@ export default function BackofficeDashboard() {
             </CardDescription>
         </div>
         <Button asChild>
-            <Link href="/solicitud">
+            <Link href="/backoffice_oirs/solicitud_oirs">
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Crear Solicitud
             </Link>
@@ -575,5 +575,3 @@ export default function BackofficeDashboard() {
     </Card>
   );
 }
-
-    
