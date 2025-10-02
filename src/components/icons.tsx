@@ -1,3 +1,4 @@
+
 import {
   HelpCircle,
   Lightbulb,
@@ -11,6 +12,7 @@ import {
   LoaderCircle,
   WandSparkles,
   Send,
+  KeyRound
 } from 'lucide-react';
 
 export type Icon = LucideIcon;
@@ -27,4 +29,5 @@ export const Icons = {
   Loading: LoaderCircle,
   Sparkles: WandSparkles,
   Submit: Send,
+  Key: KeyRound,
 };

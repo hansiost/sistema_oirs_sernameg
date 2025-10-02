@@ -1,6 +1,6 @@
 
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -15,9 +15,10 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { Building2, LayoutDashboard, BarChart3, Settings, LogOut, UserCircle } from 'lucide-react';
+import { Building2, LayoutDashboard, BarChart3, Settings, LogOut, UserCircle, KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { ChangePasswordDialog } from '@/components/change-password-dialog';
 
 const menuItems = [
   {
@@ -43,6 +44,7 @@ export default function BackofficeLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false);
 
   return (
     <SidebarProvider>
@@ -95,6 +97,10 @@ export default function BackofficeLayout({
                         <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>admin@sernameg.gob.cl</DropdownMenuItem>
+                         <DropdownMenuItem onSelect={() => setShowChangePasswordDialog(true)}>
+                           <KeyRound className="mr-2 h-4 w-4" />
+                           <span>Cambiar clave</span>
+                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                          <DropdownMenuItem asChild>
                            <Link href="/backoffice_oirs">
@@ -110,6 +116,7 @@ export default function BackofficeLayout({
             {children}
         </main>
       </SidebarInset>
+      <ChangePasswordDialog open={showChangePasswordDialog} onOpenChange={setShowChangePasswordDialog} />
     </SidebarProvider>
   );
 }
