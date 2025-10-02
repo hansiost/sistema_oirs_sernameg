@@ -20,7 +20,7 @@ import { Building2 } from 'lucide-react';
 
 export default function BackofficeLoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -32,7 +32,7 @@ export default function BackofficeLoginPage() {
 
     // Simulate API call for backoffice login
     setTimeout(() => {
-      if (username === 'admin' && password === 'admin') {
+      if (email === 'admin@sernameg.gob.cl' && password === 'admin') {
         // On successful login, you would redirect to the backoffice dashboard
         // For now, let's just log it and reset.
         console.log('Backoffice login successful');
@@ -65,19 +65,26 @@ export default function BackofficeLoginPage() {
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username">Usuario</Label>
+                <Label htmlFor="email">Correo Electrónico</Label>
                 <Input
-                  id="username"
-                  type="text"
-                  placeholder="ej: juan.perez"
+                  id="email"
+                  type="email"
+                  placeholder="ej: admin@sernameg.gob.cl"
                   required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoggingIn}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Clave</Label>
+                <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Clave</Label>
+                    <Button variant="link" asChild className="text-xs px-0">
+                        <Link href="#">
+                            ¿Olvidó su clave?
+                        </Link>
+                    </Button>
+                </div>
                 <Input
                   id="password"
                   type="password"
