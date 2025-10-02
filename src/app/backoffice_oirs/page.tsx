@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Icons } from '@/components/icons';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function BackofficeLoginPage() {
   const router = useRouter();
@@ -49,9 +50,11 @@ export default function BackofficeLoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-6">
             <Link href="/">
-                <img
+                <Image
                     src="https://www.sernameg.gob.cl/wp-content/uploads/2021/11/logo-sernameg-2021-horizontal-1.png"
                     alt="Logo SERNAMEG"
+                    width={200}
+                    height={48}
                     className="mx-auto h-12 w-auto"
                 />
             </Link>
