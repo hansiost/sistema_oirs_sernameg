@@ -29,6 +29,8 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import { PlusCircle, ArrowUpDown } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 
 type Solicitud = {
     id: string;
@@ -152,10 +154,218 @@ const mockSolicitudes: Solicitud[] = [
     estado: 'Cerrada',
     fechaRespuesta: '2024-07-19',
     tiempoRestante: '-',
-  }
+  },
+  {
+    id: 'UV-21314',
+    fechaEnvio: '2024-07-17',
+    tipo: 'Consulta',
+    tema: 'Salud sexual y reproductiva',
+    oficina: 'Antofagasta',
+    ciudadano: 'Carolina Romero',
+    estado: 'Ingresada',
+    fechaRespuesta: null,
+    tiempoRestante: '10 días',
+  },
+  {
+    id: 'WX-42536',
+    fechaEnvio: '2024-07-16',
+    tipo: 'Reclamo',
+    tema: 'Publicidad sexista',
+    oficina: 'Metropolitana de Santiago',
+    ciudadano: 'Valeria Torres',
+    estado: 'En proceso',
+    fechaRespuesta: null,
+    tiempoRestante: '6 días',
+  },
+  {
+    id: 'YZ-63758',
+    fechaEnvio: '2024-07-15',
+    tipo: 'Queja',
+    tema: 'Falta de respuesta a solicitud previa',
+    oficina: 'Valparaíso',
+    ciudadano: 'Gabriela Flores',
+    estado: 'Respondida',
+    fechaRespuesta: '2024-07-18',
+    tiempoRestante: '-',
+  },
+  {
+    id: 'BC-74869',
+    fechaEnvio: '2024-07-14',
+    tipo: 'Felicitacion',
+    tema: 'Efectividad de un programa o servicio',
+    oficina: 'Biobío',
+    ciudadano: 'Mónica Reyes',
+    estado: 'Cerrada',
+    fechaRespuesta: '2024-07-14',
+    tiempoRestante: '-',
+  },
+  {
+    id: 'DE-85970',
+    fechaEnvio: '2024-07-13',
+    tipo: 'Sugerencia',
+    tema: 'Nuevos programas o talleres',
+    oficina: 'La Araucanía',
+    ciudadano: 'Patricia Morales',
+    estado: 'Ingresada',
+    fechaRespuesta: null,
+    tiempoRestante: '12 días',
+  },
+  {
+    id: 'FG-96081',
+    fechaEnvio: '2024-07-12',
+    tipo: 'Consulta',
+    tema: 'Participación política y social',
+    oficina: 'Los Lagos',
+    ciudadano: 'Verónica Castillo',
+    estado: 'En proceso',
+    fechaRespuesta: null,
+    tiempoRestante: '9 días',
+  },
+  {
+    id: 'HI-17293',
+    fechaEnvio: '2024-07-11',
+    tipo: 'Reclamo',
+    tema: 'Maltrato laboral',
+    oficina: 'Arica y Parinacota',
+    ciudadano: 'Daniela Herrera',
+    estado: 'En proceso (Urgente)',
+    fechaRespuesta: null,
+    tiempoRestante: '4 días',
+  },
+  {
+    id: 'JK-28304',
+    fechaEnvio: '2024-07-10',
+    tipo: 'Queja',
+    tema: 'Procedimientos institucionales confusos',
+    oficina: 'Ñuble',
+    ciudadano: 'Natalia Núñez',
+    estado: 'Respondida',
+    fechaRespuesta: '2024-07-13',
+    tiempoRestante: '-',
+  },
+  {
+    id: 'LM-39415',
+    fechaEnvio: '2024-07-09',
+    tipo: 'Sugerencia',
+    tema: 'Colaboración con otras entidades',
+    oficina: 'Atacama',
+    ciudadano: 'Paula Orellana',
+    estado: 'Cerrada',
+    fechaRespuesta: '2024-07-10',
+    tiempoRestante: '-',
+  },
+  {
+    id: 'NO-40526',
+    fechaEnvio: '2024-07-08',
+    tipo: 'Felicitacion',
+    tema: 'Agradecimiento a funcionario/a o equipo',
+    oficina: 'Coquimbo',
+    ciudadano: 'Constanza Rojas',
+    estado: 'Cerrada',
+    fechaRespuesta: '2024-07-08',
+    tiempoRestante: '-',
+  },
+  {
+    id: 'PQ-51637',
+    fechaEnvio: '2024-07-07',
+    tipo: 'Consulta',
+    tema: 'Derechos de la mujer',
+    oficina: 'Maule',
+    ciudadano: 'Andrea Vega',
+    estado: 'Ingresada',
+    fechaRespuesta: null,
+    tiempoRestante: '15 días',
+  },
+  {
+    id: 'RS-62748',
+    fechaEnvio: '2024-07-06',
+    tipo: 'Reclamo',
+    tema: 'Violencia intrafamiliar',
+    oficina: 'Antofagasta',
+    ciudadano: 'Fernanda Ríos',
+    estado: 'En proceso (Urgente)',
+    fechaRespuesta: null,
+    tiempoRestante: '3 días',
+  },
+  {
+    id: 'TU-73859',
+    fechaEnvio: '2024-07-05',
+    tipo: 'Queja',
+    tema: 'Infraestructura inadecuada',
+    oficina: 'Metropolitana de Santiago',
+    ciudadano: 'Marcela Fuentes',
+    estado: 'Respondida',
+    fechaRespuesta: '2024-07-08',
+    tiempoRestante: '-',
+  },
+  {
+    id: 'VW-84960',
+    fechaEnvio: '2024-07-04',
+    tipo: 'Sugerencia',
+    tema: 'Mejorar accesibilidad de la información',
+    oficina: 'Valparaíso',
+    ciudadano: 'Ximena Paredes',
+    estado: 'Ingresada',
+    fechaRespuesta: null,
+    tiempoRestante: '18 días',
+  },
+  {
+    id: 'XY-95071',
+    fechaEnvio: '2024-07-03',
+    tipo: 'Felicitacion',
+    tema: 'Iniciativa destacada',
+    oficina: 'Biobío',
+    ciudadano: 'Javiera Bravo',
+    estado: 'Cerrada',
+    fechaRespuesta: '2024-07-03',
+    tiempoRestante: '-',
+  },
+  {
+    id: 'ZA-06182',
+    fechaEnvio: '2024-07-02',
+    tipo: 'Consulta',
+    tema: 'Programas de apoyo y orientación',
+    oficina: 'La Araucanía',
+    ciudadano: 'Catalina Araya',
+    estado: 'En proceso',
+    fechaRespuesta: null,
+    tiempoRestante: '14 días',
+  },
+  {
+    id: 'AC-17293',
+    fechaEnvio: '2024-07-01',
+    tipo: 'Reclamo',
+    tema: 'Atención deficiente en servicio público',
+    oficina: 'Los Lagos',
+    ciudadano: 'Camila Espinoza',
+    estado: 'En proceso',
+    fechaRespuesta: null,
+    tiempoRestante: '11 días',
+  },
+  {
+    id: 'CE-28304',
+    fechaEnvio: '2024-06-30',
+    tipo: 'Queja',
+    tema: 'Conducta de funcionario/a',
+    oficina: 'Arica y Parinacota',
+    ciudadano: 'Valentina Maldonado',
+    estado: 'Respondida',
+    fechaRespuesta: '2024-07-02',
+    tiempoRestante: '-',
+  },
+  {
+    id: 'EG-39415',
+    fechaEnvio: '2024-06-29',
+    tipo: 'Sugerencia',
+    tema: 'Mejora de servicios de atención',
+    oficina: 'Ñuble',
+    ciudadano: 'Sofía Contreras',
+    estado: 'Cerrada',
+    fechaRespuesta: '2024-06-30',
+    tiempoRestante: '-',
+  },
 ];
 
-const ITEMS_PER_PAGE = 10;
 
 type SortConfig = {
   key: keyof Solicitud;
@@ -181,6 +391,7 @@ const formatDate = (dateString: string | null) => {
 
 export default function BackofficeDashboard() {
     const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [filters, setFilters] = useState<Partial<Record<keyof Solicitud, string>>>({});
     const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'fechaEnvio', direction: 'descending' });
 
@@ -224,9 +435,9 @@ export default function BackofficeDashboard() {
         return filtered;
     }, [filters, sortConfig]);
 
-    const totalPages = Math.ceil(filteredSolicitudes.length / ITEMS_PER_PAGE);
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const totalPages = Math.ceil(filteredSolicitudes.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
     const currentSolicitudes = filteredSolicitudes.slice(startIndex, endIndex);
 
     const handlePreviousPage = () => {
@@ -235,6 +446,11 @@ export default function BackofficeDashboard() {
 
     const handleNextPage = () => {
         setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+    };
+
+    const handleItemsPerPageChange = (value: string) => {
+        setItemsPerPage(Number(value));
+        setCurrentPage(1);
     };
     
     const tableHeaders: { key: keyof Solicitud, label: string, sortable: boolean }[] = [
@@ -324,20 +540,40 @@ export default function BackofficeDashboard() {
        <CardFooter>
         <div className="flex justify-between w-full items-center">
             <div className="text-xs text-muted-foreground">
-                Mostrando {currentSolicitudes.length} de {filteredSolicitudes.length} solicitudes. Página {currentPage} de {totalPages}.
+                Mostrando {Math.min(itemsPerPage, currentSolicitudes.length)} de {filteredSolicitudes.length} solicitudes.
             </div>
-            <Pagination>
-                <PaginationContent>
-                    <PaginationItem>
-                        <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); handlePreviousPage(); }} aria-disabled={currentPage === 1} />
-                    </PaginationItem>
-                    <PaginationItem>
-                        <PaginationNext href="#" onClick={(e) => { e.preventDefault(); handleNextPage(); }} aria-disabled={currentPage === totalPages}/>
-                    </PaginationItem>
-                </PaginationContent>
-            </Pagination>
+             <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">Items por página:</span>
+                     <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+                        <SelectTrigger className="h-8 w-20">
+                            <SelectValue placeholder={itemsPerPage} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {[10, 20, 30, 40, 50].map(size => (
+                                <SelectItem key={size} value={size.toString()}>{size}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                    Página {currentPage} de {totalPages}.
+                </div>
+                <Pagination>
+                    <PaginationContent>
+                        <PaginationItem>
+                            <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); handlePreviousPage(); }} aria-disabled={currentPage === 1} />
+                        </PaginationItem>
+                        <PaginationItem>
+                            <PaginationNext href="#" onClick={(e) => { e.preventDefault(); handleNextPage(); }} aria-disabled={currentPage === totalPages}/>
+                        </PaginationItem>
+                    </PaginationContent>
+                </Pagination>
+            </div>
         </div>
       </CardFooter>
     </Card>
   );
 }
+
+    
