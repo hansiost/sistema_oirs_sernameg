@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Icons } from '@/components/icons';
 import Link from 'next/link';
-import { LogoSernameg } from '@/components/logo-sernameg';
+import Image from 'next/image';
 
 export default function BackofficeLoginPage() {
   const router = useRouter();
@@ -51,7 +51,13 @@ export default function BackofficeLoginPage() {
         <div className="text-center mb-6">
             <Link href="/">
                 <div className="flex justify-center text-primary">
-                    <LogoSernameg className="h-16 w-auto" />
+                    <Image
+                        src="https://sgp.sernameg.gob.cl/images/fondo-login/logo_sernameg.jpg"
+                        alt="Logo SERNAMEG"
+                        width={200}
+                        height={50}
+                        priority
+                    />
                 </div>
             </Link>
         </div>

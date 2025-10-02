@@ -2,14 +2,20 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
-import { LogoSernameg } from '@/components/logo-sernameg';
+import Image from 'next/image';
 
 export default function RootPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
        <header className="w-full p-4 border-b flex justify-center">
          <div className="flex justify-center text-primary">
-            <LogoSernameg className="h-16 w-auto" />
+            <Image
+                src="https://sgp.sernameg.gob.cl/images/fondo-login/logo_sernameg.jpg"
+                alt="Logo SERNAMEG"
+                width={200}
+                height={50}
+                priority
+            />
          </div>
       </header>
       <main className="flex-grow flex items-center justify-center p-4">
