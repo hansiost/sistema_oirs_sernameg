@@ -35,7 +35,7 @@ import {
 } from '@/components/ui/card';
 import { X, Save, ArrowLeft } from 'lucide-react';
 
-import { REQUEST_TYPES, TOPICS, REGIONES_CHILE, type RequestType } from '@/lib/constants';
+import { REQUEST_TYPES, TOPICS, REGIONES_CHILE, VIAS_DE_INGRESO, type RequestType } from '@/lib/constants';
 import { GENDER_OPTIONS, INDIGENOUS_PEOPLES } from '@/lib/constants-gender-ethnicity';
 import { submitSolicitudInterna } from './actions';
 import { Icons } from '@/components/icons';
@@ -111,6 +111,7 @@ const formSchema = z.object({
   requestType: z.enum(REQUEST_TYPES, {
     required_error: 'Debe seleccionar un tipo de solicitud.',
   }),
+  viaIngreso: z.enum(VIAS_DE_INGRESO, { required_error: 'Debe seleccionar una vía de ingreso.' }),
   oficinaRegional: z.enum(REGIONES_CHILE, { required_error: 'Debe seleccionar una oficina regional.' }),
   topic: z.string().min(1, 'Debe seleccionar un tema específico.'),
   subject: z.string().min(5, 'El asunto debe tener al menos 5 caracteres.'),
@@ -188,6 +189,7 @@ const mockSolicitudData: Partial<FormValues> = {
     genero: "Femenino",
     puebloOriginario: "Ninguno",
     requestType: "Consulta",
+    viaIngreso: "Web",
     oficinaRegional: "Metropolitana de Santiago",
     topic: "Derechos de la mujer",
     subject: "Consulta sobre derechos laborales",
@@ -229,6 +231,9 @@ export default function SolicitudInternaForm() {
       region: '',
       telefono: '',
       email: '',
+      requestType: undefined,
+      viaIngreso: undefined,
+      oficinaRegional: undefined,
       topic: '',
       subject: '',
       description: '',
@@ -326,7 +331,7 @@ export default function SolicitudInternaForm() {
       const formData = new FormData();
       
       const keysToSubmit: (keyof FormValues)[] = [
-        'rut', 'nombres', 'apellidoPaterno', 'apellidoMaterno', 'sexo', 'estadoCivil', 'calle', 'numero', 'comuna', 'region', 'telefono', 'email', 'genero', 'puebloOriginario', 'requestType', 'oficinaRegional', 'topic', 'subject', 'description'
+        'rut', 'nombres', 'apellidoPaterno', 'apellidoMaterno', 'sexo', 'estadoCivil', 'calle', 'numero', 'comuna', 'region', 'telefono', 'email', 'genero', 'puebloOriginario', 'requestType', 'viaIngreso', 'oficinaRegional', 'topic', 'subject', 'description'
       ];
 
       keysToSubmit.forEach(key => {
@@ -728,6 +733,34 @@ export default function SolicitudInternaForm() {
                       )}
                     />
                   </div>
+                   <FormField
+                    control={form.control}
+                    name="viaIngreso"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Vía de Ingreso</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={isRequestCreated}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccione la vía de ingreso" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {VIAS_DE_INGRESO.map((via) => (
+                              <SelectItem key={via} value={via}>
+                                {via}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <FormField
                       control={form.control}
                       name="oficinaRegional"
@@ -953,7 +986,7 @@ export default function SolicitudInternaForm() {
                                   <FormControl>
                                   <SelectTrigger>
                                       <SelectValue placeholder="Seleccione un tipo" />
-                                  </SelectTrigger>
+                                  </Trigger>
                                   </FormControl>
                                   <SelectContent>
                                   {TIPO_RESOLUCION_OPTIONS.map((option) => (

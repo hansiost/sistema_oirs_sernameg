@@ -2,7 +2,7 @@
 'use server';
 
 import { z } from 'zod';
-import { REQUEST_TYPES, REGIONES_CHILE } from '@/lib/constants';
+import { REQUEST_TYPES, REGIONES_CHILE, VIAS_DE_INGRESO } from '@/lib/constants';
 import { GENDER_OPTIONS, INDIGENOUS_PEOPLES } from '@/lib/constants-gender-ethnicity';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -43,6 +43,7 @@ const SolicitudSchema = z.object({
   genero: z.enum(GENDER_OPTIONS, { required_error: 'Debe seleccionar un género.' }),
   puebloOriginario: z.enum(INDIGENOUS_PEOPLES, { required_error: 'Debe seleccionar una opción.' }),
   requestType: z.enum(REQUEST_TYPES),
+  viaIngreso: z.enum(VIAS_DE_INGRESO, { required_error: 'Debe seleccionar una vía de ingreso.' }),
   oficinaRegional: z.enum(REGIONES_CHILE, { required_error: 'Debe seleccionar una oficina regional.' }),
   topic: z.string().min(1, 'Debe seleccionar un tema.'),
   subject: z.string().min(5, 'El asunto debe tener al menos 5 caracteres.'),
@@ -76,6 +77,7 @@ export async function submitSolicitudInterna(
     genero: formData.get('genero'),
     puebloOriginario: formData.get('puebloOriginario'),
     requestType: formData.get('requestType'),
+    viaIngreso: formData.get('viaIngreso'),
     oficinaRegional: formData.get('oficinaRegional'),
     topic: formData.get('topic'),
     subject: formData.get('subject'),

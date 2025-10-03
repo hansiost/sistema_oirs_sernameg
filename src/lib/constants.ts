@@ -69,3 +69,11 @@ export const REGIONES_CHILE = [
   'Aysén del General Carlos Ibáñez del Campo',
   'Magallanes y de la Antártica Chilena',
 ] as const;
+
+export const VIAS_DE_INGRESO = [
+  'Presencial',
+  'Telefónica',
+  'Web',
+  'Email',
+  'Carta',
+] as const;
