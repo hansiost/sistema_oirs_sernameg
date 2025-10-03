@@ -1,6 +1,6 @@
 
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -27,10 +27,12 @@ export function EncuestaSatisfaccionDialog({
   open,
   onOpenChange,
   solicitud,
+  onSurveySubmit,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   solicitud: Solicitud | null;
+  onSurveySubmit: (folio: string) => void;
 }) {
   const { toast } = useToast();
   const [rating, setRating] = useState(0);
@@ -38,8 +40,22 @@ export function EncuestaSatisfaccionDialog({
   const [comments, setComments] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Reset state when the dialog is closed or the solicitud changes
+  useEffect(() => {
+    if (!open) {
+      setTimeout(() => {
+        setRating(0);
+        setComments('');
+        setHoverRating(0);
+        setIsSubmitting(false);
+      }, 300); // Delay to allow animation to finish
+    }
+  }, [open]);
+
   const handleSubmit = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
+    if (!solicitud) return;
+    
     if (rating === 0) {
       toast({
         title: 'Error',
@@ -52,19 +68,18 @@ export function EncuestaSatisfaccionDialog({
     // Simulate API call
     setTimeout(() => {
       console.log({
-        solicitudId: solicitud?.folio,
+        solicitudId: solicitud.folio,
         rating,
         comments,
       });
+
+      onSurveySubmit(solicitud.folio);
       setIsSubmitting(false);
       onOpenChange(false);
       toast({
         title: '¡Gracias por su opinión!',
         description: 'Su encuesta ha sido enviada correctamente.',
       });
-      // Reset fields
-      setRating(0);
-      setComments('');
     }, 1500);
   };
 
@@ -129,4 +144,3 @@ export function EncuestaSatisfaccionDialog({
     </Dialog>
   );
 }
-

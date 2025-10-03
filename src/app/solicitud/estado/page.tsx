@@ -106,10 +106,16 @@ export default function EstadoSolicitudesPage({ searchParams }: { searchParams?:
   
   const [showSurveyDialog, setShowSurveyDialog] = useState(false);
   const [selectedSolicitud, setSelectedSolicitud] = useState<Solicitud | null>(null);
+  const [submittedSurveys, setSubmittedSurveys] = useState<string[]>([]);
+
 
   const handleOpenSurvey = (solicitud: Solicitud) => {
     setSelectedSolicitud(solicitud);
     setShowSurveyDialog(true);
+  };
+
+  const handleSurveySubmit = (folio: string) => {
+    setSubmittedSurveys(prev => [...prev, folio]);
   };
 
 
@@ -207,36 +213,52 @@ export default function EstadoSolicitudesPage({ searchParams }: { searchParams?:
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {allSolicitudes.map((solicitud) => (
-                    <TableRow key={solicitud.folio}>
-                      <TableCell className="font-medium">
-                        <Button variant="link" asChild className="p-0 h-auto">
-                            <Link href={`/solicitud/detalle?id=${solicitud.folio}`}>
-                                {solicitud.folio}
-                            </Link>
-                        </Button>
-                      </TableCell>
-                      <TableCell>{solicitud.tipo}</TableCell>
-                      <TableCell>{new Date(solicitud.fecha).toLocaleDateString('es-CL')}</TableCell>
-                      <TableCell>{solicitud.descripcion.substring(0, 30)}...</TableCell>
-                      <TableCell>
-                        <Badge variant={getStatusVariant(solicitud.estado) as any}>
-                          {solicitud.estado}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                         <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleOpenSurvey(solicitud)}
-                            aria-label="Realizar encuesta de satisfacción"
-                            disabled={solicitud.estado !== 'Respondida'}
-                         >
-                            <ClipboardList className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {allSolicitudes.map((solicitud) => {
+                    const isSurveySubmitted = submittedSurveys.includes(solicitud.folio);
+                    const canSubmitSurvey = solicitud.estado === 'Respondida' && !isSurveySubmitted;
+                    return (
+                      <TableRow key={solicitud.folio}>
+                        <TableCell className="font-medium">
+                          <Button variant="link" asChild className="p-0 h-auto">
+                              <Link href={`/solicitud/detalle?id=${solicitud.folio}`}>
+                                  {solicitud.folio}
+                              </Link>
+                          </Button>
+                        </TableCell>
+                        <TableCell>{solicitud.tipo}</TableCell>
+                        <TableCell>{new Date(solicitud.fecha).toLocaleDateString('es-CL')}</TableCell>
+                        <TableCell>{solicitud.descripcion.substring(0, 30)}...</TableCell>
+                        <TableCell>
+                          <Badge variant={getStatusVariant(solicitud.estado) as any}>
+                            {solicitud.estado}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {isSurveySubmitted ? (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              disabled
+                              aria-label="Encuesta ya realizada"
+                              className="text-green-500"
+                            >
+                              <CheckCircle className="h-4 w-4" />
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleOpenSurvey(solicitud)}
+                              aria-label="Realizar encuesta de satisfacción"
+                              disabled={!canSubmitSurvey}
+                            >
+                              <ClipboardList className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </CardContent>
@@ -251,6 +273,7 @@ export default function EstadoSolicitudesPage({ searchParams }: { searchParams?:
            open={showSurveyDialog}
            onOpenChange={setShowSurveyDialog}
            solicitud={selectedSolicitud}
+           onSurveySubmit={handleSurveySubmit}
          />
        )}
     </>
