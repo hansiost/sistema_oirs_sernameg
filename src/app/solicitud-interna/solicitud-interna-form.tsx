@@ -33,7 +33,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { X, Save } from 'lucide-react';
+import { X, Save, ArrowLeft } from 'lucide-react';
 
 import { REQUEST_TYPES, TOPICS, REGIONES_CHILE, type RequestType } from '@/lib/constants';
 import { GENDER_OPTIONS, INDIGENOUS_PEOPLES } from '@/lib/constants-gender-ethnicity';
@@ -1056,15 +1056,21 @@ export default function SolicitudInternaForm() {
                       />
                     </CardContent>
                   </Card>
-                  <div className="flex justify-end gap-4">
-                      <Button type="button" variant="secondary" size="lg" onClick={() => toast({ title: 'Gestión Guardada', description: 'Los detalles de la gestión han sido guardados.'})}>
-                          <Save className="mr-2 h-4 w-4" />
-                          Guardar Solicitud
-                      </Button>
-                      <Button type="button" size="lg" variant="default" onClick={() => setShowConfirmDialog(true)}>
-                          <Icons.Submit className="mr-2 h-4 w-4" />
-                          Responder y Cerrar Solicitud
-                      </Button>
+                  <div className="flex w-full justify-between items-center">
+                    <Button type="button" variant="outline" size="lg" onClick={() => router.push('/backoffice_oirs/dashboard')}>
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        Cerrar
+                    </Button>
+                    <div className="flex gap-4">
+                        <Button type="button" variant="secondary" size="lg" onClick={() => toast({ title: 'Gestión Guardada', description: 'Los detalles de la gestión han sido guardados.'})}>
+                            <Save className="mr-2 h-4 w-4" />
+                            Guardar Solicitud
+                        </Button>
+                        <Button type="button" size="lg" variant="default" onClick={() => setShowConfirmDialog(true)}>
+                            <Icons.Submit className="mr-2 h-4 w-4" />
+                            Responder y Cerrar Solicitud
+                        </Button>
+                    </div>
                   </div>
                 </>
               )}
@@ -1083,5 +1089,3 @@ export default function SolicitudInternaForm() {
     </>
   );
 }
-
-    
