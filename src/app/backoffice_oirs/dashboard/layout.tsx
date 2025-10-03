@@ -15,7 +15,7 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { Building2, LayoutDashboard, BarChart3, Settings, LogOut, UserCircle, KeyRound, ChevronDown, Users, FileText, Network, Waypoints, Wrench, Building, VenetianMask, Feather, ListChecks, CheckCheck, FileCheck, Database } from 'lucide-react';
+import { Building2, LayoutDashboard, BarChart3, Settings, LogOut, UserCircle, KeyRound, ChevronDown, Users, FileText, Network, Waypoints, Wrench, Building, VenetianMask, Feather, ListChecks, CheckCheck, FileCheck, Database, Files, BookUser } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ChangePasswordDialog } from '@/components/change-password-dialog';
@@ -32,6 +32,16 @@ const menuItems = [
     href: '/backoffice_oirs/reportes',
     label: 'Reportes',
     icon: BarChart3,
+  },
+  {
+    href: '#',
+    label: 'Documentos',
+    icon: Files,
+  },
+  {
+    href: '#',
+    label: 'Contactos',
+    icon: BookUser,
   },
 ];
 
