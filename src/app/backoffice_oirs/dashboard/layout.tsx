@@ -14,7 +14,7 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { Building2, LayoutDashboard, BarChart3, Settings, LogOut, UserCircle, KeyRound, ChevronDown, Users, FileText, Network, Waypoints, Wrench, Building, VenetianMask, Feather, ListChecks, CheckCheck, FileCheck } from 'lucide-react';
+import { Building2, LayoutDashboard, BarChart3, Settings, LogOut, UserCircle, KeyRound, ChevronDown, Users, FileText, Network, Waypoints, Wrench, Building, VenetianMask, Feather, ListChecks, CheckCheck, FileCheck, Database } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ChangePasswordDialog } from '@/components/change-password-dialog';
@@ -36,6 +36,10 @@ const menuItems = [
 
 const adminSubMenuItems = [
     { href: '#', label: 'Usuarios', icon: Users },
+    { href: '#', label: 'Otros parámetros', icon: Wrench },
+];
+
+const maintainerSubMenuItems = [
     { href: '#', label: 'Tipos de Solicitudes', icon: FileText },
     { href: '#', label: 'Árbol de Temas', icon: Network },
     { href: '#', label: 'Vías de Ingreso', icon: Waypoints },
@@ -45,8 +49,8 @@ const adminSubMenuItems = [
     { href: '#', label: 'Estados de Solicitud', icon: ListChecks },
     { href: '#', label: 'Resultado de Atención', icon: CheckCheck },
     { href: '#', label: 'Tipo Resolución', icon: FileCheck },
-    { href: '#', label: 'Otros parámetros', icon: Wrench },
 ];
+
 
 export default function BackofficeLayout({
   children,
@@ -55,8 +59,13 @@ export default function BackofficeLayout({
 }) {
   const pathname = usePathname();
   const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false);
+  
   const isAdministracionActive = pathname.startsWith('/backoffice_oirs/administracion');
   const [isAdministracionOpen, setIsAdministracionOpen] = useState(isAdministracionActive);
+
+  // TODO: Add proper active state detection for mantenedores
+  const isMantenedoresActive = false; 
+  const [isMantenedoresOpen, setIsMantenedoresOpen] = useState(isMantenedoresActive);
 
 
   return (
@@ -103,6 +112,39 @@ export default function BackofficeLayout({
                     <CollapsibleContent>
                         <div className="pl-8 flex flex-col gap-1 mt-1">
                             {adminSubMenuItems.map((item) => (
+                                 <Link
+                                    key={item.label}
+                                    href={item.href}
+                                    className={cn(
+                                        "flex items-center gap-2 p-2 rounded-md text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                                        pathname === item.href && "bg-accent text-accent-foreground"
+                                    )}
+                                >
+                                    <item.icon className="h-4 w-4" />
+                                    <span>{item.label}</span>
+                                </Link>
+                            ))}
+                        </div>
+                    </CollapsibleContent>
+                </SidebarMenuItem>
+            </Collapsible>
+            <Collapsible open={isMantenedoresOpen} onOpenChange={setIsMantenedoresOpen} asChild>
+                <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                        <SidebarMenuButton
+                            isActive={isMantenedoresActive}
+                            className="justify-between"
+                        >
+                            <div className="flex items-center gap-2">
+                                <Database />
+                                <span>Mantenedores</span>
+                            </div>
+                            <ChevronDown className={cn("h-4 w-4 transition-transform", isMantenedoresOpen && "rotate-180")} />
+                        </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                        <div className="pl-8 flex flex-col gap-1 mt-1">
+                            {maintainerSubMenuItems.map((item) => (
                                  <Link
                                     key={item.label}
                                     href={item.href}
