@@ -648,7 +648,7 @@ export default function BackofficeDashboard() {
                 <Button asChild variant="secondary">
                     <Link href="/solicitud-interna">
                         <FilePenLine className="mr-2 h-4 w-4" />
-                        Crear Solicitud Interna
+                        Crear Solicitud
                     </Link>
                 </Button>
             </div>
