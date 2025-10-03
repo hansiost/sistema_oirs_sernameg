@@ -1,4 +1,3 @@
-
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
@@ -39,7 +38,7 @@ const menuItems = [
     icon: Files,
   },
   {
-    href: '#',
+    href: '#!',
     label: 'Contactos',
     icon: BookUser,
   },
@@ -128,7 +127,7 @@ export default function BackofficeLayout({
                                     href={item.href}
                                     className={cn(
                                         "flex items-center gap-2 p-2 rounded-md text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-                                        pathname === item.href && "bg-accent text-accent-foreground"
+                                        (pathname === item.href || (item.href !== '/backoffice_oirs/administracion' && pathname.startsWith(item.href))) && "bg-accent text-accent-foreground"
                                     )}
                                 >
                                     <item.icon className="h-4 w-4" />
