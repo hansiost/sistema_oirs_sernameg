@@ -42,7 +42,7 @@ const formSchema = z.object({
   nombre: z.string().min(1, 'Nombre es obligatorio'),
   email: z.string().email('Email inválido'),
   oficina: z.enum(REGIONES_CHILE, { required_error: 'Debe seleccionar una oficina' }),
-  perfil: z.enum(['Administrador', 'Encargado OIRS', 'Funcionario'], { required_error: 'Debe seleccionar un perfil' }),
+  perfil: z.enum(['Administrador', 'Encargado OIRS Regional', 'Encargado OIRS Nacional'], { required_error: 'Debe seleccionar un perfil' }),
   estado: z.enum(['Activo', 'Inactivo'], { required_error: 'Debe seleccionar un estado' }),
 });
 
@@ -198,7 +198,7 @@ const UserFormContent = () => {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {['Administrador', 'Encargado OIRS', 'Funcionario'].map(perfil => (
+                        {['Administrador', 'Encargado OIRS Regional', 'Encargado OIRS Nacional'].map(perfil => (
                           <SelectItem key={perfil} value={perfil}>{perfil}</SelectItem>
                         ))}
                       </SelectContent>
