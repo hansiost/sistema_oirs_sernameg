@@ -63,6 +63,9 @@ const UserFormContent = () => {
       rut: '',
       nombre: '',
       email: '',
+      oficina: undefined,
+      perfil: undefined,
+      estado: undefined,
     },
   });
 
@@ -70,7 +73,16 @@ const UserFormContent = () => {
     if (mode === 'edit' && userId) {
       const userToEdit = mockUsers.find(u => u.id === userId);
       if (userToEdit) {
-        form.reset(userToEdit);
+        // Reset form for text inputs
+        form.reset({
+            rut: userToEdit.rut,
+            nombre: userToEdit.nombre,
+            email: userToEdit.email,
+        });
+        // Explicitly set values for Select components
+        form.setValue('oficina', userToEdit.oficina);
+        form.setValue('perfil', userToEdit.perfil);
+        form.setValue('estado', userToEdit.estado);
       } else {
         toast({
           title: 'Error',
@@ -169,7 +181,7 @@ const UserFormContent = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Oficina Regional</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Seleccione una oficina" />
@@ -191,7 +203,7 @@ const UserFormContent = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Perfil</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Seleccione un perfil" />
@@ -213,7 +225,7 @@ const UserFormContent = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Estado</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Seleccione un estado" />
