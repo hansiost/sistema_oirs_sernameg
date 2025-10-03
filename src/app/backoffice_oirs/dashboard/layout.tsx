@@ -1,4 +1,3 @@
-
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
@@ -15,10 +14,12 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { Building2, LayoutDashboard, BarChart3, Settings, LogOut, UserCircle, KeyRound } from 'lucide-react';
+import { Building2, LayoutDashboard, BarChart3, Settings, LogOut, UserCircle, KeyRound, ChevronDown, Users, FileText, Network, Waypoints, Wrench, Building } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ChangePasswordDialog } from '@/components/change-password-dialog';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { cn } from '@/lib/utils';
 
 const menuItems = [
   {
@@ -31,11 +32,15 @@ const menuItems = [
     label: 'Reportes',
     icon: BarChart3,
   },
-  {
-    href: '/backoffice_oirs/administracion',
-    label: 'Administración',
-    icon: Settings,
-  },
+];
+
+const adminSubMenuItems = [
+    { href: '#', label: 'Usuarios', icon: Users },
+    { href: '#', label: 'Tipos de Solicitudes', icon: FileText },
+    { href: '#', label: 'Árbol de Temas', icon: Network },
+    { href: '#', label: 'Vías de Ingreso', icon: Waypoints },
+    { href: '#', label: 'Otros parámetros', icon: Wrench },
+    { href: '#', label: 'Oficinas Regionales', icon: Building },
 ];
 
 export default function BackofficeLayout({
@@ -45,6 +50,9 @@ export default function BackofficeLayout({
 }) {
   const pathname = usePathname();
   const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false);
+  const isAdministracionActive = pathname.startsWith('/backoffice_oirs/administracion');
+  const [isAdministracionOpen, setIsAdministracionOpen] = useState(isAdministracionActive);
+
 
   return (
     <SidebarProvider>
@@ -73,6 +81,39 @@ export default function BackofficeLayout({
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
+             <Collapsible open={isAdministracionOpen} onOpenChange={setIsAdministracionOpen} asChild>
+                <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                        <SidebarMenuButton
+                            isActive={isAdministracionActive}
+                            className="justify-between"
+                        >
+                            <div className="flex items-center gap-2">
+                                <Settings />
+                                <span>Administración</span>
+                            </div>
+                            <ChevronDown className={cn("h-4 w-4 transition-transform", isAdministracionOpen && "rotate-180")} />
+                        </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                        <div className="pl-8 flex flex-col gap-1 mt-1">
+                            {adminSubMenuItems.map((item) => (
+                                 <Link
+                                    key={item.label}
+                                    href={item.href}
+                                    className={cn(
+                                        "flex items-center gap-2 p-2 rounded-md text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                                        pathname === item.href && "bg-accent text-accent-foreground"
+                                    )}
+                                >
+                                    <item.icon className="h-4 w-4" />
+                                    <span>{item.label}</span>
+                                </Link>
+                            ))}
+                        </div>
+                    </CollapsibleContent>
+                </SidebarMenuItem>
+            </Collapsible>
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>

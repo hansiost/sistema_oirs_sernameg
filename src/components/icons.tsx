@@ -1,4 +1,3 @@
-
 import {
   HelpCircle,
   Lightbulb,
@@ -12,7 +11,13 @@ import {
   LoaderCircle,
   WandSparkles,
   Send,
-  KeyRound
+  KeyRound,
+  Users,
+  FileText,
+  Network,
+  Waypoints,
+  Wrench,
+  Building,
 } from 'lucide-react';
 
 export type Icon = LucideIcon;
@@ -30,4 +35,10 @@ export const Icons = {
   Sparkles: WandSparkles,
   Submit: Send,
   Key: KeyRound,
+  Users: Users,
+  FileText: FileText,
+  Network: Network,
+  Waypoints: Waypoints,
+  Wrench: Wrench,
+  Building: Building,
 };
