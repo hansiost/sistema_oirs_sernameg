@@ -21,6 +21,7 @@ import {
   Building,
   ClipboardList,
   FileCheck2,
+  Edit,
 } from 'lucide-react';
 
 export type Icon = LucideIcon;
@@ -47,4 +48,5 @@ export const Icons = {
   Survey: ClipboardList,
   Detail: FileCheck2,
   FAQ: HelpCircle,
+  Edit: Edit,
 };
