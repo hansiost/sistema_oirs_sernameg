@@ -46,7 +46,7 @@ const menuItems = [
 ];
 
 const adminSubMenuItems = [
-    { href: '/backoffice_oirs/administracion', label: 'Usuarios', icon: Users },
+    { href: '/backoffice_oirs/administracion/usuarios', label: 'Usuarios', icon: Users },
     { href: '#', label: 'Permisos', icon: KeyRound },
 ];
 
