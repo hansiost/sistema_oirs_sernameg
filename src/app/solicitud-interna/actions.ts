@@ -3,7 +3,6 @@
 
 import { z } from 'zod';
 import { REQUEST_TYPES, REGIONES_CHILE } from '@/lib/constants';
-import { redirect } from 'next/navigation';
 import { GENDER_OPTIONS, INDIGENOUS_PEOPLES } from '@/lib/constants-gender-ethnicity';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -109,8 +108,11 @@ export async function submitSolicitudInterna(
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 1000));
   
-  const newFolio = `INT-${Math.floor(Math.random() * 90000 + 10000)}`;
-
-  // Redirect to a status page, maybe a shared one? For now, let's redirect to the citizen one as an example
-  redirect(`/solicitud/estado?folio=${newFolio}&tipo=${validatedFields.data.requestType}`);
+  const newId = `INT-${Math.floor(Math.random() * 90000 + 10000)}`;
+  
+  return {
+    message: `La solicitud ha sido creada con éxito con el N° ${newId}. Ya puede proceder con la gestión.`,
+  };
 }
+
+    

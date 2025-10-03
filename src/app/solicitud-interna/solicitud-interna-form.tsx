@@ -32,7 +32,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { X } from 'lucide-react';
+import { X, Save } from 'lucide-react';
 
 import { REQUEST_TYPES, TOPICS, REGIONES_CHILE, type RequestType } from '@/lib/constants';
 import { GENDER_OPTIONS, INDIGENOUS_PEOPLES } from '@/lib/constants-gender-ethnicity';
@@ -118,6 +118,14 @@ const formSchema = z.object({
     .max(2000, 'La descripción no puede exceder los 2000 caracteres.'),
   attachments: z.array(fileSchema).optional()
     .refine(files => !files || files.reduce((acc, file) => acc + file.size, 0) <= MAX_TOTAL_SIZE, `El tamaño total de los archivos no debe exceder los 25MB.`),
+  observacionesOficina: z.string().optional(),
+  seguimientoOIRS: z.string().optional(),
+  resultadoAtencion: z.string().optional(),
+  tipoResolucion: z.string().optional(),
+  descripcionRespuesta: z.string().optional(),
+  observacionesNivelCentral: z.string().optional(),
+  gestionAttachments: z.array(fileSchema).optional()
+    .refine(files => !files || files.reduce((acc, file) => acc + file.size, 0) <= MAX_TOTAL_SIZE, `El tamaño total de los archivos no debe exceder los 25MB.`),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -159,6 +167,9 @@ const mockUserApi = (rut: string) => {
   });
 };
 
+const RESULTADO_ATENCION_OPTIONS = ['Respuesta directa', 'Derivación a programa', 'Derivación a otra institución', 'No aplica', 'Otro'];
+const TIPO_RESOLUCION_OPTIONS = ['Resolución favorable', 'Resolución no favorable', 'Sin resolución', 'No aplica'];
+
 
 export default function SolicitudInternaForm() {
   const { toast } = useToast();
@@ -166,6 +177,7 @@ export default function SolicitudInternaForm() {
   const [isSubmitting, startSubmitTransition] = useTransition();
   const [userFound, setUserFound] = useState(false);
   const [rutInput, setRutInput] = useState('');
+  const [isRequestCreated, setIsRequestCreated] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -186,6 +198,13 @@ export default function SolicitudInternaForm() {
       subject: '',
       description: '',
       attachments: [],
+      observacionesOficina: '',
+      seguimientoOIRS: '',
+      resultadoAtencion: '',
+      tipoResolucion: '',
+      descripcionRespuesta: '',
+      observacionesNivelCentral: '',
+      gestionAttachments: [],
     },
   });
   
@@ -223,6 +242,7 @@ export default function SolicitudInternaForm() {
   const requestType = form.watch('requestType');
   const descriptionValue = form.watch('description');
   const attachmentsValue = form.watch('attachments') || [];
+  const gestionAttachmentsValue = form.watch('gestionAttachments') || [];
   const [availableTopics, setAvailableTopics] = useState<string[]>([]);
   
   const handleRequestTypeChange = (value: string) => {
@@ -236,9 +256,14 @@ export default function SolicitudInternaForm() {
     startSubmitTransition(async () => {
       const formData = new FormData();
       
-      Object.entries(values).forEach(([key, value]) => {
-        if (key !== 'attachments' && value) {
-          formData.append(key, value as string);
+      // We only send the fields up to the description/attachments, not the management part yet.
+      const keysToSubmit: (keyof FormValues)[] = [
+        'rut', 'nombres', 'apellidoPaterno', 'apellidoMaterno', 'sexo', 'estadoCivil', 'calle', 'numero', 'comuna', 'region', 'telefono', 'email', 'genero', 'puebloOriginario', 'requestType', 'oficinaRegional', 'topic', 'subject', 'description'
+      ];
+
+      keysToSubmit.forEach(key => {
+         if (values[key]) {
+          formData.append(key, values[key] as string);
         }
       });
       
@@ -256,6 +281,12 @@ export default function SolicitudInternaForm() {
           description: result.error,
           variant: 'destructive',
         });
+      } else if (result?.message) {
+        toast({
+          title: 'Solicitud Creada',
+          description: result.message,
+        });
+        setIsRequestCreated(true);
       }
     });
   };
@@ -556,6 +587,7 @@ export default function SolicitudInternaForm() {
                         <Select
                           onValueChange={handleRequestTypeChange}
                           defaultValue={field.value}
+                          disabled={isRequestCreated}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -589,7 +621,7 @@ export default function SolicitudInternaForm() {
                         <Select
                           onValueChange={field.onChange}
                           value={field.value}
-                          disabled={!requestType || availableTopics.length === 0}
+                          disabled={!requestType || availableTopics.length === 0 || isRequestCreated}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -618,6 +650,7 @@ export default function SolicitudInternaForm() {
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
+                          disabled={isRequestCreated}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -646,6 +679,7 @@ export default function SolicitudInternaForm() {
                         <Input
                           placeholder="Ej: Problema con atención en oficina"
                           {...field}
+                          disabled={isRequestCreated}
                         />
                       </FormControl>
                       <FormMessage />
@@ -663,6 +697,7 @@ export default function SolicitudInternaForm() {
                           placeholder="Explique aquí la situación de la forma más clara posible..."
                           className="min-h-[150px]"
                           {...field}
+                          disabled={isRequestCreated}
                         />
                       </FormControl>
                       <div className="flex justify-between items-center">
@@ -694,6 +729,7 @@ export default function SolicitudInternaForm() {
                           onBlur={onBlur}
                           name={name}
                           ref={ref}
+                          disabled={isRequestCreated}
                         />
                       </FormControl>
                       <FormDescription>
@@ -716,6 +752,7 @@ export default function SolicitudInternaForm() {
                                     newFiles.splice(index, 1);
                                     form.setValue('attachments', newFiles, { shouldValidate: true });
                                   }}
+                                  disabled={isRequestCreated}
                                 >
                                   <X className="h-4 w-4" />
                                 </Button>
@@ -734,7 +771,8 @@ export default function SolicitudInternaForm() {
               </CardContent>
             </Card>
 
-            <div className="flex justify-end">
+            {!isRequestCreated && (
+              <div className="flex justify-end">
                 <Button type="submit" size="lg" disabled={isSubmitting}>
                   {isSubmitting ? (
                     <Icons.Loading className="mr-2 h-4 w-4 animate-spin" />
@@ -743,10 +781,203 @@ export default function SolicitudInternaForm() {
                   )}
                   Crear Solicitud
                 </Button>
-            </div>
+              </div>
+            )}
+            
+            {isRequestCreated && (
+              <>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>5. Gestión de la Solicitud</CardTitle>
+                    <CardDescription>
+                      Complete los campos para gestionar y dar respuesta a la solicitud.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="observacionesOficina"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Observaciones de la Oficina Regional</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Añadir observaciones internas sobre el caso..."
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="seguimientoOIRS"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Seguimiento OIRS</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Detalle del seguimiento realizado por OIRS..."
+                              rows={4}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="grid sm:grid-cols-2 gap-4">
+                        <FormField
+                        control={form.control}
+                        name="resultadoAtencion"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Resultado de la atención</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Seleccione un resultado" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {RESULTADO_ATENCION_OPTIONS.map((option) => (
+                                    <SelectItem key={option} value={option}>
+                                    {option}
+                                    </SelectItem>
+                                ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                        <FormField
+                        control={form.control}
+                        name="tipoResolucion"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Tipo de Resolución</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Seleccione un tipo" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {TIPO_RESOLUCION_OPTIONS.map((option) => (
+                                    <SelectItem key={option} value={option}>
+                                    {option}
+                                    </SelectItem>
+                                ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                    </div>
+                     <FormField
+                      control={form.control}
+                      name="descripcionRespuesta"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Descripción de la respuesta</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Redacte aquí la respuesta final que se entregará al ciudadano..."
+                              className="min-h-[150px]"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="observacionesNivelCentral"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Observaciones Nivel Central</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Observaciones adicionales del nivel central..."
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                     <Controller
+                      control={form.control}
+                      name="gestionAttachments"
+                      render={({ field: { onChange, onBlur, name, ref }, fieldState }) => (
+                        <FormItem>
+                          <FormLabel>Adjuntar Archivos a la Gestión</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="file"
+                              multiple
+                              accept={ALLOWED_FILE_TYPES.join(',')}
+                              onChange={(e) => {
+                                const files = e.target.files ? Array.from(e.target.files) : [];
+                                const currentFiles = form.getValues('gestionAttachments') || [];
+                                onChange([...currentFiles, ...files]);
+                              }}
+                              onBlur={onBlur}
+                              name={name}
+                              ref={ref}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Archivos internos para la gestión del caso.
+                          </FormDescription>
+                          {gestionAttachmentsValue.length > 0 && (
+                            <div className="space-y-2 mt-2">
+                              <p className="text-sm font-medium">Archivos de gestión seleccionados:</p>
+                              <ul className="list-disc pl-5 space-y-1">
+                                {gestionAttachmentsValue.map((file, index) => (
+                                  <li key={index} className="text-sm flex items-center justify-between">
+                                    <span>{file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-6 w-6 p-0"
+                                      onClick={() => {
+                                        const newFiles = [...gestionAttachmentsValue];
+                                        newFiles.splice(index, 1);
+                                        form.setValue('gestionAttachments', newFiles, { shouldValidate: true });
+                                      }}
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </Button>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          <FormMessage>{fieldState.error?.message}</FormMessage>
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
+                 <div className="flex justify-end">
+                    <Button type="button" size="lg" onClick={() => toast({ title: 'Gestión Guardada', description: 'Los detalles de la gestión han sido guardados.'})}>
+                        <Save className="mr-2 h-4 w-4" />
+                        Guardar Gestión
+                    </Button>
+                </div>
+              </>
+            )}
           </>
         )}
       </form>
     </Form>
   );
 }
+
+    
