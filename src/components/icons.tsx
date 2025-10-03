@@ -20,6 +20,7 @@ import {
   Wrench,
   Building,
   ClipboardList,
+  FileCheck2,
 } from 'lucide-react';
 
 export type Icon = LucideIcon;
@@ -44,4 +45,5 @@ export const Icons = {
   Wrench: Wrench,
   Building: Building,
   Survey: ClipboardList,
+  Detail: FileCheck2,
 };
