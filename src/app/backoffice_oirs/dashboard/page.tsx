@@ -691,5 +691,3 @@ export default function BackofficeDashboard() {
         </Card>
     );
 }
-
-    
