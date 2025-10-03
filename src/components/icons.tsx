@@ -46,4 +46,5 @@ export const Icons = {
   Building: Building,
   Survey: ClipboardList,
   Detail: FileCheck2,
+  FAQ: HelpCircle,
 };

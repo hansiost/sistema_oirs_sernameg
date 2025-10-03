@@ -1,4 +1,3 @@
-
 'use client';
 import { useState } from 'react';
 import {
@@ -19,7 +18,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, PlusCircle, CheckCircle, ClipboardList } from 'lucide-react';
+import { ArrowLeft, PlusCircle, CheckCircle, ClipboardList, HelpCircle } from 'lucide-react';
 import { REQUEST_TYPES } from '@/lib/constants';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -129,12 +128,20 @@ export default function EstadoSolicitudesPage({ searchParams }: { searchParams?:
               Volver al Inicio
             </Link>
           </Button>
-          <Button asChild>
-            <Link href="/solicitud">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Nueva Solicitud
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" asChild>
+                <Link href="/preguntas-frecuentes">
+                    <HelpCircle className="mr-2 h-4 w-4" />
+                    Preguntas Frecuentes
+                </Link>
+            </Button>
+            <Button asChild>
+                <Link href="/solicitud">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Nueva Solicitud
+                </Link>
+            </Button>
+          </div>
         </header>
         <main className="w-full max-w-4xl space-y-8">
           {newFolio && (
