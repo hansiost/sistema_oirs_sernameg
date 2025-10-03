@@ -645,7 +645,7 @@ export default function BackofficeDashboard() {
                 </CardDescription>
             </div>
             <div className="flex gap-2">
-                <Button asChild variant="secondary">
+                <Button asChild>
                     <Link href="/solicitud-interna">
                         <FilePenLine className="mr-2 h-4 w-4" />
                         Crear Solicitud
