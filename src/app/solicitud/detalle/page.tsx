@@ -19,55 +19,62 @@ import { ArrowLeft, FileCheck2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 
-const mockSolicitudDetalle = {
-  id: '98765',
-  datosPersonales: {
-    rut: '12.345.678-9',
-    nombres: 'Juana Andrea',
-    apellidoPaterno: 'Pérez',
-    apellidoMaterno: 'González',
-    sexo: 'Mujer',
-    estadoCivil: 'Soltera',
-  },
-  datosContacto: {
-    calle: 'Av. Siempre Viva',
-    numero: '742',
-    comuna: 'Providencia',
-    region: 'Metropolitana de Santiago',
-    telefono: '+56 9 8765 4321',
-    email: 'juana.perez@email.com',
-  },
-  identificacionAdicional: {
-    genero: 'Femenino',
-    puebloOriginario: 'Mapuche',
-  },
-  detalleSolicitud: {
-    tipo: 'Queja',
-    tema: 'Conducta de funcionario/a',
-    oficinaRegional: 'Metropolitana de Santiago',
-    asunto: 'Demora excesiva en la atención telefónica',
-    descripcion: 'Llevo varios días intentando comunicarme con el centro de la mujer de mi comuna y nadie contesta el teléfono. Necesito orientación urgente y no he podido recibirla. La espera es demasiado larga y frustrante.',
-    adjuntos: [],
-  },
-  respuesta: {
+
+// Mock data matching the list page for consistency
+const mockSolicitudesConDetalle = [
+  {
+    id: '98765',
+    datosPersonales: { rut: '12.345.678-9', nombres: 'Juana Andrea', apellidoPaterno: 'Pérez', apellidoMaterno: 'González', sexo: 'Mujer', estadoCivil: 'Soltera' },
+    datosContacto: { calle: 'Av. Siempre Viva', numero: '742', comuna: 'Providencia', region: 'Metropolitana de Santiago', telefono: '+56 9 8765 4321', email: 'juana.perez@email.com' },
+    identificacionAdicional: { genero: 'Femenino', puebloOriginario: 'Mapuche' },
+    detalleSolicitud: { tipo: 'Queja', tema: 'Conducta de funcionario/a', oficinaRegional: 'Metropolitana de Santiago', asunto: 'Demora excesiva en la atención telefónica', descripcion: 'Llevo varios días intentando comunicarme con el centro de la mujer de mi comuna y nadie contesta el teléfono. Necesito orientación urgente y no he podido recibirla. La espera es demasiado larga y frustrante.', adjuntos: [] },
     estado: 'Respondida',
-    fecha: '22-07-2024',
-    texto: 'Estimada Juana, lamentamos profundamente los inconvenientes que ha experimentado. Hemos contactado directamente al centro de la mujer de su comuna para notificarles la situación y asegurar que se tomen las medidas correctivas. Una encargada se pondrá en contacto con usted a la brevedad para ofrecerle la orientación que necesita. Agradecemos su paciencia y por habernos informado de esta situación.',
+    fecha: '2024-07-20',
+    respuesta: { fecha: '22-07-2024', texto: 'Estimada Juana, lamentamos los inconvenientes. Hemos contactado al centro para notificarles y una encargada se comunicará con usted a la brevedad.' },
   },
-};
+  {
+    id: '98123',
+    datosPersonales: { rut: '12.345.678-9', nombres: 'Juana Andrea', apellidoPaterno: 'Pérez', apellidoMaterno: 'González', sexo: 'Mujer', estadoCivil: 'Soltera' },
+    datosContacto: { calle: 'Av. Siempre Viva', numero: '742', comuna: 'Providencia', region: 'Metropolitana de Santiago', telefono: '+56 9 8765 4321', email: 'juana.perez@email.com' },
+    identificacionAdicional: { genero: 'Femenino', puebloOriginario: 'Mapuche' },
+    detalleSolicitud: { tipo: 'Consulta', tema: 'Programas de apoyo y orientación', oficinaRegional: 'Metropolitana de Santiago', asunto: 'Consulta sobre programa Mujeres Jefas de Hogar', descripcion: 'Consulta sobre los requisitos para postular al programa Mujeres Jefas de Hogar...', adjuntos: [] },
+    estado: 'En proceso',
+    fecha: '2024-07-15',
+  },
+  {
+    id: '97543',
+    datosPersonales: { rut: '12.345.678-9', nombres: 'Juana Andrea', apellidoPaterno: 'Pérez', apellidoMaterno: 'González', sexo: 'Mujer', estadoCivil: 'Soltera' },
+    datosContacto: { calle: 'Av. Siempre Viva', numero: '742', comuna: 'Providencia', region: 'Metropolitana de Santiago', telefono: '+56 9 8765 4321', email: 'juana.perez@email.com' },
+    identificacionAdicional: { genero: 'Femenino', puebloOriginario: 'Mapuche' },
+    detalleSolicitud: { tipo: 'Sugerencia', tema: 'Nuevos programas o talleres', oficinaRegional: 'Metropolitana de Santiago', asunto: 'Sugerencia de talleres de alfabetización digital', descripcion: 'Sugerencia para implementar talleres de alfabetización digital para adultas mayores...', adjuntos: [] },
+    estado: 'Solicitud Enviada',
+    fecha: '2024-06-28',
+  },
+  {
+    id: '96881',
+    datosPersonales: { rut: '12.345.678-9', nombres: 'Juana Andrea', apellidoPaterno: 'Pérez', apellidoMaterno: 'González', sexo: 'Mujer', estadoCivil: 'Soltera' },
+    datosContacto: { calle: 'Av. Siempre Viva', numero: '742', comuna: 'Providencia', region: 'Metropolitana de Santiago', telefono: '+56 9 8765 4321', email: 'juana.perez@email.com' },
+    identificacionAdicional: { genero: 'Femenino', puebloOriginario: 'Mapuche' },
+    detalleSolicitud: { tipo: 'Reclamo', tema: 'Atención deficiente en servicio público', oficinaRegional: 'Biobío', asunto: 'Falta de accesibilidad en edificio', descripcion: 'Reclamo por falta de accesibilidad en edificio de la dirección regional...', adjuntos: [] },
+    estado: 'Respondida',
+    fecha: '2024-06-10',
+    respuesta: { fecha: '12-06-2024', texto: 'Estimada Juana, agradecemos su reclamo. Se ha levantado un requerimiento para evaluar e implementar las mejoras de accesibilidad necesarias en el edificio señalado. Esperamos tener una solución en los próximos meses.' },
+  },
+];
 
 
 function DetalleContent() {
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
 
-  // En una aplicación real, aquí se haría una llamada a la API para obtener los datos
-  const solicitud = mockSolicitudDetalle;
+  // In a real application, you would make an API call here.
+  // We find the specific request from our mock data.
+  const solicitud = mockSolicitudesConDetalle.find(s => s.id === id);
 
-  if (!id) {
+  if (!id || !solicitud) {
     return (
       <div className="text-center">
-        <p>No se ha especificado un número de solicitud.</p>
+        <p>No se ha especificado o no se ha encontrado el número de solicitud.</p>
         <Button asChild className="mt-4">
             <Link href="/solicitud/estado">Volver al listado</Link>
         </Button>
@@ -176,8 +183,13 @@ function DetalleContent() {
                 <Label>Descripción</Label>
                 <Textarea value={solicitud.detalleSolicitud.descripcion} className="min-h-[120px]" disabled />
             </div>
-            {solicitud.detalleSolicitud.adjuntos.length > 0 && (
+            {solicitud.detalleSolicitud.adjuntos.length > 0 ? (
                 <div className="space-y-1">
+                    <Label>Archivos Adjuntos</Label>
+                    <p className="text-sm text-muted-foreground">Esta solicitud tiene archivos adjuntos.</p>
+                </div>
+            ) : (
+                 <div className="space-y-1">
                     <Label>Archivos Adjuntos</Label>
                     <p className="text-sm text-muted-foreground">No hay archivos adjuntos para esta solicitud.</p>
                 </div>
@@ -185,19 +197,19 @@ function DetalleContent() {
           </CardContent>
         </Card>
 
-        {solicitud.respuesta.estado === 'Respondida' && (
+        {solicitud.estado === 'Respondida' && solicitud.respuesta && (
             <Card>
                 <CardHeader>
                     <div className="flex justify-between items-center">
                         <CardTitle>Respuesta de la Solicitud</CardTitle>
-                        <Badge variant="default">{solicitud.respuesta.estado}</Badge>
+                        <Badge variant="default">{solicitud.estado}</Badge>
                     </div>
                     <CardDescription>
                         Respuesta emitida el {solicitud.respuesta.fecha}
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Textarea value={solicitud.respuesta.texto} className="min-h-[150px] bg-background" disabled />
+                    <Textarea value={solicitud.respuesta.texto} className="min-h-[150px]" disabled />
                 </CardContent>
             </Card>
         )}
@@ -230,4 +242,3 @@ export default function DetalleSolicitudPage() {
     );
 }
 
-    
