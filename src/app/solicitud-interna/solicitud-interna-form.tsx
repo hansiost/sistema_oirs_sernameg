@@ -133,7 +133,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 // Mocked user data from "Registro Civil"
-const mockUserApi = (rut: string) => {
+const mockUserApi = (identifier: string) => {
   return new Promise<{
     rut: string;
     nombres: string;
@@ -143,8 +143,9 @@ const mockUserApi = (rut: string) => {
     estadoCivil: string;
   } | null>((resolve) => {
     setTimeout(() => {
-      const cleanedRut = cleanRut(rut);
-      if (cleanedRut.startsWith('12345678') || cleanedRut.includes('AB-12345')) {
+      const cleanedIdentifier = cleanRut(identifier);
+      // Check if it's a RUT or a case ID
+      if (cleanedIdentifier.startsWith('12345678') || identifier.startsWith('AB-')) {
         resolve({
           rut: '12.345.678-9',
           nombres: 'Juana Andrea',
@@ -153,7 +154,7 @@ const mockUserApi = (rut: string) => {
           sexo: 'Mujer',
           estadoCivil: 'Soltera',
         });
-      } else if (cleanedRut.startsWith('11478406') || cleanedRut.includes('CD-67890')) {
+      } else if (cleanedIdentifier.startsWith('11478406') || identifier.startsWith('CD-')) {
         resolve({
           rut: '11.478.406-0',
           nombres: 'Ana María',
@@ -163,7 +164,15 @@ const mockUserApi = (rut: string) => {
           estadoCivil: 'Casada',
         });
       } else {
-        resolve(null);
+        // As a fallback for other IDs, return a generic user
+         resolve({
+          rut: '9.876.543-K',
+          nombres: 'Ciudadana Ejemplo',
+          apellidoPaterno: 'Apellido',
+          apellidoMaterno: 'Ejemplo',
+          sexo: 'Mujer',
+          estadoCivil: 'Soltera',
+        });
       }
     }, 500);
   });
