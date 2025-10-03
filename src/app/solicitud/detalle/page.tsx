@@ -185,7 +185,7 @@ function DetalleContent() {
           </CardContent>
         </Card>
 
-        <Card className="bg-muted/30">
+        <Card>
             <CardHeader>
                 <div className="flex justify-between items-center">
                     <CardTitle>Respuesta de la Solicitud</CardTitle>
@@ -228,3 +228,4 @@ export default function DetalleSolicitudPage() {
     );
 }
 
+    
