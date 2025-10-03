@@ -422,11 +422,11 @@ const formatDate = (dateString: string | null) => {
 
 const tableHeaders: { key: keyof Solicitud, label: string, sortable: boolean }[] = [
     { key: 'id', label: 'N° Solicitud', sortable: true },
-    { key: 'rut', label: 'RUT', sortable: true },
     { key: 'fechaEnvio', label: 'Fecha envío', sortable: true },
     { key: 'tipo', label: 'Tipo', sortable: false },
-    { key: 'tema', label: 'Tema', sortable: false },
+    { key: 'tema', label: 'Asunto', sortable: false },
     { key: 'oficina', label: 'Oficina Regional', sortable: false },
+    { key: 'rut', label: 'RUT', sortable: true },
     { key: 'ciudadano', label: 'Nombre Ciudadano', sortable: false },
     { key: 'estado', label: 'Estado', sortable: false },
     { key: 'fechaRespuesta', label: 'Fecha Respuesta', sortable: false },
@@ -547,11 +547,11 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes }) => {
                             </Link>
                             </Button>
                         </TableCell>
-                        <TableCell>{solicitud.rut}</TableCell>
                         <TableCell>{formatDate(solicitud.fechaEnvio)}</TableCell>
                         <TableCell>{solicitud.tipo}</TableCell>
                         <TableCell>{solicitud.tema}</TableCell>
                         <TableCell>{solicitud.oficina}</TableCell>
+                        <TableCell>{solicitud.rut}</TableCell>
                         <TableCell>{solicitud.ciudadano}</TableCell>
                         <TableCell>
                             <Badge variant={getStatusVariant(solicitud.estado) as any}>
@@ -653,5 +653,7 @@ export default function BackofficeDashboard() {
         </Card>
     );
 }
+
+    
 
     
