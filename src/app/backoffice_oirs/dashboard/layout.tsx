@@ -14,7 +14,7 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { Building2, LayoutDashboard, BarChart3, Settings, LogOut, UserCircle, KeyRound, ChevronDown, Users, FileText, Network, Waypoints, Wrench, Building } from 'lucide-react';
+import { Building2, LayoutDashboard, BarChart3, Settings, LogOut, UserCircle, KeyRound, ChevronDown, Users, FileText, Network, Waypoints, Wrench, Building, VenetianMask, Feather, ListChecks, CheckCheck, FileCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ChangePasswordDialog } from '@/components/change-password-dialog';
@@ -39,8 +39,13 @@ const adminSubMenuItems = [
     { href: '#', label: 'Tipos de Solicitudes', icon: FileText },
     { href: '#', label: 'Árbol de Temas', icon: Network },
     { href: '#', label: 'Vías de Ingreso', icon: Waypoints },
-    { href: '#', label: 'Otros parámetros', icon: Wrench },
     { href: '#', label: 'Oficinas Regionales', icon: Building },
+    { href: '#', label: 'Género', icon: VenetianMask },
+    { href: '#', label: 'Pueblos Originarios', icon: Feather },
+    { href: '#', label: 'Estados de Solicitud', icon: ListChecks },
+    { href: '#', label: 'Resultado de Atención', icon: CheckCheck },
+    { href: '#', label: 'Tipo Resolución', icon: FileCheck },
+    { href: '#', label: 'Otros parámetros', icon: Wrench },
 ];
 
 export default function BackofficeLayout({
