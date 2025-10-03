@@ -28,7 +28,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-import { PlusCircle, ArrowUpDown } from 'lucide-react';
+import { PlusCircle, ArrowUpDown, FilePenLine } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 
@@ -475,12 +475,20 @@ export default function BackofficeDashboard() {
             Aquí se muestran las últimas solicitudes ciudadanas recibidas.
             </CardDescription>
         </div>
-        <Button asChild>
-            <Link href="/backoffice_oirs/solicitud_oirs">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Crear Solicitud
-            </Link>
-        </Button>
+        <div className="flex gap-2">
+            <Button asChild>
+                <Link href="/backoffice_oirs/solicitud_oirs">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Crear Solicitud
+                </Link>
+            </Button>
+            <Button asChild variant="secondary">
+                <Link href="/solicitud-interna">
+                    <FilePenLine className="mr-2 h-4 w-4" />
+                    Crear Solicitud Interna
+                </Link>
+            </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">

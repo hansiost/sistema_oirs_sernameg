@@ -21,7 +21,7 @@ export default function RootPage() {
               Seleccione el portal al que desea ingresar.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="border rounded-lg p-8 flex flex-col items-center text-center shadow-lg transition-transform hover:scale-105">
                <div className="bg-primary/10 p-4 rounded-full mb-4">
                  <ArrowRight className="h-10 w-10 text-primary" />
@@ -37,21 +37,6 @@ export default function RootPage() {
                 </Link>
               </Button>
             </div>
-             <div className="border rounded-lg p-8 flex flex-col items-center text-center shadow-lg transition-transform hover:scale-105">
-               <div className="bg-purple-500/10 p-4 rounded-full mb-4">
-                <FilePenLine className="h-10 w-10 text-purple-500" />
-              </div>
-              <h2 className="text-2xl font-bold font-headline text-purple-600 mb-4">Solicitud Interna</h2>
-              <p className="text-muted-foreground mb-6 text-sm">
-                Para que funcionarios/as ingresen una solicitud en nombre de un/a ciudadano/a.
-              </p>
-              <Button asChild size="lg" className="w-full font-bold bg-purple-600 hover:bg-purple-700">
-                <Link href="/solicitud-interna">
-                  Crear Solicitud
-                   <FilePenLine className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-            </div>
             <div className="border rounded-lg p-8 flex flex-col items-center text-center shadow-lg transition-transform hover:scale-105">
                <div className="bg-accent/10 p-4 rounded-full mb-4">
                 <ShieldCheck className="h-10 w-10 text-accent" />
@@ -59,7 +44,7 @@ export default function RootPage() {
               <h2 className="text-2xl font-bold font-headline text-accent mb-4">Backoffice OIRS</h2>
               <p className="text-muted-foreground mb-6 text-sm">
                 Para la gestión interna de solicitudes, casos y estadísticas por parte de funcionarios/as.
-              _</p>
+              </p>
               <Button asChild size="lg" className="w-full font-bold" variant="outline">
                 <Link href="/backoffice_oirs">
                   Ingresar al Backoffice
