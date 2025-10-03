@@ -185,20 +185,22 @@ function DetalleContent() {
           </CardContent>
         </Card>
 
-        <Card>
-            <CardHeader>
-                <div className="flex justify-between items-center">
-                    <CardTitle>Respuesta de la Solicitud</CardTitle>
-                    <Badge variant="default">{solicitud.respuesta.estado}</Badge>
-                </div>
-                <CardDescription>
-                    Respuesta emitida el {solicitud.respuesta.fecha}
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Textarea value={solicitud.respuesta.texto} className="min-h-[150px] bg-background" disabled />
-            </CardContent>
-        </Card>
+        {solicitud.respuesta.estado === 'Respondida' && (
+            <Card>
+                <CardHeader>
+                    <div className="flex justify-between items-center">
+                        <CardTitle>Respuesta de la Solicitud</CardTitle>
+                        <Badge variant="default">{solicitud.respuesta.estado}</Badge>
+                    </div>
+                    <CardDescription>
+                        Respuesta emitida el {solicitud.respuesta.fecha}
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Textarea value={solicitud.respuesta.texto} className="min-h-[150px] bg-background" disabled />
+                </CardContent>
+            </Card>
+        )}
 
     </div>
   );
