@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useMemo, ChangeEvent, FC } from 'react';
 import Link from 'next/link';
@@ -34,6 +35,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 type Solicitud = {
     id: string;
+    rut: string;
     fechaEnvio: string;
     tipo: string;
     tema: string;
@@ -47,6 +49,7 @@ type Solicitud = {
 const mockSolicitudes: Solicitud[] = [
   {
     id: 'AB-12345',
+    rut: '12.345.678-9',
     fechaEnvio: '2024-07-28',
     tipo: 'Consulta',
     tema: 'Derechos de la mujer',
@@ -58,6 +61,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'CD-67890',
+    rut: '11.478.406-0',
     fechaEnvio: '2024-07-27',
     tipo: 'Reclamo',
     tema: 'Atención deficiente en servicio público',
@@ -69,6 +73,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'EF-54321',
+    rut: '10.987.654-3',
     fechaEnvio: '2024-07-25',
     tipo: 'Queja',
     tema: 'Conducta de funcionario/a',
@@ -80,6 +85,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'GH-98765',
+    rut: '13.456.789-K',
     fechaEnvio: '2024-07-24',
     tipo: 'Sugerencia',
     tema: 'Mejora de servicios de atención',
@@ -91,6 +97,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'IJ-11223',
+    rut: '14.567.890-1',
     fechaEnvio: '2024-07-23',
     tipo: 'Felicitacion',
     tema: 'Buena atención recibida',
@@ -102,6 +109,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'KL-33445',
+    rut: '15.678.901-2',
     fechaEnvio: '2024-07-22',
     tipo: 'Consulta',
     tema: 'Programas de apoyo y orientación',
@@ -113,6 +121,7 @@ const mockSolicitudes: Solicitud[] = [
   },
    {
     id: 'MN-55667',
+    rut: '16.789.012-3',
     fechaEnvio: '2024-07-21',
     tipo: 'Reclamo',
     tema: 'Violencia intrafamiliar',
@@ -124,6 +133,7 @@ const mockSolicitudes: Solicitud[] = [
   },
    {
     id: 'OP-77889',
+    rut: '17.890.123-4',
     fechaEnvio: '2024-07-20',
     tipo: 'Consulta',
     tema: 'Asesoría legal',
@@ -135,6 +145,7 @@ const mockSolicitudes: Solicitud[] = [
   },
    {
     id: 'QR-99001',
+    rut: '18.901.234-5',
     fechaEnvio: '2024-07-19',
     tipo: 'Queja',
     tema: 'Demora excesiva en la atención',
@@ -146,6 +157,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'ST-10203',
+    rut: '19.012.345-6',
     fechaEnvio: '2024-07-18',
     tipo: 'Sugerencia',
     tema: 'Campañas de difusión y sensibilización',
@@ -157,6 +169,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'UV-21314',
+    rut: '20.123.456-7',
     fechaEnvio: '2024-07-17',
     tipo: 'Consulta',
     tema: 'Salud sexual y reproductiva',
@@ -168,6 +181,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'WX-42536',
+    rut: '21.234.567-8',
     fechaEnvio: '2024-07-16',
     tipo: 'Reclamo',
     tema: 'Publicidad sexista',
@@ -179,6 +193,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'YZ-63758',
+    rut: '22.345.678-9',
     fechaEnvio: '2024-07-15',
     tipo: 'Queja',
     tema: 'Falta de respuesta a solicitud previa',
@@ -190,6 +205,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'BC-74869',
+    rut: '23.456.789-0',
     fechaEnvio: '2024-07-14',
     tipo: 'Felicitacion',
     tema: 'Efectividad de un programa o servicio',
@@ -201,6 +217,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'DE-85970',
+    rut: '24.567.890-K',
     fechaEnvio: '2024-07-13',
     tipo: 'Sugerencia',
     tema: 'Nuevos programas o talleres',
@@ -212,6 +229,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'FG-96081',
+    rut: '7.890.123-4',
     fechaEnvio: '2024-07-12',
     tipo: 'Consulta',
     tema: 'Participación política y social',
@@ -223,6 +241,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'HI-17293',
+    rut: '8.901.234-5',
     fechaEnvio: '2024-07-11',
     tipo: 'Reclamo',
     tema: 'Maltrato laboral',
@@ -234,6 +253,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'JK-28304',
+    rut: '9.012.345-6',
     fechaEnvio: '2024-07-10',
     tipo: 'Queja',
     tema: 'Procedimientos institucionales confusos',
@@ -245,6 +265,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'LM-39415',
+    rut: '6.543.210-K',
     fechaEnvio: '2024-07-09',
     tipo: 'Sugerencia',
     tema: 'Colaboración con otras entidades',
@@ -256,6 +277,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'NO-40526',
+    rut: '5.432.109-8',
     fechaEnvio: '2024-07-08',
     tipo: 'Felicitacion',
     tema: 'Agradecimiento a funcionario/a o equipo',
@@ -267,6 +289,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'PQ-51637',
+    rut: '4.321.098-7',
     fechaEnvio: '2024-07-07',
     tipo: 'Consulta',
     tema: 'Derechos de la mujer',
@@ -278,6 +301,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'RS-62748',
+    rut: '3.210.987-6',
     fechaEnvio: '2024-07-06',
     tipo: 'Reclamo',
     tema: 'Violencia intrafamiliar',
@@ -289,6 +313,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'TU-73859',
+    rut: '2.109.876-5',
     fechaEnvio: '2024-07-05',
     tipo: 'Queja',
     tema: 'Infraestructura inadecuada',
@@ -300,6 +325,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'VW-84960',
+    rut: '1.098.765-4',
     fechaEnvio: '2024-07-04',
     tipo: 'Sugerencia',
     tema: 'Mejorar accesibilidad de la información',
@@ -311,6 +337,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'XY-95071',
+    rut: '987.654-3',
     fechaEnvio: '2024-07-03',
     tipo: 'Felicitacion',
     tema: 'Iniciativa destacada',
@@ -322,6 +349,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'ZA-06182',
+    rut: '876.543-2',
     fechaEnvio: '2024-07-02',
     tipo: 'Consulta',
     tema: 'Programas de apoyo y orientación',
@@ -333,6 +361,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'AC-17293',
+    rut: '765.432-1',
     fechaEnvio: '2024-07-01',
     tipo: 'Reclamo',
     tema: 'Atención deficiente en servicio público',
@@ -344,6 +373,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'CE-28304',
+    rut: '654.321-0',
     fechaEnvio: '2024-06-30',
     tipo: 'Queja',
     tema: 'Conducta de funcionario/a',
@@ -355,6 +385,7 @@ const mockSolicitudes: Solicitud[] = [
   },
   {
     id: 'EG-39415',
+    rut: '543.210-9',
     fechaEnvio: '2024-06-29',
     tipo: 'Sugerencia',
     tema: 'Mejora de servicios de atención',
@@ -391,6 +422,7 @@ const formatDate = (dateString: string | null) => {
 
 const tableHeaders: { key: keyof Solicitud, label: string, sortable: boolean }[] = [
     { key: 'id', label: 'N° Solicitud', sortable: true },
+    { key: 'rut', label: 'RUT', sortable: true },
     { key: 'fechaEnvio', label: 'Fecha envío', sortable: true },
     { key: 'tipo', label: 'Tipo', sortable: false },
     { key: 'tema', label: 'Tema', sortable: false },
@@ -515,6 +547,7 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes }) => {
                             </Link>
                             </Button>
                         </TableCell>
+                        <TableCell>{solicitud.rut}</TableCell>
                         <TableCell>{formatDate(solicitud.fechaEnvio)}</TableCell>
                         <TableCell>{solicitud.tipo}</TableCell>
                         <TableCell>{solicitud.tema}</TableCell>
@@ -620,3 +653,5 @@ export default function BackofficeDashboard() {
         </Card>
     );
 }
+
+    
