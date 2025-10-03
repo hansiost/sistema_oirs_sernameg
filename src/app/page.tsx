@@ -46,7 +46,7 @@ export default function RootPage() {
                 Para la gestión interna de solicitudes, casos y estadísticas por parte de funcionarios/as.
               </p>
               <Button asChild size="lg" className="w-full font-bold" variant="outline">
-                <Link href="/backoffice_oirs">
+                <Link href="/login/backoffice">
                   Ingresar al Backoffice
                    <ShieldCheck className="ml-2 h-5 w-5" />
                 </Link>

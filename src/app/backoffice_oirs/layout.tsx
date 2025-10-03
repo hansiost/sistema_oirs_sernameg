@@ -202,7 +202,7 @@ export default function BackofficeLayout({
                          </DropdownMenuItem>
                         <DropdownMenuSeparator />
                          <DropdownMenuItem asChild>
-                           <Link href="/backoffice_oirs">
+                           <Link href="/login/backoffice">
                              <LogOut className="mr-2 h-4 w-4" />
                              <span>Cerrar sesión</span>
                            </Link>
