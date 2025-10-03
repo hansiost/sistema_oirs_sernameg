@@ -449,7 +449,7 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
     const [filters, setFilters] = useState<Partial<Record<keyof Solicitud, string>>>({});
     const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'fechaEnvio', direction: 'descending' });
 
-    const tableHeaders: { key: keyof Solicitud, label: string, sortable: boolean }[] = [
+    const allHeaders: { key: keyof Solicitud, label: string, sortable: boolean }[] = [
         { key: 'id', label: 'N° Solicitud', sortable: true },
         { key: 'fechaEnvio', label: 'Fecha envío', sortable: true },
         { key: 'tipo', label: 'Tipo', sortable: false },
@@ -461,6 +461,14 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
         { key: 'fechaRespuesta', label: 'Fecha Respuesta', sortable: false },
         { key: 'tiempoRestante', label: isClosedTab ? 'Tiempo Resolución' : 'Tiempo Restante', sortable: false },
     ];
+    
+    const tableHeaders = useMemo(() => {
+        if (isClosedTab) {
+            return allHeaders;
+        }
+        return allHeaders.filter(header => header.key !== 'fechaRespuesta');
+    }, [isClosedTab]);
+
 
     const handleFilterChange = (e: ChangeEvent<HTMLInputElement>, key: keyof Solicitud) => {
         setFilters(prev => ({...prev, [key]: e.target.value }));
@@ -519,6 +527,33 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
         setItemsPerPage(Number(value));
         setCurrentPage(1);
     };
+    
+    const getCellValue = (solicitud: Solicitud, key: keyof Solicitud) => {
+        switch (key) {
+            case 'fechaEnvio':
+            case 'fechaRespuesta':
+                return formatDate(solicitud[key]);
+            case 'id':
+                return (
+                    <Button variant="link" asChild className="p-0 h-auto">
+                        <Link href={`/solicitud-interna?id=${solicitud.id}`}>
+                            {solicitud.id}
+                        </Link>
+                    </Button>
+                );
+            case 'estado':
+                return (
+                     <Badge variant={getStatusVariant(solicitud.estado) as any}>
+                        {solicitud.estado}
+                    </Badge>
+                );
+            case 'tiempoRestante':
+                return isClosedTab ? solicitud.tiempoResolucion : solicitud.tiempoRestante;
+            default:
+                return solicitud[key as keyof Solicitud];
+        }
+    };
+
 
     return (
         <div className="space-y-4">
@@ -538,6 +573,7 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
                                     )}
                                 </TableHead>
                             ))}
+                             <TableHead></TableHead>
                         </TableRow>
                         <TableRow>
                             {tableHeaders.map(header => (
@@ -557,26 +593,11 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
                     <TableBody>
                     {currentSolicitudes.length > 0 ? currentSolicitudes.map((solicitud) => (
                         <TableRow key={solicitud.id} className="text-xs">
-                        <TableCell className="font-medium">
-                            <Button variant="link" asChild className="p-0 h-auto">
-                            <Link href={`/solicitud-interna?id=${solicitud.id}`}>
-                                {solicitud.id}
-                            </Link>
-                            </Button>
-                        </TableCell>
-                        <TableCell>{formatDate(solicitud.fechaEnvio)}</TableCell>
-                        <TableCell>{solicitud.tipo}</TableCell>
-                        <TableCell>{solicitud.tema}</TableCell>
-                        <TableCell>{solicitud.oficina}</TableCell>
-                        <TableCell>{solicitud.rut}</TableCell>
-                        <TableCell>{solicitud.ciudadano}</TableCell>
-                        <TableCell>
-                            <Badge variant={getStatusVariant(solicitud.estado) as any}>
-                            {solicitud.estado}
-                            </Badge>
-                        </TableCell>
-                        <TableCell>{formatDate(solicitud.fechaRespuesta)}</TableCell>
-                        <TableCell>{isClosedTab ? solicitud.tiempoResolucion : solicitud.tiempoRestante}</TableCell>
+                             {tableHeaders.map(header => (
+                                <TableCell key={header.key} className="font-medium">
+                                    {getCellValue(solicitud, header.key)}
+                                </TableCell>
+                            ))}
                         </TableRow>
                     )) : (
                         <TableRow>
@@ -670,3 +691,5 @@ export default function BackofficeDashboard() {
         </Card>
     );
 }
+
+    
