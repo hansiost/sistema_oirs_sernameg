@@ -1,3 +1,4 @@
+
 import {
   Card,
   CardContent,
@@ -59,6 +60,10 @@ const mockUserData = {
   nombres: 'Juana Andrea',
   apellidoPaterno: 'Pérez',
   apellidoMaterno: 'González',
+  sexo: 'Mujer',
+  estadoCivil: 'Soltera',
+  genero: 'Femenino',
+  puebloOriginario: 'Mapuche',
 };
 
 
@@ -143,6 +148,22 @@ export default function EstadoSolicitudesPage({ searchParams }: { searchParams?:
             <div className="space-y-1">
               <Label>Apellido Materno</Label>
               <Input value={mockUserData.apellidoMaterno} disabled />
+            </div>
+            <div className="space-y-1">
+              <Label>Sexo</Label>
+              <Input value={mockUserData.sexo} disabled />
+            </div>
+            <div className="space-y-1">
+              <Label>Estado Civil</Label>
+              <Input value={mockUserData.estadoCivil} disabled />
+            </div>
+             <div className="space-y-1">
+              <Label>Género</Label>
+              <Input value={mockUserData.genero} disabled />
+            </div>
+            <div className="space-y-1">
+              <Label>Pueblo Originario</Label>
+              <Input value={mockUserData.puebloOriginario} disabled />
             </div>
           </CardContent>
         </Card>
