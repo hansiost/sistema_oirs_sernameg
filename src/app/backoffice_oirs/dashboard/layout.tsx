@@ -1,3 +1,4 @@
+
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
@@ -36,7 +37,7 @@ const menuItems = [
 
 const adminSubMenuItems = [
     { href: '#', label: 'Usuarios', icon: Users },
-    { href: '#', label: 'Otros parámetros', icon: Wrench },
+    { href: '#', label: 'Permisos', icon: KeyRound },
 ];
 
 const maintainerSubMenuItems = [
