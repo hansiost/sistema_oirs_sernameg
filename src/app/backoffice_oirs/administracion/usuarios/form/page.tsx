@@ -169,7 +169,7 @@ const UserFormContent = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Oficina Regional</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Seleccione una oficina" />
@@ -191,7 +191,7 @@ const UserFormContent = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Perfil</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Seleccione un perfil" />
@@ -213,7 +213,7 @@ const UserFormContent = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Estado</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Seleccione un estado" />
