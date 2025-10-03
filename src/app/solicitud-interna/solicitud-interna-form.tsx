@@ -384,13 +384,13 @@ export default function SolicitudInternaForm() {
   return (
     <>
       <div className="text-center mb-8">
-          <h1 className="font-headline text-4xl font-bold text-primary">
-            {pageTitle}
-          </h1>
-          <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
-            {pageDescription}
-          </p>
-        </div>
+        <h1 className="font-headline text-4xl font-bold text-primary">
+          {pageTitle}
+        </h1>
+        <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
+          {pageDescription}
+        </p>
+      </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           {mode === 'create' && (
@@ -669,6 +669,34 @@ export default function SolicitudInternaForm() {
                   <CardTitle>Detalle de la Solicitud</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                   <FormField
+                    control={form.control}
+                    name="viaIngreso"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Vía de Ingreso</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={isRequestCreated}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccione la vía de ingreso" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {VIAS_DE_INGRESO.map((via) => (
+                              <SelectItem key={via} value={via}>
+                                {via}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <div className="grid sm:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
@@ -733,34 +761,6 @@ export default function SolicitudInternaForm() {
                       )}
                     />
                   </div>
-                   <FormField
-                    control={form.control}
-                    name="viaIngreso"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Vía de Ingreso</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                          disabled={isRequestCreated}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Seleccione la vía de ingreso" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {VIAS_DE_INGRESO.map((via) => (
-                              <SelectItem key={via} value={via}>
-                                {via}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                   <FormField
                       control={form.control}
                       name="oficinaRegional"
@@ -986,7 +986,7 @@ export default function SolicitudInternaForm() {
                                   <FormControl>
                                   <SelectTrigger>
                                       <SelectValue placeholder="Seleccione un tipo" />
-                                  </Trigger>
+                                  </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
                                   {TIPO_RESOLUCION_OPTIONS.map((option) => (
@@ -1122,3 +1122,5 @@ export default function SolicitudInternaForm() {
     </>
   );
 }
+
+    
