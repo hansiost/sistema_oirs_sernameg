@@ -1,6 +1,5 @@
-
 'use client';
-import { useState, useMemo, ChangeEvent } from 'react';
+import { useState, useMemo, ChangeEvent, FC } from 'react';
 import Link from 'next/link';
 import {
   Table,
@@ -30,6 +29,7 @@ import {
 } from '@/components/ui/pagination';
 import { ArrowUpDown, FilePenLine } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 
 type Solicitud = {
@@ -206,9 +206,9 @@ const mockSolicitudes: Solicitud[] = [
     tema: 'Nuevos programas o talleres',
     oficina: 'La Araucanía',
     ciudadano: 'Patricia Morales',
-    estado: 'Ingresada',
-    fechaRespuesta: null,
-    tiempoRestante: '12 días',
+    estado: 'Cancelada',
+    fechaRespuesta: '2024-07-14',
+    tiempoRestante: '-',
   },
   {
     id: 'FG-96081',
@@ -377,6 +377,7 @@ const getStatusVariant = (estado: string) => {
   if (estado === 'Ingresada') return 'outline';
   if (estado === 'En proceso') return 'secondary';
   if (estado === 'Respondida') return 'default';
+  if (estado === 'Cancelada') return 'destructive';
   return 'default';
 };
 
@@ -388,8 +389,25 @@ const formatDate = (dateString: string | null) => {
     return `${day}-${month}-${year}`;
 };
 
+const tableHeaders: { key: keyof Solicitud, label: string, sortable: boolean }[] = [
+    { key: 'id', label: 'N° Solicitud', sortable: true },
+    { key: 'fechaEnvio', label: 'Fecha envío', sortable: true },
+    { key: 'tipo', label: 'Tipo', sortable: false },
+    { key: 'tema', label: 'Tema', sortable: false },
+    { key: 'oficina', label: 'Oficina Regional', sortable: false },
+    { key: 'ciudadano', label: 'Nombre Ciudadano', sortable: false },
+    { key: 'estado', label: 'Estado', sortable: false },
+    { key: 'fechaRespuesta', label: 'Fecha Respuesta', sortable: false },
+    { key: 'tiempoRestante', label: 'Tiempo Restante', sortable: false },
+];
 
-export default function BackofficeDashboard() {
+
+interface SolicitudesTableProps {
+    solicitudes: Solicitud[];
+}
+
+
+const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [filters, setFilters] = useState<Partial<Record<keyof Solicitud, string>>>({});
@@ -409,7 +427,7 @@ export default function BackofficeDashboard() {
     };
 
     const filteredSolicitudes = useMemo(() => {
-        let filtered = [...mockSolicitudes];
+        let filtered = [...solicitudes];
 
         Object.entries(filters).forEach(([key, value]) => {
             if (value) {
@@ -433,7 +451,7 @@ export default function BackofficeDashboard() {
         }
 
         return filtered;
-    }, [filters, sortConfig]);
+    }, [filters, sortConfig, solicitudes]);
 
     const totalPages = Math.ceil(filteredSolicitudes.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -452,136 +470,153 @@ export default function BackofficeDashboard() {
         setItemsPerPage(Number(value));
         setCurrentPage(1);
     };
-    
-    const tableHeaders: { key: keyof Solicitud, label: string, sortable: boolean }[] = [
-        { key: 'id', label: 'N° Solicitud', sortable: true },
-        { key: 'fechaEnvio', label: 'Fecha envío', sortable: true },
-        { key: 'tipo', label: 'Tipo', sortable: false },
-        { key: 'tema', label: 'Tema', sortable: false },
-        { key: 'oficina', label: 'Oficina Regional', sortable: false },
-        { key: 'ciudadano', label: 'Nombre Ciudadano', sortable: false },
-        { key: 'estado', label: 'Estado', sortable: false },
-        { key: 'fechaRespuesta', label: 'Fecha Respuesta', sortable: false },
-        { key: 'tiempoRestante', label: 'Tiempo Restante', sortable: false },
-    ];
 
-
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-            <CardTitle>Bandeja de Entrada de Solicitudes</CardTitle>
-            <CardDescription>
-            Aquí se muestran las últimas solicitudes ciudadanas recibidas.
-            </CardDescription>
-        </div>
-        <div className="flex gap-2">
-            <Button asChild variant="secondary">
-                <Link href="/solicitud-interna">
-                    <FilePenLine className="mr-2 h-4 w-4" />
-                    Crear Solicitud Interna
-                </Link>
-            </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                {tableHeaders.map(header => (
-                    <TableHead key={header.key}>
-                        {header.sortable ? (
-                            <Button variant="ghost" onClick={() => requestSort(header.key)}>
-                                {header.label}
-                                <ArrowUpDown className="ml-2 h-4 w-4" />
-                            </Button>
-                        ) : (
-                            header.label
-                        )}
-                    </TableHead>
-                ))}
-              </TableRow>
-              <TableRow>
-                {tableHeaders.map(header => (
-                    <TableHead key={`${header.key}-filter`}>
-                       {header.key !== 'fechaRespuesta' && header.key !== 'tiempoRestante' ? (
-                            <Input
-                                placeholder={`Filtrar...`}
-                                value={filters[header.key] || ''}
-                                onChange={(e) => handleFilterChange(e, header.key)}
-                                className="h-8"
-                            />
-                        ) : (<div />)}
-                    </TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {currentSolicitudes.map((solicitud) => (
-                <TableRow key={solicitud.id} className="text-xs">
-                  <TableCell className="font-medium">
-                     <Button variant="link" asChild className="p-0 h-auto">
-                      <Link href={`/solicitud-interna?id=${solicitud.id}`}>
-                        {solicitud.id}
-                      </Link>
-                    </Button>
-                  </TableCell>
-                  <TableCell>{formatDate(solicitud.fechaEnvio)}</TableCell>
-                  <TableCell>{solicitud.tipo}</TableCell>
-                  <TableCell>{solicitud.tema}</TableCell>
-                  <TableCell>{solicitud.oficina}</TableCell>
-                  <TableCell>{solicitud.ciudadano}</TableCell>
-                  <TableCell>
-                    <Badge variant={getStatusVariant(solicitud.estado) as any}>
-                      {solicitud.estado}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{formatDate(solicitud.fechaRespuesta)}</TableCell>
-                  <TableCell>{solicitud.tiempoRestante}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-       <CardFooter>
-        <div className="flex justify-between w-full items-center">
-            <div className="text-xs text-muted-foreground">
-                Mostrando {Math.min(itemsPerPage, currentSolicitudes.length)} de {filteredSolicitudes.length} solicitudes.
-            </div>
-             <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">Items por página:</span>
-                     <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                        <SelectTrigger className="h-8 w-20">
-                            <SelectValue placeholder={itemsPerPage} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {[10, 20, 30, 40, 50].map(size => (
-                                <SelectItem key={size} value={size.toString()}>{size}</SelectItem>
+    return (
+        <div className="space-y-4">
+            <div className="overflow-x-auto">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            {tableHeaders.map(header => (
+                                <TableHead key={header.key}>
+                                    {header.sortable ? (
+                                        <Button variant="ghost" onClick={() => requestSort(header.key)}>
+                                            {header.label}
+                                            <ArrowUpDown className="ml-2 h-4 w-4" />
+                                        </Button>
+                                    ) : (
+                                        header.label
+                                    )}
+                                </TableHead>
                             ))}
-                        </SelectContent>
-                    </Select>
-                </div>
+                        </TableRow>
+                        <TableRow>
+                            {tableHeaders.map(header => (
+                                <TableHead key={`${header.key}-filter`}>
+                                {header.key !== 'fechaRespuesta' && header.key !== 'tiempoRestante' ? (
+                                        <Input
+                                            placeholder={`Filtrar...`}
+                                            value={filters[header.key] || ''}
+                                            onChange={(e) => handleFilterChange(e, header.key)}
+                                            className="h-8"
+                                        />
+                                    ) : (<div />)}
+                                </TableHead>
+                            ))}
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                    {currentSolicitudes.length > 0 ? currentSolicitudes.map((solicitud) => (
+                        <TableRow key={solicitud.id} className="text-xs">
+                        <TableCell className="font-medium">
+                            <Button variant="link" asChild className="p-0 h-auto">
+                            <Link href={`/solicitud-interna?id=${solicitud.id}`}>
+                                {solicitud.id}
+                            </Link>
+                            </Button>
+                        </TableCell>
+                        <TableCell>{formatDate(solicitud.fechaEnvio)}</TableCell>
+                        <TableCell>{solicitud.tipo}</TableCell>
+                        <TableCell>{solicitud.tema}</TableCell>
+                        <TableCell>{solicitud.oficina}</TableCell>
+                        <TableCell>{solicitud.ciudadano}</TableCell>
+                        <TableCell>
+                            <Badge variant={getStatusVariant(solicitud.estado) as any}>
+                            {solicitud.estado}
+                            </Badge>
+                        </TableCell>
+                        <TableCell>{formatDate(solicitud.fechaRespuesta)}</TableCell>
+                        <TableCell>{solicitud.tiempoRestante}</TableCell>
+                        </TableRow>
+                    )) : (
+                        <TableRow>
+                            <TableCell colSpan={tableHeaders.length} className="h-24 text-center">
+                                No hay solicitudes para mostrar.
+                            </TableCell>
+                        </TableRow>
+                    )}
+                    </TableBody>
+                </Table>
+            </div>
+            <div className="flex justify-between w-full items-center">
                 <div className="text-xs text-muted-foreground">
-                    Página {currentPage} de {totalPages}.
+                    Mostrando {Math.min(itemsPerPage, currentSolicitudes.length)} de {filteredSolicitudes.length} solicitudes.
                 </div>
-                <Pagination>
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); handlePreviousPage(); }} aria-disabled={currentPage === 1} />
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationNext href="#" onClick={(e) => { e.preventDefault(); handleNextPage(); }} aria-disabled={currentPage === totalPages}/>
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">Items por página:</span>
+                        <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+                            <SelectTrigger className="h-8 w-20">
+                                <SelectValue placeholder={itemsPerPage} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {[10, 20, 30, 40, 50].map(size => (
+                                    <SelectItem key={size} value={size.toString()}>{size}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                        Página {currentPage} de {totalPages}.
+                    </div>
+                    <Pagination>
+                        <PaginationContent>
+                            <PaginationItem>
+                                <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); handlePreviousPage(); }} aria-disabled={currentPage === 1} />
+                            </PaginationItem>
+                            <PaginationItem>
+                                <PaginationNext href="#" onClick={(e) => { e.preventDefault(); handleNextPage(); }} aria-disabled={currentPage === totalPages}/>
+                            </PaginationItem>
+                        </PaginationContent>
+                    </Pagination>
+                </div>
             </div>
         </div>
-      </CardFooter>
-    </Card>
-  );
-}
+    );
+};
 
-    
+
+export default function BackofficeDashboard() {
+    const solicitudesEnProceso = useMemo(() => 
+        mockSolicitudes.filter(s => ['Ingresada', 'En proceso', 'En proceso (Urgente)'].includes(s.estado)), 
+    []);
+
+    const solicitudesCerradas = useMemo(() => 
+        mockSolicitudes.filter(s => ['Respondida', 'Cerrada', 'Cancelada'].includes(s.estado)), 
+    []);
+
+    return (
+        <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+                <CardTitle>Bandeja de Entrada de Solicitudes</CardTitle>
+                <CardDescription>
+                Aquí se muestran las últimas solicitudes ciudadanas recibidas.
+                </CardDescription>
+            </div>
+            <div className="flex gap-2">
+                <Button asChild variant="secondary">
+                    <Link href="/solicitud-interna">
+                        <FilePenLine className="mr-2 h-4 w-4" />
+                        Crear Solicitud Interna
+                    </Link>
+                </Button>
+            </div>
+        </CardHeader>
+        <CardContent>
+            <Tabs defaultValue="en-proceso">
+                <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="en-proceso">Solicitudes en Proceso</TabsTrigger>
+                    <TabsTrigger value="cerradas">Solicitudes Cerradas</TabsTrigger>
+                </TabsList>
+                <TabsContent value="en-proceso" className="mt-4">
+                    <SolicitudesTable solicitudes={solicitudesEnProceso} />
+                </TabsContent>
+                <TabsContent value="cerradas" className="mt-4">
+                    <SolicitudesTable solicitudes={solicitudesCerradas} />
+                </TabsContent>
+            </Tabs>
+        </CardContent>
+        </Card>
+    );
+}
