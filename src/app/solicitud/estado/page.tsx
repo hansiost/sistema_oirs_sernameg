@@ -203,7 +203,7 @@ export default function EstadoSolicitudesPage({ searchParams }: { searchParams?:
                     <TableHead>Fecha de Envío</TableHead>
                     <TableHead>Descripción</TableHead>
                     <TableHead>Estado Solicitud</TableHead>
-                    <TableHead className="text-right">Acción</TableHead>
+                    <TableHead className="text-right">Encuesta de Satisfacción</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -230,6 +230,7 @@ export default function EstadoSolicitudesPage({ searchParams }: { searchParams?:
                             size="icon"
                             onClick={() => handleOpenSurvey(solicitud)}
                             aria-label="Realizar encuesta de satisfacción"
+                            disabled={solicitud.estado !== 'Respondida'}
                          >
                             <ClipboardList className="h-4 w-4" />
                         </Button>
