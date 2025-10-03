@@ -44,6 +44,7 @@ type Solicitud = {
     estado: string;
     fechaRespuesta: string | null;
     tiempoRestante: string;
+    tiempoResolucion?: string;
 }
 
 const mockSolicitudes: Solicitud[] = [
@@ -82,6 +83,7 @@ const mockSolicitudes: Solicitud[] = [
     estado: 'Respondida',
     fechaRespuesta: '2024-07-26',
     tiempoRestante: '-',
+    tiempoResolucion: '1 día',
   },
   {
     id: 'GH-98765',
@@ -94,6 +96,7 @@ const mockSolicitudes: Solicitud[] = [
     estado: 'Cerrada',
     fechaRespuesta: '2024-07-25',
     tiempoRestante: '-',
+    tiempoResolucion: '1 día',
   },
   {
     id: 'IJ-11223',
@@ -106,6 +109,7 @@ const mockSolicitudes: Solicitud[] = [
     estado: 'Cerrada',
     fechaRespuesta: '2024-07-23',
     tiempoRestante: '-',
+    tiempoResolucion: '1 día',
   },
   {
     id: 'KL-33445',
@@ -154,6 +158,7 @@ const mockSolicitudes: Solicitud[] = [
     estado: 'Respondida',
     fechaRespuesta: '2024-07-22',
     tiempoRestante: '-',
+    tiempoResolucion: '3 días',
   },
   {
     id: 'ST-10203',
@@ -166,6 +171,7 @@ const mockSolicitudes: Solicitud[] = [
     estado: 'Cerrada',
     fechaRespuesta: '2024-07-19',
     tiempoRestante: '-',
+    tiempoResolucion: '1 día',
   },
   {
     id: 'UV-21314',
@@ -202,6 +208,7 @@ const mockSolicitudes: Solicitud[] = [
     estado: 'Respondida',
     fechaRespuesta: '2024-07-18',
     tiempoRestante: '-',
+    tiempoResolucion: '3 días',
   },
   {
     id: 'BC-74869',
@@ -214,6 +221,7 @@ const mockSolicitudes: Solicitud[] = [
     estado: 'Cerrada',
     fechaRespuesta: '2024-07-14',
     tiempoRestante: '-',
+    tiempoResolucion: '0 días',
   },
   {
     id: 'DE-85970',
@@ -226,6 +234,7 @@ const mockSolicitudes: Solicitud[] = [
     estado: 'Cancelada',
     fechaRespuesta: '2024-07-14',
     tiempoRestante: '-',
+    tiempoResolucion: '1 día',
   },
   {
     id: 'FG-96081',
@@ -262,6 +271,7 @@ const mockSolicitudes: Solicitud[] = [
     estado: 'Respondida',
     fechaRespuesta: '2024-07-13',
     tiempoRestante: '-',
+    tiempoResolucion: '3 días',
   },
   {
     id: 'LM-39415',
@@ -274,6 +284,7 @@ const mockSolicitudes: Solicitud[] = [
     estado: 'Cerrada',
     fechaRespuesta: '2024-07-10',
     tiempoRestante: '-',
+    tiempoResolucion: '1 día',
   },
   {
     id: 'NO-40526',
@@ -286,6 +297,7 @@ const mockSolicitudes: Solicitud[] = [
     estado: 'Cerrada',
     fechaRespuesta: '2024-07-08',
     tiempoRestante: '-',
+    tiempoResolucion: '0 días',
   },
   {
     id: 'PQ-51637',
@@ -322,6 +334,7 @@ const mockSolicitudes: Solicitud[] = [
     estado: 'Respondida',
     fechaRespuesta: '2024-07-08',
     tiempoRestante: '-',
+    tiempoResolucion: '3 días',
   },
   {
     id: 'VW-84960',
@@ -346,6 +359,7 @@ const mockSolicitudes: Solicitud[] = [
     estado: 'Cerrada',
     fechaRespuesta: '2024-07-03',
     tiempoRestante: '-',
+    tiempoResolucion: '0 días',
   },
   {
     id: 'ZA-06182',
@@ -382,6 +396,7 @@ const mockSolicitudes: Solicitud[] = [
     estado: 'Respondida',
     fechaRespuesta: '2024-07-02',
     tiempoRestante: '-',
+    tiempoResolucion: '2 días',
   },
   {
     id: 'EG-39415',
@@ -394,6 +409,7 @@ const mockSolicitudes: Solicitud[] = [
     estado: 'Cerrada',
     fechaRespuesta: '2024-06-30',
     tiempoRestante: '-',
+    tiempoResolucion: '1 día',
   },
 ];
 
@@ -420,30 +436,31 @@ const formatDate = (dateString: string | null) => {
     return `${day}-${month}-${year}`;
 };
 
-const tableHeaders: { key: keyof Solicitud, label: string, sortable: boolean }[] = [
-    { key: 'id', label: 'N° Solicitud', sortable: true },
-    { key: 'fechaEnvio', label: 'Fecha envío', sortable: true },
-    { key: 'tipo', label: 'Tipo', sortable: false },
-    { key: 'tema', label: 'Asunto', sortable: false },
-    { key: 'oficina', label: 'Oficina Regional', sortable: false },
-    { key: 'rut', label: 'RUT', sortable: true },
-    { key: 'ciudadano', label: 'Nombre Ciudadano', sortable: false },
-    { key: 'estado', label: 'Estado', sortable: false },
-    { key: 'fechaRespuesta', label: 'Fecha Respuesta', sortable: false },
-    { key: 'tiempoRestante', label: 'Tiempo Restante', sortable: false },
-];
-
 
 interface SolicitudesTableProps {
     solicitudes: Solicitud[];
+    isClosedTab?: boolean;
 }
 
 
-const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes }) => {
+const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab = false }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [filters, setFilters] = useState<Partial<Record<keyof Solicitud, string>>>({});
     const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'fechaEnvio', direction: 'descending' });
+
+    const tableHeaders: { key: keyof Solicitud, label: string, sortable: boolean }[] = [
+        { key: 'id', label: 'N° Solicitud', sortable: true },
+        { key: 'fechaEnvio', label: 'Fecha envío', sortable: true },
+        { key: 'tipo', label: 'Tipo', sortable: false },
+        { key: 'tema', label: 'Asunto', sortable: false },
+        { key: 'oficina', label: 'Oficina Regional', sortable: false },
+        { key: 'rut', label: 'RUT', sortable: true },
+        { key: 'ciudadano', label: 'Nombre Ciudadano', sortable: false },
+        { key: 'estado', label: 'Estado', sortable: false },
+        { key: 'fechaRespuesta', label: 'Fecha Respuesta', sortable: false },
+        { key: 'tiempoRestante', label: isClosedTab ? 'Tiempo Resolución' : 'Tiempo Restante', sortable: false },
+    ];
 
     const handleFilterChange = (e: ChangeEvent<HTMLInputElement>, key: keyof Solicitud) => {
         setFilters(prev => ({...prev, [key]: e.target.value }));
@@ -559,7 +576,7 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes }) => {
                             </Badge>
                         </TableCell>
                         <TableCell>{formatDate(solicitud.fechaRespuesta)}</TableCell>
-                        <TableCell>{solicitud.tiempoRestante}</TableCell>
+                        <TableCell>{isClosedTab ? solicitud.tiempoResolucion : solicitud.tiempoRestante}</TableCell>
                         </TableRow>
                     )) : (
                         <TableRow>
@@ -646,14 +663,10 @@ export default function BackofficeDashboard() {
                     <SolicitudesTable solicitudes={solicitudesEnProceso} />
                 </TabsContent>
                 <TabsContent value="cerradas" className="mt-4">
-                    <SolicitudesTable solicitudes={solicitudesCerradas} />
+                    <SolicitudesTable solicitudes={solicitudesCerradas} isClosedTab={true} />
                 </TabsContent>
             </Tabs>
         </CardContent>
         </Card>
     );
 }
-
-    
-
-    
