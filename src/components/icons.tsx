@@ -1,3 +1,4 @@
+
 import {
   HelpCircle,
   Lightbulb,
@@ -18,6 +19,7 @@ import {
   Waypoints,
   Wrench,
   Building,
+  ClipboardList,
 } from 'lucide-react';
 
 export type Icon = LucideIcon;
@@ -41,4 +43,5 @@ export const Icons = {
   Waypoints: Waypoints,
   Wrench: Wrench,
   Building: Building,
+  Survey: ClipboardList,
 };
