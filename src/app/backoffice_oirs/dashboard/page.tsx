@@ -520,7 +520,13 @@ export default function BackofficeDashboard() {
             <TableBody>
               {currentSolicitudes.map((solicitud) => (
                 <TableRow key={solicitud.id} className="text-xs">
-                  <TableCell className="font-medium">{solicitud.id}</TableCell>
+                  <TableCell className="font-medium">
+                     <Button variant="link" asChild className="p-0 h-auto">
+                      <Link href={`/solicitud-interna?id=${solicitud.id}`}>
+                        {solicitud.id}
+                      </Link>
+                    </Button>
+                  </TableCell>
                   <TableCell>{formatDate(solicitud.fechaEnvio)}</TableCell>
                   <TableCell>{solicitud.tipo}</TableCell>
                   <TableCell>{solicitud.tema}</TableCell>
@@ -577,3 +583,5 @@ export default function BackofficeDashboard() {
     </Card>
   );
 }
+
+    

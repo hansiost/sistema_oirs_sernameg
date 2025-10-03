@@ -1,11 +1,11 @@
 
 'use client';
 
-import { useTransition, useState } from 'react';
+import { useTransition, useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -144,18 +144,18 @@ const mockUserApi = (rut: string) => {
   } | null>((resolve) => {
     setTimeout(() => {
       const cleanedRut = cleanRut(rut);
-      if (cleanedRut.startsWith('12345678')) {
+      if (cleanedRut.startsWith('12345678') || cleanedRut.includes('AB-12345')) {
         resolve({
-          rut: formatRut(rut),
+          rut: '12.345.678-9',
           nombres: 'Juana Andrea',
           apellidoPaterno: 'Pérez',
           apellidoMaterno: 'González',
           sexo: 'Mujer',
           estadoCivil: 'Soltera',
         });
-      } else if (cleanedRut.startsWith('11478406')) {
+      } else if (cleanedRut.startsWith('11478406') || cleanedRut.includes('CD-67890')) {
         resolve({
-          rut: formatRut(rut),
+          rut: '11.478.406-0',
           nombres: 'Ana María',
           apellidoPaterno: 'López',
           apellidoMaterno: 'Soto',
@@ -165,9 +165,26 @@ const mockUserApi = (rut: string) => {
       } else {
         resolve(null);
       }
-    }, 1000);
+    }, 500);
   });
 };
+
+const mockSolicitudData: Partial<FormValues> = {
+    calle: "Av. Siempre Viva",
+    numero: "742",
+    comuna: "Providencia",
+    region: "Metropolitana de Santiago",
+    telefono: "+56987654321",
+    email: "juana.perez@email.com",
+    genero: "Femenino",
+    puebloOriginario: "Ninguno",
+    requestType: "Consulta",
+    oficinaRegional: "Metropolitana de Santiago",
+    topic: "Derechos de la mujer",
+    subject: "Consulta sobre derechos laborales",
+    description: "Quisiera saber más sobre los derechos laborales para mujeres, específicamente en lo que respecta a la igualdad salarial y el acoso en el lugar de trabajo. He sentido que en mi empleo actual no se están respetando estos principios y necesito orientación.",
+};
+
 
 const RESULTADO_ATENCION_OPTIONS = ['Respuesta directa', 'Derivación a programa', 'Derivación a otra institución', 'No aplica', 'Otro'];
 const TIPO_RESOLUCION_OPTIONS = ['Resolución favorable', 'Resolución no favorable', 'Sin resolución', 'No aplica'];
@@ -175,9 +192,14 @@ const TIPO_RESOLUCION_OPTIONS = ['Resolución favorable', 'Resolución no favora
 
 export default function SolicitudInternaForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
   const [isVerifying, startVerifyingTransition] = useTransition();
   const [isSubmitting, startSubmitTransition] = useTransition();
+  
+  const editId = searchParams.get('id');
+  const [mode, setMode] = useState<'create' | 'edit'>(editId ? 'edit' : 'create');
+
   const [userFound, setUserFound] = useState(false);
   const [rutInput, setRutInput] = useState('');
   const [isRequestCreated, setIsRequestCreated] = useState(false);
@@ -211,6 +233,34 @@ export default function SolicitudInternaForm() {
       gestionAttachments: [],
     },
   });
+
+  const loadEditData = async (id: string) => {
+    // In a real app, this would be an API call to fetch the request data
+    toast({ title: 'Cargando solicitud...', description: `Cargando datos para la solicitud N° ${id}.` });
+    const userData = await mockUserApi(id); // Use a mock to get user data based on ID
+    if (userData) {
+        Object.entries(userData).forEach(([key, value]) => {
+          form.setValue(key as keyof FormValues, value, { shouldValidate: true });
+        });
+        Object.entries(mockSolicitudData).forEach(([key, value]) => {
+            form.setValue(key as keyof FormValues, value, { shouldValidate: true });
+        });
+        setUserFound(true);
+        setIsRequestCreated(true); // Go directly to management section
+        setRutInput(userData.rut);
+        toast({ title: 'Solicitud Cargada', description: `Se han cargado los datos para la solicitud N° ${id}.` });
+    } else {
+        toast({ title: 'Error', description: 'No se pudo cargar la solicitud.', variant: 'destructive' });
+        router.push('/backoffice_oirs/dashboard');
+    }
+  };
+
+  useEffect(() => {
+    if (editId) {
+      setMode('edit');
+      loadEditData(editId);
+    }
+  }, [editId]);
   
   const handleVerificarRut = () => {
     const result = rutSchema.safeParse(rutInput);
@@ -248,6 +298,12 @@ export default function SolicitudInternaForm() {
   const attachmentsValue = form.watch('attachments') || [];
   const gestionAttachmentsValue = form.watch('gestionAttachments') || [];
   const [availableTopics, setAvailableTopics] = useState<string[]>([]);
+
+  useEffect(() => {
+      if (requestType) {
+          setAvailableTopics(TOPICS[requestType] || []);
+      }
+  }, [requestType]);
   
   const handleRequestTypeChange = (value: string) => {
     const newType = value as RequestType;
@@ -260,7 +316,6 @@ export default function SolicitudInternaForm() {
     startSubmitTransition(async () => {
       const formData = new FormData();
       
-      // We only send the fields up to the description/attachments, not the management part yet.
       const keysToSubmit: (keyof FormValues)[] = [
         'rut', 'nombres', 'apellidoPaterno', 'apellidoMaterno', 'sexo', 'estadoCivil', 'calle', 'numero', 'comuna', 'region', 'telefono', 'email', 'genero', 'puebloOriginario', 'requestType', 'oficinaRegional', 'topic', 'subject', 'description'
       ];
@@ -306,60 +361,70 @@ export default function SolicitudInternaForm() {
         router.push('/backoffice_oirs/dashboard');
     }, 1500);
   };
+
+  const pageTitle = mode === 'edit' ? `Gestión de Solicitud N° ${editId}` : 'Formulario de Ingreso de Solicitud Interna';
+  const pageDescription = mode === 'edit' ? 'Gestione y responda la solicitud del ciudadano.' : 'Ingrese el RUT del ciudadano para comenzar. Sus datos se cargarán y luego podrá completar la solicitud en su nombre.';
   
   const formError = form.formState.errors.rut;
 
   return (
     <>
+      <div className="text-center mb-8">
+          <h1 className="font-headline text-4xl font-bold text-primary">
+            {pageTitle}
+          </h1>
+          <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
+            {pageDescription}
+          </p>
+        </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>1. Identificación del Ciudadano</CardTitle>
-              <CardDescription>
-                Ingrese el RUT del ciudadano para buscar y autocompletar sus datos.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col sm:flex-row items-start gap-4">
-                <div className="w-full sm:w-auto flex-grow space-y-2">
-                  <Label htmlFor="rut">RUT del Ciudadano *</Label>
-                  <Input
-                    id="rut"
-                    placeholder="12.345.678-9"
-                    value={rutInput}
-                    onChange={(e) => setRutInput(e.target.value)}
-                    disabled={isVerifying || userFound}
-                    className={formError ? 'border-destructive' : ''}
-                  />
-                  {formError && <p className="text-sm font-medium text-destructive">{formError.message}</p>}
+          {mode === 'create' && (
+            <Card>
+              <CardHeader>
+                <CardTitle>1. Identificación del Ciudadano</CardTitle>
+                <CardDescription>
+                  Ingrese el RUT del ciudadano para buscar y autocompletar sus datos.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col sm:flex-row items-start gap-4">
+                  <div className="w-full sm:w-auto flex-grow space-y-2">
+                    <Label htmlFor="rut">RUT del Ciudadano *</Label>
+                    <Input
+                      id="rut"
+                      placeholder="12.345.678-9"
+                      value={rutInput}
+                      onChange={(e) => setRutInput(e.target.value)}
+                      disabled={isVerifying || userFound}
+                      className={formError ? 'border-destructive' : ''}
+                    />
+                    {formError && <p className="text-sm font-medium text-destructive">{formError.message}</p>}
+                  </div>
+                  <div className='pt-2 sm:pt-8'>
+                    <Button
+                      type="button"
+                      onClick={handleVerificarRut}
+                      disabled={isVerifying || userFound || !rutInput}
+                    >
+                      {isVerifying ? (
+                        <Icons.Loading className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Icons.Login className="mr-2 h-4 w-4" />
+                      )}
+                      Verificar RUT
+                    </Button>
+                  </div>
                 </div>
-                <div className='pt-2 sm:pt-8'>
-                  <Button
-                    type="button"
-                    onClick={handleVerificarRut}
-                    disabled={isVerifying || userFound || !rutInput}
-                  >
-                    {isVerifying ? (
-                      <Icons.Loading className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <Icons.Login className="mr-2 h-4 w-4" />
-                    )}
-                    Verificar RUT
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
 
           {userFound && (
             <>
               <Card>
                 <CardHeader>
-                  <CardTitle>2. Datos Personales</CardTitle>
-                  <CardDescription>
-                    Revise la información del ciudadano. Los campos con * son editables.
-                  </CardDescription>
+                  <CardTitle>Datos Personales</CardTitle>
                 </CardHeader>
                 <CardContent className="grid sm:grid-cols-2 gap-x-4 gap-y-6">
                   <FormField
@@ -439,10 +504,11 @@ export default function SolicitudInternaForm() {
                     name="genero"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Género *</FormLabel>
+                        <FormLabel>Género</FormLabel>
                         <Select
                           onValueChange={field.onChange}
-                          defaultValue={field.value}
+                          value={field.value}
+                          disabled={mode === 'edit'}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -466,10 +532,11 @@ export default function SolicitudInternaForm() {
                     name="puebloOriginario"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Pueblo Originario *</FormLabel>
+                        <FormLabel>Pueblo Originario</FormLabel>
                         <Select
                           onValueChange={field.onChange}
-                          defaultValue={field.value}
+                          value={field.value}
+                           disabled={mode === 'edit'}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -493,10 +560,7 @@ export default function SolicitudInternaForm() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>3. Datos de Contacto</CardTitle>
-                  <CardDescription>
-                    Por favor, complete la información de contacto del ciudadano.
-                  </CardDescription>
+                  <CardTitle>Datos de Contacto</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid sm:grid-cols-3 gap-4">
@@ -507,7 +571,7 @@ export default function SolicitudInternaForm() {
                         <FormItem className="sm:col-span-2">
                           <FormLabel>Calle</FormLabel>
                           <FormControl>
-                            <Input placeholder="Ej: Av. Libertador" {...field} />
+                            <Input placeholder="Ej: Av. Libertador" {...field} disabled={mode === 'edit'} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -520,7 +584,7 @@ export default function SolicitudInternaForm() {
                         <FormItem>
                           <FormLabel>Número</FormLabel>
                           <FormControl>
-                            <Input placeholder="Ej: 123" {...field} />
+                            <Input placeholder="Ej: 123" {...field} disabled={mode === 'edit'} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -535,7 +599,7 @@ export default function SolicitudInternaForm() {
                         <FormItem>
                           <FormLabel>Comuna</FormLabel>
                           <FormControl>
-                            <Input placeholder="Ej: Santiago" {...field} />
+                            <Input placeholder="Ej: Santiago" {...field} disabled={mode === 'edit'} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -548,7 +612,7 @@ export default function SolicitudInternaForm() {
                         <FormItem>
                           <FormLabel>Región</FormLabel>
                           <FormControl>
-                            <Input placeholder="Ej: Metropolitana" {...field} />
+                            <Input placeholder="Ej: Metropolitana" {...field} disabled={mode === 'edit'} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -563,7 +627,7 @@ export default function SolicitudInternaForm() {
                         <FormItem>
                           <FormLabel>Teléfono</FormLabel>
                           <FormControl>
-                            <Input placeholder="+56 9 1234 5678" {...field} />
+                            <Input placeholder="+56 9 1234 5678" {...field} disabled={mode === 'edit'} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -576,7 +640,7 @@ export default function SolicitudInternaForm() {
                         <FormItem>
                           <FormLabel>E-mail</FormLabel>
                           <FormControl>
-                            <Input placeholder="juana.perez@email.com" {...field} />
+                            <Input placeholder="juana.perez@email.com" {...field} disabled={mode === 'edit'} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -588,10 +652,7 @@ export default function SolicitudInternaForm() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>4. Detalle de la Solicitud</CardTitle>
-                  <CardDescription>
-                    Seleccione el tipo de solicitud y describa el requerimiento.
-                  </CardDescription>
+                  <CardTitle>Detalle de la Solicitud</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid sm:grid-cols-2 gap-4">
@@ -600,10 +661,10 @@ export default function SolicitudInternaForm() {
                       name="requestType"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Tipo de Solicitud *</FormLabel>
+                          <FormLabel>Tipo de Solicitud</FormLabel>
                           <Select
                             onValueChange={handleRequestTypeChange}
-                            defaultValue={field.value}
+                            value={field.value}
                             disabled={isRequestCreated}
                           >
                             <FormControl>
@@ -634,7 +695,7 @@ export default function SolicitudInternaForm() {
                       name="topic"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Tema Específico *</FormLabel>
+                          <FormLabel>Tema Específico</FormLabel>
                           <Select
                             onValueChange={field.onChange}
                             value={field.value}
@@ -663,10 +724,10 @@ export default function SolicitudInternaForm() {
                       name="oficinaRegional"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Oficina Regional a la que dirige la solicitud *</FormLabel>
+                          <FormLabel>Oficina Regional a la que dirige la solicitud</FormLabel>
                           <Select
                             onValueChange={field.onChange}
-                            defaultValue={field.value}
+                            value={field.value}
                             disabled={isRequestCreated}
                           >
                             <FormControl>
@@ -691,7 +752,7 @@ export default function SolicitudInternaForm() {
                     name="subject"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Asunto o título *</FormLabel>
+                        <FormLabel>Asunto o título</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="Ej: Problema con atención en oficina"
@@ -708,7 +769,7 @@ export default function SolicitudInternaForm() {
                     name="description"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Descripción de la solicitud *</FormLabel>
+                        <FormLabel>Descripción de la solicitud</FormLabel>
                         <FormControl>
                           <Textarea
                             placeholder="Explique aquí la situación de la forma más clara posible..."
@@ -732,25 +793,27 @@ export default function SolicitudInternaForm() {
                     name="attachments"
                     render={({ field: { onChange, onBlur, name, ref }, fieldState }) => (
                       <FormItem>
-                        <FormLabel>Adjuntar Archivos (Opcional)</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="file"
-                            multiple
-                            accept={ALLOWED_FILE_TYPES.join(',')}
-                            onChange={(e) => {
-                              const files = e.target.files ? Array.from(e.target.files) : [];
-                              const currentFiles = form.getValues('attachments') || [];
-                              onChange([...currentFiles, ...files]);
-                            }}
-                            onBlur={onBlur}
-                            name={name}
-                            ref={ref}
-                            disabled={isRequestCreated}
-                          />
-                        </FormControl>
+                        <FormLabel>Archivos Adjuntos</FormLabel>
+                         {mode === 'create' && (
+                            <FormControl>
+                            <Input
+                                type="file"
+                                multiple
+                                accept={ALLOWED_FILE_TYPES.join(',')}
+                                onChange={(e) => {
+                                const files = e.target.files ? Array.from(e.target.files) : [];
+                                const currentFiles = form.getValues('attachments') || [];
+                                onChange([...currentFiles, ...files]);
+                                }}
+                                onBlur={onBlur}
+                                name={name}
+                                ref={ref}
+                                disabled={isRequestCreated}
+                            />
+                            </FormControl>
+                         )}
                         <FormDescription>
-                          Puede adjuntar múltiples archivos (imágenes, PDF, Word, audio, video). Tamaño máx. por archivo: 5MB. Total: 25MB.
+                           {mode === 'create' ? 'Puede adjuntar múltiples archivos (imágenes, PDF, Word, audio, video). Tamaño máx. por archivo: 5MB. Total: 25MB.' : 'Archivos adjuntados a la solicitud.'}
                         </FormDescription>
                         {attachmentsValue.length > 0 && (
                           <div className="space-y-2 mt-2">
@@ -759,20 +822,22 @@ export default function SolicitudInternaForm() {
                               {attachmentsValue.map((file, index) => (
                                 <li key={index} className="text-sm flex items-center justify-between">
                                   <span>{file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-6 w-6 p-0"
-                                    onClick={() => {
-                                      const newFiles = [...attachmentsValue];
-                                      newFiles.splice(index, 1);
-                                      form.setValue('attachments', newFiles, { shouldValidate: true });
-                                    }}
-                                    disabled={isRequestCreated}
-                                  >
-                                    <X className="h-4 w-4" />
-                                  </Button>
+                                  {mode === 'create' && (
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-6 w-6 p-0"
+                                        onClick={() => {
+                                        const newFiles = [...attachmentsValue];
+                                        newFiles.splice(index, 1);
+                                        form.setValue('attachments', newFiles, { shouldValidate: true });
+                                        }}
+                                        disabled={isRequestCreated}
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                  )}
                                 </li>
                               ))}
                             </ul>
@@ -805,7 +870,7 @@ export default function SolicitudInternaForm() {
                 <>
                   <Card>
                     <CardHeader>
-                      <CardTitle>5. Gestión de la Solicitud</CardTitle>
+                      <CardTitle>Gestión de la Solicitud</CardTitle>
                       <CardDescription>
                         Complete los campos para gestionar y dar respuesta a la solicitud.
                       </CardDescription>
@@ -851,7 +916,7 @@ export default function SolicitudInternaForm() {
                           render={({ field }) => (
                               <FormItem>
                               <FormLabel>Resultado de la atención</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <Select onValueChange={field.onChange} value={field.value}>
                                   <FormControl>
                                   <SelectTrigger>
                                       <SelectValue placeholder="Seleccione un resultado" />
@@ -875,7 +940,7 @@ export default function SolicitudInternaForm() {
                           render={({ field }) => (
                               <FormItem>
                               <FormLabel>Tipo de Resolución</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <Select onValueChange={field.onChange} value={field.value}>
                                   <FormControl>
                                   <SelectTrigger>
                                       <SelectValue placeholder="Seleccione un tipo" />
