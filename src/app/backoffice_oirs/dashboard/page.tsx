@@ -1,4 +1,3 @@
-
 'use client';
 import { useState, useMemo, ChangeEvent, FC } from 'react';
 import Link from 'next/link';
@@ -419,13 +418,20 @@ type SortConfig = {
   direction: 'ascending' | 'descending';
 } | null;
 
-const getStatusVariant = (estado: string) => {
-  if (estado.includes('Urgente')) return 'destructive';
-  if (estado === 'Ingresada') return 'outline';
-  if (estado === 'En proceso') return 'secondary';
+const getStatusVariant = (estado: string, tiempoRestante: string): BadgeProps['variant'] => {
+  if (estado.includes('Urgente')) return 'danger';
+  
+  if (estado === 'Ingresada' || estado === 'En proceso') {
+    const dias = parseInt(tiempoRestante.split(' ')[0], 10);
+    if (dias <= 2) return 'danger';
+    if (dias >= 3 && dias <= 5) return 'warning';
+    if (dias >= 6) return 'success';
+  }
+
   if (estado === 'Respondida') return 'default';
+  if (estado === 'Cerrada') return 'secondary';
   if (estado === 'Cancelada') return 'destructive';
-  return 'default';
+  return 'outline';
 };
 
 const formatDate = (dateString: string | null) => {
@@ -543,7 +549,7 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
                 );
             case 'estado':
                 return (
-                     <Badge variant={getStatusVariant(solicitud.estado) as any}>
+                     <Badge variant={getStatusVariant(solicitud.estado, solicitud.tiempoRestante)}>
                         {solicitud.estado}
                     </Badge>
                 );

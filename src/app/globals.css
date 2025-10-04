@@ -24,6 +24,13 @@
     --input: 240 4% 92%;
     --ring: 265 80% 50%;
     --radius: 0.5rem;
+
+    --success: 142.1 76.2% 36.3%;
+    --success-foreground: 142.1 76.2% 96.3%;
+    --warning: 47.9 95.8% 53.1%;
+    --warning-foreground: 47.9 95.8% 13.1%;
+    --danger: 0 84.2% 60.2%;
+    --danger-foreground: 0 0% 98%;
   }
   .dark {
     --background: 240 6% 10%;
@@ -45,6 +52,13 @@
     --border: 240 5% 25%;
     --input: 240 5% 22%;
     --ring: 265 80% 55%;
+
+    --success: 142.1 76.2% 28.3%;
+    --success-foreground: 142.1 76.2% 88.3%;
+    --warning: 47.9 95.8% 40.1%;
+    --warning-foreground: 47.9 95.8% 10.1%;
+    --danger: 0 72.2% 50.6%;
+    --danger-foreground: 0 0% 98%;
   }
 }
 @layer base {
