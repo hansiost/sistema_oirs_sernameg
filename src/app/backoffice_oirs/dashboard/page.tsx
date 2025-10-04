@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useMemo, ChangeEvent, FC } from 'react';
 import Link from 'next/link';
@@ -9,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import { Badge, BadgeProps } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -130,7 +131,7 @@ const mockSolicitudes: Solicitud[] = [
     tema: 'Violencia intrafamiliar',
     oficina: 'Ñuble',
     ciudadano: 'Sara Muñoz',
-    estado: 'En proceso (Urgente)',
+    estado: 'En proceso',
     fechaRespuesta: null,
     tiempoRestante: '1 día',
   },
@@ -255,7 +256,7 @@ const mockSolicitudes: Solicitud[] = [
     tema: 'Maltrato laboral',
     oficina: 'Arica y Parinacota',
     ciudadano: 'Daniela Herrera',
-    estado: 'En proceso (Urgente)',
+    estado: 'En proceso',
     fechaRespuesta: null,
     tiempoRestante: '4 días',
   },
@@ -318,7 +319,7 @@ const mockSolicitudes: Solicitud[] = [
     tema: 'Violencia intrafamiliar',
     oficina: 'Antofagasta',
     ciudadano: 'Fernanda Ríos',
-    estado: 'En proceso (Urgente)',
+    estado: 'En proceso',
     fechaRespuesta: null,
     tiempoRestante: '3 días',
   },
@@ -419,8 +420,6 @@ type SortConfig = {
 } | null;
 
 const getStatusVariant = (estado: string, tiempoRestante: string): BadgeProps['variant'] => {
-  if (estado.includes('Urgente')) return 'danger';
-  
   if (estado === 'Ingresada' || estado === 'En proceso') {
     const dias = parseInt(tiempoRestante.split(' ')[0], 10);
     if (dias <= 2) return 'danger';
@@ -655,7 +654,7 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
 
 export default function BackofficeDashboard() {
     const solicitudesEnProceso = useMemo(() => 
-        mockSolicitudes.filter(s => ['Ingresada', 'En proceso', 'En proceso (Urgente)'].includes(s.estado)), 
+        mockSolicitudes.filter(s => ['Ingresada', 'En proceso'].includes(s.estado)), 
     []);
 
     const solicitudesCerradas = useMemo(() => 
