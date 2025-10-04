@@ -17,7 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { ArrowUpDown, Edit, FileUp, Files, Trash2 } from 'lucide-react';
+import { ArrowUpDown, Edit, FileUp, Files, Trash2, Download, FileText } from 'lucide-react';
 import { mockDocuments, type Documento } from '@/lib/mock-data-docs';
 import { Icons } from '@/components/icons';
 import { DocumentDialog } from './document-dialog';
@@ -30,7 +30,7 @@ type SortConfig = {
 
 const getDocumentIcon = (type: Documento['tipo']) => {
   const Icon = Icons[type];
-  return Icon ? <Icon className="h-5 w-5 text-muted-foreground" /> : <FileText className="h-5 w-5 text-muted-foreground" />;
+  return Icon ? <Icon className="h-6 w-6 text-muted-foreground" /> : <FileText className="h-6 w-6 text-muted-foreground" />;
 };
 
 const formatDate = (dateString: string) => {
@@ -94,6 +94,11 @@ export default function DocumentosPage() {
         if (deletingDocumentId) {
             setDocumentos(prev => prev.filter(doc => doc.id !== deletingDocumentId));
         }
+    };
+    
+    const handleDownload = (docName: string) => {
+        // En una aplicación real, esto iniciaría la descarga del archivo.
+        alert(`Descargando ${docName}...`);
     };
 
     const filteredDocuments = useMemo(() => {
@@ -172,6 +177,10 @@ export default function DocumentosPage() {
                                     <TableCell className="text-muted-foreground">{doc.descripcion}</TableCell>
                                     <TableCell>{formatDate(doc.fechaCarga)}</TableCell>
                                     <TableCell className="text-right">
+                                        <Button variant="ghost" size="icon" onClick={() => handleDownload(doc.nombre)}>
+                                            <Download className="h-4 w-4" />
+                                            <span className="sr-only">Descargar</span>
+                                        </Button>
                                         <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(doc)}>
                                             <Edit className="h-4 w-4" />
                                             <span className="sr-only">Editar</span>
