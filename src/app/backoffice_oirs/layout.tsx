@@ -38,7 +38,7 @@ const menuItems = [
     icon: Files,
   },
   {
-    href: '#!',
+    href: '/backoffice_oirs/contactos',
     label: 'Contactos',
     icon: BookUser,
   },

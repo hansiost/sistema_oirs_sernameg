@@ -26,6 +26,7 @@ import {
   Trash2,
   FileImage,
   FileAudio,
+  BookUser,
 } from 'lucide-react';
 
 export type Icon = LucideIcon;
@@ -57,4 +58,5 @@ export const Icons = {
   Edit: Edit,
   FileUp: FileUp,
   Trash2: Trash2,
+  BookUser: BookUser,
 };
