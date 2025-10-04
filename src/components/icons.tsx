@@ -22,6 +22,10 @@ import {
   ClipboardList,
   FileCheck2,
   Edit,
+  FileUp,
+  Trash2,
+  FileImage,
+  FileAudio,
 } from 'lucide-react';
 
 export type Icon = LucideIcon;
@@ -41,6 +45,8 @@ export const Icons = {
   Key: KeyRound,
   Users: Users,
   FileText: FileText,
+  FileImage: FileImage,
+  FileAudio: FileAudio,
   Network: Network,
   Waypoints: Waypoints,
   Wrench: Wrench,
@@ -49,4 +55,6 @@ export const Icons = {
   Detail: FileCheck2,
   FAQ: HelpCircle,
   Edit: Edit,
+  FileUp: FileUp,
+  Trash2: Trash2,
 };

@@ -33,7 +33,7 @@ const menuItems = [
     icon: BarChart3,
   },
   {
-    href: '#',
+    href: '/backoffice_oirs/documentos',
     label: 'Documentos',
     icon: Files,
   },
