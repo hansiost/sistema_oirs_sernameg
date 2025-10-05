@@ -40,6 +40,7 @@ const formSchema = z.object({
   nombre: z.string().min(3, 'El nombre es obligatorio.'),
   descripcion: z.string().min(10, 'La descripción es obligatoria.'),
   tipo: z.enum(['Tabla', 'Dashboard'], { required_error: 'Debe seleccionar un tipo de reporte' }),
+  link: z.string().url({ message: 'Por favor, ingrese una URL válida.' }).optional().or(z.literal('')),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -59,6 +60,7 @@ const ReportFormContent = () => {
       nombre: '',
       descripcion: '',
       tipo: undefined,
+      link: '',
     },
   });
 
@@ -162,6 +164,19 @@ const ReportFormContent = () => {
                         <SelectItem value="Dashboard">Dashboard</SelectItem>
                       </SelectContent>
                     </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="link"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Enlace al Reporte (Opcional)</FormLabel>
+                    <FormControl>
+                      <Input type="url" placeholder="https://ejemplo.com/reporte" {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

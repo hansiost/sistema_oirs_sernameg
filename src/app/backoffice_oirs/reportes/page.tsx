@@ -63,10 +63,11 @@ const ReportesTable = () => {
         
         if (sortConfig !== null) {
             filtered.sort((a, b) => {
-                if (a[sortConfig.key]! < b[sortConfig.key]!) {
+                const key = sortConfig.key as keyof Reporte;
+                if (a[key]! < b[key]!) {
                     return sortConfig.direction === 'ascending' ? -1 : 1;
                 }
-                if (a[sortConfig.key]! > b[sortConfig.key]!) {
+                if (a[key]! > b[key]!) {
                     return sortConfig.direction === 'ascending' ? 1 : -1;
                 }
                 return 0;
@@ -110,7 +111,7 @@ const ReportesTable = () => {
                         <TableRow key={report.id}>
                             <TableCell className="font-mono text-xs">
                                <Button variant="link" asChild className="p-0 h-auto font-mono">
-                                    <Link href={`/backoffice_oirs/reportes/view?id=${report.id}`}>
+                                    <Link href={report.link || `/backoffice_oirs/reportes/view?id=${report.id}`} target={report.link ? '_blank' : '_self'}>
                                         {report.id}
                                     </Link>
                                 </Button>
