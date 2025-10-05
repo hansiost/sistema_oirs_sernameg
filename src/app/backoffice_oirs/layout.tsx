@@ -46,19 +46,18 @@ const menuItems = [
 
 const adminSubMenuItems = [
     { href: '/backoffice_oirs/administracion/usuarios', label: 'Usuarios', icon: Users },
-    { href: '#', label: 'Permisos', icon: KeyRound },
 ];
 
 const maintainerSubMenuItems = [
-    { href: '#', label: 'Tipos de Solicitudes', icon: FileText },
-    { href: '#', label: 'Árbol de Temas', icon: Network },
-    { href: '#', label: 'Vías de Ingreso', icon: Waypoints },
-    { href: '#', label: 'Oficinas Regionales', icon: Building },
-    { href: '#', label: 'Género', icon: VenetianMask },
-    { href: '#', label: 'Pueblos Originarios', icon: Feather },
-    { href: '#', label: 'Estados de Solicitud', icon: ListChecks },
-    { href: '#', label: 'Resultado de Atención', icon: CheckCheck },
-    { href: '#', label: 'Tipo Resolución', icon: FileCheck },
+    { href: '/backoffice_oirs/mantenedores/tipos-solicitud', label: 'Tipos de Solicitudes', icon: FileText },
+    { href: '/backoffice_oirs/mantenedores/arbol-temas', label: 'Árbol de Temas', icon: Network },
+    { href: '/backoffice_oirs/mantenedores/vias-ingreso', label: 'Vías de Ingreso', icon: Waypoints },
+    { href: '/backoffice_oirs/mantenedores/oficinas-regionales', label: 'Oficinas Regionales', icon: Building },
+    { href: '/backoffice_oirs/mantenedores/genero', label: 'Género', icon: VenetianMask },
+    { href: '/backoffice_oirs/mantenedores/pueblos-originarios', label: 'Pueblos Originarios', icon: Feather },
+    { href: '/backoffice_oirs/mantenedores/estados-solicitud', label: 'Estados de Solicitud', icon: ListChecks },
+    { href: '/backoffice_oirs/mantenedores/resultado-atencion', label: 'Resultado de Atención', icon: CheckCheck },
+    { href: '/backoffice_oirs/mantenedores/tipo-resolucion', label: 'Tipo Resolución', icon: FileCheck },
 ];
 
 
@@ -73,8 +72,7 @@ export default function BackofficeLayout({
   const isAdministracionActive = pathname.startsWith('/backoffice_oirs/administracion');
   const [isAdministracionOpen, setIsAdministracionOpen] = useState(isAdministracionActive);
 
-  // TODO: Add proper active state detection for mantenedores
-  const isMantenedoresActive = false; 
+  const isMantenedoresActive = pathname.startsWith('/backoffice_oirs/mantenedores');
   const [isMantenedoresOpen, setIsMantenedoresOpen] = useState(isMantenedoresActive);
 
 
@@ -160,7 +158,7 @@ export default function BackofficeLayout({
                                     href={item.href}
                                     className={cn(
                                         "flex items-center gap-2 p-2 rounded-md text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-                                        pathname === item.href && "bg-accent text-accent-foreground"
+                                        pathname.startsWith(item.href) && "bg-accent text-accent-foreground"
                                     )}
                                 >
                                     <item.icon className="h-4 w-4" />

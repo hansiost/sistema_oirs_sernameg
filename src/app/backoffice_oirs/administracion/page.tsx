@@ -15,7 +15,7 @@ export default function AdministracionPage() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <p>Aquí podrá gestionar usuarios, permisos y otros mantenedores del sistema OIRS.</p>
+        <p>Aquí podrá gestionar usuarios y permisos del sistema OIRS.</p>
       </CardContent>
     </Card>
   );
