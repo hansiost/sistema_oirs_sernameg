@@ -108,7 +108,13 @@ const ReportesTable = () => {
                     <TableBody>
                     {filteredReports.length > 0 ? filteredReports.map((report) => (
                         <TableRow key={report.id}>
-                            <TableCell className="font-mono text-xs">{report.id}</TableCell>
+                            <TableCell className="font-mono text-xs">
+                               <Button variant="link" asChild className="p-0 h-auto font-mono">
+                                    <Link href={`/backoffice_oirs/reportes/view?id=${report.id}`}>
+                                        {report.id}
+                                    </Link>
+                                </Button>
+                            </TableCell>
                             <TableCell className="font-medium">{report.nombre}</TableCell>
                             <TableCell className="text-muted-foreground">{report.descripcion}</TableCell>
                             <TableCell>

@@ -31,6 +31,12 @@
     --warning-foreground: 47.9 95.8% 13.1%;
     --danger: 0 84.2% 60.2%;
     --danger-foreground: 0 0% 98%;
+    
+    --chart-1: 265 80% 45%;
+    --chart-2: 300 75% 55%;
+    --chart-3: 240 5% 65%;
+    --chart-4: 48 96% 53%;
+    --chart-5: 142 76% 36%;
   }
   .dark {
     --background: 240 6% 10%;
@@ -59,6 +65,12 @@
     --warning-foreground: 47.9 95.8% 10.1%;
     --danger: 0 72.2% 50.6%;
     --danger-foreground: 0 0% 98%;
+
+    --chart-1: 265 80% 55%;
+    --chart-2: 300 75% 60%;
+    --chart-3: 240 5% 45%;
+    --chart-4: 48 96% 63%;
+    --chart-5: 142 76% 28%;
   }
 }
 @layer base {
