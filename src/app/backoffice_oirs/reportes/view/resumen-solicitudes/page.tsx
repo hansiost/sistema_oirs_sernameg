@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { DateRange } from 'react-day-picker';
 import { format, startOfYear, endOfYear } from 'date-fns';
-import { Pie, PieChart, Cell, Legend, BarChart, CartesianGrid, XAxis, YAxis, Bar } from 'recharts';
+import { Pie, PieChart, Cell, Legend, BarChart, CartesianGrid, XAxis, YAxis, Bar, Tooltip } from 'recharts';
 import {
   Table,
   TableBody,
@@ -109,6 +109,7 @@ const ResumenNacionalPieChart = ({ data, dateRange }: { data: Omit<RegionSummary
                             nameKey="name"
                             cx="50%"
                             cy="50%"
+                            outerRadius={100}
                             strokeWidth={5}
                         >
                             {chartData.map((entry) => (
@@ -167,6 +168,53 @@ const ResumenRegionalBarChart = ({ data, dateRange }: { data: RegionSummary[], d
                         <YAxis />
                         <ChartTooltip content={<ChartTooltipContent />} />
                         <Bar dataKey="total" fill="var(--color-total)" radius={4} />
+                    </BarChart>
+                </ChartContainer>
+            </CardContent>
+        </Card>
+    );
+};
+
+const ResumenRegionalPorEstadoBarChart = ({ data, dateRange }: { data: RegionSummary[], dateRange?: DateRange }) => {
+    const chartData = data.map(item => ({
+        region: item.region,
+        ...item
+    }));
+
+    const dateRangeString = dateRange?.from && dateRange?.to
+        ? `Datos desde ${format(dateRange.from, "dd/MM/yy")} hasta ${format(dateRange.to, "dd/MM/yy")}.`
+        : 'Datos para todo el período.';
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5" />
+                    Desglose de Solicitudes por Región y Estado
+                </CardTitle>
+                <CardDescription>
+                    {dateRangeString}
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <ChartContainer config={chartConfig} className="min-h-[400px] w-full">
+                    <BarChart data={chartData}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis 
+                            dataKey="region"
+                            tickLine={false}
+                            axisLine={false}
+                            tickMargin={8}
+                            tickFormatter={(value) => value.slice(0, 3)}
+                        />
+                        <YAxis />
+                        <Tooltip content={<ChartTooltipContent />} cursor={false} />
+                        <Legend />
+                        <Bar dataKey="ingresada" stackId="a" fill="var(--color-ingresada)" radius={0} />
+                        <Bar dataKey="enProceso" stackId="a" fill="var(--color-enProceso)" radius={0} />
+                        <Bar dataKey="respondida" stackId="a" fill="var(--color-respondida)" radius={0} />
+                        <Bar dataKey="cerrada" stackId="a" fill="var(--color-cerrada)" radius={0} />
+                        <Bar dataKey="cancelada" stackId="a" fill="var(--color-cancelada)" radius={[4, 4, 0, 0]} />
                     </BarChart>
                 </ChartContainer>
             </CardContent>
@@ -319,6 +367,9 @@ const ResumenSolicitudesReport = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <ResumenNacionalPieChart data={totals} dateRange={date} />
                 <ResumenRegionalBarChart data={data} dateRange={date} />
+            </div>
+            <div className="mt-6">
+                <ResumenRegionalPorEstadoBarChart data={data} dateRange={date} />
             </div>
         </div>
     );
