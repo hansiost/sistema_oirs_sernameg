@@ -38,8 +38,8 @@ export const mockReports: Reporte[] = [
     { 
         id: 'REP-004', 
         nombre: 'Reporte de Satisfacción Usuaria', 
-        descripcion: 'Dashboard externo en Looker Studio que analiza los resultados de las encuestas de satisfacción.',
-        tipo: 'Dashboard',
-        link: 'https://lookerstudio.google.com'
+        descripcion: 'Análisis del nivel de satisfacción de las usuarias por región, basado en las encuestas de atención.',
+        tipo: 'Tabla',
+        link: '/backoffice_oirs/reportes/view/satisfaccion-usuaria'
     },
 ];
