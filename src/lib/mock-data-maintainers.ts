@@ -11,9 +11,15 @@ export type TipoSolicitudItem = {
     diasAtencion: number;
 };
 
+export type TemaItem = {
+    id: string;
+    value: string;
+    requestType: string;
+};
+
 export type MockMaintainers = {
     tiposSolicitud: TipoSolicitudItem[];
-    arbolTemas: MaintainerItem[];
+    arbolTemas: TemaItem[];
     viasIngreso: MaintainerItem[];
     oficinasRegionales: MaintainerItem[];
     genero: MaintainerItem[];
@@ -32,9 +38,21 @@ export const mockMaintainers: MockMaintainers = {
         { id: 'ts-5', value: 'Felicitacion', tiempoMaximo: 5, diasCritico: 1, diasAtencion: 3 },
     ],
     arbolTemas: [
-        { id: 'at-1', value: 'Derechos de la mujer' },
-        { id: 'at-2', value: 'Violencia intrafamiliar' },
-        { id: 'at-3', value: 'Atención deficiente' },
+        { id: 'at-1', value: 'Derechos de la mujer', requestType: 'Consulta' },
+        { id: 'at-2', value: 'Violencia intrafamiliar', requestType: 'Reclamo' },
+        { id: 'at-3', value: 'Atención deficiente en servicio público', requestType: 'Reclamo' },
+        { id: 'at-4', value: 'Programas de apoyo y orientación', requestType: 'Consulta' },
+        { id: 'at-5', value: 'Mejora de servicios de atención', requestType: 'Sugerencia' },
+        { id: 'at-6', value: 'Conducta de funcionario/a', requestType: 'Queja' },
+        { id: 'at-7', value: 'Buena atención recibida', requestType: 'Felicitacion' },
+        { id: 'at-8', value: 'Maltrato laboral', requestType: 'Reclamo' },
+        { id: 'at-9', value: 'Asesoría legal', requestType: 'Consulta' },
+        { id: 'at-10', value: 'Nuevos programas o talleres', requestType: 'Sugerencia' },
+        { id: 'at-11', value: 'Demora excesiva en la atención', requestType: 'Queja' },
+        { id: 'at-12', value: 'Efectividad de un programa o servicio', requestType: 'Felicitacion' },
+        { id: 'at-13', value: 'Publicidad sexista', requestType: 'Reclamo' },
+        { id: 'at-14', value: 'Salud sexual y reproductiva', requestType: 'Consulta' },
+        { id: 'at-15', value: 'Campañas de difusión y sensibilización', requestType: 'Sugerencia' },
     ],
     viasIngreso: [
         { id: 'vi-1', value: 'Presencial' },
