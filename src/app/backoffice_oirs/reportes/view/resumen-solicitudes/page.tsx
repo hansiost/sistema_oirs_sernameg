@@ -69,14 +69,18 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 
-const ResumenNacionalPieChart = ({ data }: { data: Omit<RegionSummary, 'region' | 'total'> }) => {
+const ResumenNacionalPieChart = ({ data, dateRange }: { data: Omit<RegionSummary, 'region' | 'total'>, dateRange?: DateRange }) => {
     const chartData = Object.entries(data)
-        .filter(([key]) => key in chartConfig) // Filtrar solo las claves que existen en chartConfig
+        .filter(([key]) => key in chartConfig)
         .map(([key, value]) => ({
             name: chartConfig[key as keyof typeof chartConfig].label,
             value: value,
             fill: chartConfig[key as keyof typeof chartConfig].color,
         }));
+    
+    const dateRangeString = dateRange?.from && dateRange?.to 
+        ? `Datos desde ${format(dateRange.from, "dd/MM/yy")} hasta ${format(dateRange.to, "dd/MM/yy")}.`
+        : 'Datos para todo el período.';
 
 
     return (
@@ -87,13 +91,13 @@ const ResumenNacionalPieChart = ({ data }: { data: Omit<RegionSummary, 'region' 
                     Distribución Nacional por Estado
                 </CardTitle>
                 <CardDescription>
-                    Gráfico de torta con el porcentaje de solicitudes en cada estado a nivel nacional.
+                    {dateRangeString}
                 </CardDescription>
             </CardHeader>
             <CardContent>
                 <ChartContainer
                     config={chartConfig}
-                    className="mx-auto aspect-square h-[250px]"
+                    className="mx-auto aspect-square h-[300px]"
                 >
                     <PieChart>
                         <ChartTooltip
@@ -264,7 +268,7 @@ const ResumenSolicitudesReport = () => {
                     </div>
                 </CardContent>
             </Card>
-            <ResumenNacionalPieChart data={totals} />
+            <ResumenNacionalPieChart data={totals} dateRange={date} />
         </div>
     );
 };
