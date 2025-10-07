@@ -1,7 +1,9 @@
 
 'use client';
-import { useState, useMemo, ChangeEvent, FC } from 'react';
+import { useState, useMemo, ChangeEvent } from 'react';
 import Link from 'next/link';
+import { DateRange } from 'react-day-picker';
+import { addDays, format, startOfYear, endOfYear, parse } from 'date-fns';
 import {
   Table,
   TableBody,
@@ -28,9 +30,13 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-import { ArrowUpDown, FileDown, ArrowLeft, Table2 } from 'lucide-react';
+import { ArrowUpDown, FileDown, ArrowLeft, Table2, Calendar as CalendarIcon, FilterX } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
+
 
 type Solicitud = {
     id: string;
@@ -97,7 +103,7 @@ const getStatusVariant = (estado: string): BadgeProps['variant'] => {
 
 const formatDate = (dateString: string | null) => {
     if (!dateString) return '-';
-    if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(dateString)) return dateString;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
     const [year, month, day] = dateString.split('-');
     return `${day}-${month}-${year}`;
 };
@@ -108,6 +114,10 @@ const DetalleSolicitudesTable = () => {
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [filters, setFilters] = useState<Partial<Record<keyof Solicitud, string>>>({});
     const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'fechaEnvio', direction: 'descending' });
+    const [date, setDate] = useState<DateRange | undefined>({
+        from: startOfYear(new Date(2025, 0, 1)),
+        to: endOfYear(new Date(2025, 11, 31)),
+      });
 
     const tableHeaders: { key: keyof Solicitud, label: string, sortable: boolean }[] = [
         { key: 'id', label: 'N° Solicitud', sortable: true },
@@ -138,6 +148,15 @@ const DetalleSolicitudesTable = () => {
     const filteredSolicitudes = useMemo(() => {
         let filtered = [...mockSolicitudes];
 
+        // Date filter
+        if (date?.from && date?.to) {
+            filtered = filtered.filter(solicitud => {
+                const fecha = parse(solicitud.fechaEnvio, 'yyyy-MM-dd', new Date());
+                return fecha >= date.from! && fecha <= date.to!;
+            });
+        }
+
+        // Text filters
         Object.entries(filters).forEach(([key, value]) => {
             if (value) {
                 filtered = filtered.filter(solicitud => {
@@ -160,7 +179,14 @@ const DetalleSolicitudesTable = () => {
         }
 
         return filtered;
-    }, [filters, sortConfig]);
+    }, [filters, sortConfig, date]);
+    
+    const clearFilters = () => {
+        setFilters({});
+        setDate({ from: startOfYear(new Date(2025, 0, 1)), to: endOfYear(new Date(2025, 11, 31)) });
+        setCurrentPage(1);
+        toast({ title: "Filtros limpiados", description: "Mostrando todas las solicitudes del año." });
+    };
 
     const totalPages = Math.ceil(filteredSolicitudes.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -179,34 +205,77 @@ const DetalleSolicitudesTable = () => {
             title: "Descarga iniciada",
             description: "Se está generando el archivo Excel con los datos filtrados...",
         });
-        // En una app real, aquí se llamaría a una función para generar y descargar el archivo.
         console.log("Downloading data...", filteredSolicitudes);
     };
 
     return (
         <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-                 <div>
-                    <CardTitle className="flex items-center gap-2">
-                        <Table2 className="h-6 w-6 text-primary" />
-                        Reporte: Detalle de Solicitudes (Año 2025)
-                    </CardTitle>
-                    <CardDescription>
-                        Visualice y filtre todas las solicitudes del año en curso. Puede descargar los resultados.
-                    </CardDescription>
-                 </div>
-                 <div className="flex gap-2">
-                    <Button variant="outline" asChild>
-                        <Link href="/backoffice_oirs/reportes">
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Volver a Reportes
-                        </Link>
+            <CardHeader>
+                 <div className="flex flex-row items-start justify-between">
+                    <div>
+                        <CardTitle className="flex items-center gap-2">
+                            <Table2 className="h-6 w-6 text-primary" />
+                            Reporte: Detalle de Solicitudes
+                        </CardTitle>
+                        <CardDescription>
+                            Visualice y filtre todas las solicitudes. Puede descargar los resultados.
+                        </CardDescription>
+                    </div>
+                    <div className="flex gap-2">
+                        <Button variant="outline" asChild>
+                            <Link href="/backoffice_oirs/reportes">
+                                <ArrowLeft className="mr-2 h-4 w-4" />
+                                Volver a Reportes
+                            </Link>
+                        </Button>
+                        <Button onClick={handleDownload}>
+                            <FileDown className="mr-2 h-4 w-4" />
+                            Descargar Excel
+                        </Button>
+                    </div>
+                </div>
+                <div className="flex items-center gap-4 pt-4">
+                     <Popover>
+                        <PopoverTrigger asChild>
+                        <Button
+                            id="date"
+                            variant={"outline"}
+                            className={cn(
+                                "w-[300px] justify-start text-left font-normal",
+                                !date && "text-muted-foreground"
+                            )}
+                        >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {date?.from ? (
+                            date.to ? (
+                                <>
+                                {format(date.from, "LLL dd, y")} -{" "}
+                                {format(date.to, "LLL dd, y")}
+                                </>
+                            ) : (
+                                format(date.from, "LLL dd, y")
+                            )
+                            ) : (
+                            <span>Seleccione un rango de fechas</span>
+                            )}
+                        </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                            initialFocus
+                            mode="range"
+                            defaultMonth={date?.from}
+                            selected={date}
+                            onSelect={setDate}
+                            numberOfMonths={2}
+                        />
+                        </PopoverContent>
+                    </Popover>
+                    <Button onClick={clearFilters} variant="ghost">
+                        <FilterX className="mr-2 h-4 w-4" />
+                        Limpiar Filtros
                     </Button>
-                    <Button onClick={handleDownload}>
-                        <FileDown className="mr-2 h-4 w-4" />
-                        Descargar Excel
-                    </Button>
-                 </div>
+                </div>
             </CardHeader>
             <CardContent>
                 <div className="overflow-x-auto">

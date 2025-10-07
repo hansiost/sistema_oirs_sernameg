@@ -111,7 +111,10 @@ const ReportesTable = () => {
                         <TableRow key={report.id}>
                             <TableCell className="font-mono text-xs">
                                <Button variant="link" asChild className="p-0 h-auto font-mono">
-                                    <Link href={report.link || `/backoffice_oirs/reportes/view?id=${report.id}`} target={report.link ? '_blank' : '_self'}>
+                                    <Link 
+                                        href={report.link || `/backoffice_oirs/reportes/view?id=${report.id}`} 
+                                        target={report.link?.startsWith('http') ? '_blank' : '_self'}
+                                    >
                                         {report.id}
                                     </Link>
                                 </Button>
