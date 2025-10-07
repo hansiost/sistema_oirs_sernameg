@@ -9,29 +9,30 @@ export type Reporte = {
 export const mockReports: Reporte[] = [
     { 
         id: 'REP-001', 
-        nombre: 'Solicitudes por Región', 
-        descripcion: 'Reporte tabular que muestra el número de solicitudes ingresadas por cada región en un período determinado.',
-        tipo: 'Tabla',
+        nombre: 'Dashboard General de Solicitudes', 
+        descripcion: 'Panel visual con gráficos sobre los tipos de solicitud y su distribución por región.',
+        tipo: 'Dashboard',
         link: '/backoffice_oirs/reportes/view?id=REP-001'
     },
     { 
         id: 'REP-002', 
-        nombre: 'Dashboard de Tiempos de Respuesta', 
-        descripcion: 'Panel visual con gráficos sobre los tiempos promedio de respuesta y resolución de solicitudes.',
-        tipo: 'Dashboard',
-        link: '/backoffice_oirs/reportes/view?id=REP-002'
+        nombre: 'Detalle de Solicitudes (Año en curso)', 
+        descripcion: 'Tabla con el detalle de todas las solicitudes del año, con filtros y opción de descarga.',
+        tipo: 'Tabla',
+        link: '/backoffice_oirs/reportes/view/detalle-solicitudes'
     },
     { 
         id: 'REP-003', 
-        nombre: 'Tipos de Solicitud más Frecuentes', 
-        descripcion: 'Gráfico de barras que muestra la distribución de los tipos de solicitud (Consulta, Reclamo, etc.).',
+        nombre: 'Reporte de Tiempos de Respuesta', 
+        descripcion: 'Dashboard externo en Looker Studio que analiza los tiempos de gestión y cierre de casos.',
         tipo: 'Dashboard',
         link: 'https://lookerstudio.google.com'
     },
     { 
         id: 'REP-004', 
-        nombre: 'Detalle de Solicitudes Cerradas', 
-        descripcion: 'Tabla con el detalle completo de todas las solicitudes que han sido cerradas en el último mes.',
-        tipo: 'Tabla'
+        nombre: 'Reporte de Satisfacción Usuaria', 
+        descripcion: 'Tabla que resume los resultados de las encuestas de satisfacción por cada solicitud respondida.',
+        tipo: 'Tabla',
+         link: '/backoffice_oirs/reportes/view?id=REP-004'
     },
 ];

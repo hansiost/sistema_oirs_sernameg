@@ -4,26 +4,37 @@ import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, BarChart3, Table } from 'lucide-react';
+import { ArrowLeft, BarChart3, Table, AlertCircle } from 'lucide-react';
 import { mockReports, type Reporte } from '@/lib/mock-data-reports';
 import SampleTableReport from './sample-table-report';
 import SampleDashboardReport from './sample-dashboard-report';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 function ReportViewContent() {
   const searchParams = useSearchParams();
   const reportId = searchParams.get('id');
 
+  // Find report by ID, excluding the one with a custom page link
   const report = mockReports.find(r => r.id === reportId);
 
   if (!report) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Reporte no encontrado</CardTitle>
+             <div className="flex items-center gap-2">
+                <AlertCircle className="h-6 w-6 text-destructive" />
+                <CardTitle>Reporte no encontrado</CardTitle>
+            </div>
         </CardHeader>
-        <CardContent>
-          <p>El reporte solicitado no existe o no se ha podido cargar.</p>
+        <CardContent className="space-y-4">
+          <p>El reporte solicitado no existe o no se ha podido cargar. Es posible que tenga una página dedicada.</p>
+           <Button variant="outline" asChild>
+                <Link href="/backoffice_oirs/reportes">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Volver a la lista de reportes
+                </Link>
+            </Button>
         </CardContent>
       </Card>
     );
@@ -48,8 +59,8 @@ function ReportViewContent() {
                 </Link>
             </Button>
         </div>
-
-        {report.tipo === 'Tabla' ? (
+        
+        {report.id === 'REP-004' ? (
             <SampleTableReport />
         ) : (
             <SampleDashboardReport />
@@ -66,4 +77,3 @@ export default function ReportViewPage() {
         </Suspense>
     );
 }
-
