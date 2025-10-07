@@ -15,7 +15,7 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { Building2, LayoutDashboard, BarChart3, Settings, LogOut, UserCircle, KeyRound, ChevronDown, Users, FileText, Network, Waypoints, Wrench, Building, VenetianMask, Feather, ListChecks, CheckCheck, FileCheck, Database, Files, BookUser } from 'lucide-react';
+import { Building2, LayoutDashboard, BarChart3, Settings, LogOut, UserCircle, KeyRound, ChevronDown, Users, FileText, Network, Waypoints, Wrench, Building, VenetianMask, Feather, ListChecks, CheckCheck, FileCheck, Database, Files, BookUser, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ChangePasswordDialog } from '@/components/change-password-dialog';
@@ -60,6 +60,7 @@ const maintainerSubMenuItems = [
     { href: '/backoffice_oirs/mantenedores/estados-solicitud', label: 'Estados de Solicitud', icon: ListChecks },
     { href: '/backoffice_oirs/mantenedores/resultado-atencion', label: 'Resultado de Atención', icon: CheckCheck },
     { href: '/backoffice_oirs/mantenedores/tipo-resolucion', label: 'Tipo Resolución', icon: FileCheck },
+    { href: '/backoffice_oirs/mantenedores/preguntas-frecuentes', label: 'Preguntas Frecuentes', icon: HelpCircle },
 ];
 
 
