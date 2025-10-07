@@ -420,13 +420,13 @@ type SortConfig = {
   direction: 'ascending' | 'descending';
 } | null;
 
-const getTiempoRestanteClass = (tiempoRestante: string): string => {
-  if (tiempoRestante === '-') return '';
+const getTiempoRestanteVariant = (tiempoRestante: string): BadgeProps['variant'] => {
+  if (tiempoRestante === '-') return 'outline';
   const dias = parseInt(tiempoRestante.split(' ')[0], 10);
-  if (dias <= 2) return 'text-red-600 dark:text-red-500'; // danger
-  if (dias >= 3 && dias <= 5) return 'text-yellow-600 dark:text-yellow-500'; // warning
-  if (dias >= 6) return 'text-green-600 dark:text-green-500'; // success
-  return '';
+  if (dias <= 2) return 'danger';
+  if (dias >= 3 && dias <= 5) return 'warning';
+  if (dias >= 6) return 'success';
+  return 'outline';
 };
 
 const formatDate = (dateString: string | null) => {
@@ -550,8 +550,8 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
                 );
             case 'tiempoRestante':
                 const value = isClosedTab ? solicitud.tiempoResolucion : solicitud.tiempoRestante;
-                const className = isClosedTab ? '' : getTiempoRestanteClass(solicitud.tiempoRestante);
-                return <span className={cn('font-semibold', className)}>{value}</span>;
+                const variant = isClosedTab ? 'outline' : getTiempoRestanteVariant(solicitud.tiempoRestante);
+                return <Badge variant={variant}>{value}</Badge>;
             default:
                 return solicitud[key as keyof Solicitud];
         }
@@ -581,7 +581,7 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
                         <TableRow>
                             {tableHeaders.map(header => (
                                 <TableHead key={`${header.key}-filter`}>
-                                {header.key !== 'fechaRespuesta' && header.key !== 'tiempoRestante' ? (
+                                {header.key !== 'fechaRespuesta' ? (
                                         <Input
                                             placeholder={`Filtrar...`}
                                             value={filters[header.key] || ''}
