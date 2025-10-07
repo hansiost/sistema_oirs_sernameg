@@ -21,18 +21,18 @@ export const mockReports: Reporte[] = [
         tipo: 'Tabla',
         link: '/backoffice_oirs/reportes/view/detalle-solicitudes'
     },
-    { 
-        id: 'REP-003', 
-        nombre: 'Reporte de Tiempos de Respuesta', 
-        descripcion: 'Dashboard externo en Looker Studio que analiza los tiempos de gestión y cierre de casos.',
-        tipo: 'Dashboard',
-        link: 'https://lookerstudio.google.com'
+    {
+        id: 'REP-003',
+        nombre: 'Resumen de Solicitudes por Región y Nacional',
+        descripcion: 'Tabla con el total de solicitudes por región, desglosado por estado. Incluye totales nacionales.',
+        tipo: 'Tabla',
+        link: '/backoffice_oirs/reportes/view/resumen-solicitudes',
     },
     { 
         id: 'REP-004', 
         nombre: 'Reporte de Satisfacción Usuaria', 
-        descripcion: 'Tabla que resume los resultados de las encuestas de satisfacción por cada solicitud respondida.',
-        tipo: 'Tabla',
-         link: '/backoffice_oirs/reportes/view?id=REP-004'
+        descripcion: 'Dashboard externo en Looker Studio que analiza los resultados de las encuestas de satisfacción.',
+        tipo: 'Dashboard',
+        link: 'https://lookerstudio.google.com'
     },
 ];
