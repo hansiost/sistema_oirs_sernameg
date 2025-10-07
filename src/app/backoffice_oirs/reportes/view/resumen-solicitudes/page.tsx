@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { DateRange } from 'react-day-picker';
 import { format, startOfYear, endOfYear } from 'date-fns';
+import { Pie, PieChart, Cell } from 'recharts';
 import {
   Table,
   TableBody,
@@ -21,12 +22,20 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { ArrowLeft, FileDown, Calendar as CalendarIcon, FilterX, Table2 } from 'lucide-react';
+import { ArrowLeft, FileDown, Calendar as CalendarIcon, FilterX, Table2, PieChart as PieChartIcon } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { REGIONES_CHILE } from '@/lib/constants';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+  type ChartConfig,
+} from '@/components/ui/chart';
 
 type RegionSummary = {
   region: string;
@@ -50,6 +59,65 @@ const generateMockData = (): RegionSummary[] => {
     cancelada: Math.floor(Math.random() * 10),
   }));
 };
+
+const chartConfig = {
+  ingresada: { label: 'Ingresadas', color: 'hsl(var(--chart-1))' },
+  enProceso: { label: 'En Proceso', color: 'hsl(var(--chart-2))' },
+  respondida: { label: 'Respondidas', color: 'hsl(var(--chart-3))' },
+  cerrada: { label: 'Cerradas', color: 'hsl(var(--chart-4))' },
+  cancelada: { label: 'Canceladas', color: 'hsl(var(--chart-5))' },
+} satisfies ChartConfig;
+
+
+const ResumenNacionalPieChart = ({ data }: { data: Omit<RegionSummary, 'region' | 'total'> }) => {
+    const chartData = Object.entries(data).map(([key, value]) => ({
+        name: chartConfig[key as keyof typeof chartConfig].label,
+        value: value,
+        fill: chartConfig[key as keyof typeof chartConfig].color,
+    }));
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <PieChartIcon className="h-5 w-5" />
+                    Distribución Nacional por Estado
+                </CardTitle>
+                <CardDescription>
+                    Gráfico de torta con el porcentaje de solicitudes en cada estado a nivel nacional.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <ChartContainer
+                    config={chartConfig}
+                    className="mx-auto aspect-square h-[250px]"
+                >
+                    <PieChart>
+                        <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent hideLabel />}
+                        />
+                        <Pie
+                            data={chartData}
+                            dataKey="value"
+                            nameKey="name"
+                            innerRadius={60}
+                            strokeWidth={5}
+                        >
+                            {chartData.map((entry) => (
+                                <Cell key={entry.name} fill={entry.fill} />
+                            ))}
+                        </Pie>
+                         <ChartLegend
+                            content={<ChartLegendContent nameKey="name" />}
+                            className="-translate-y-[20px] flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
+                        />
+                    </PieChart>
+                </ChartContainer>
+            </CardContent>
+        </Card>
+    )
+}
 
 const ResumenSolicitudesReport = () => {
     const { toast } = useToast();
@@ -82,116 +150,119 @@ const ResumenSolicitudesReport = () => {
     };
 
     return (
-        <Card>
-            <CardHeader>
-                 <div className="flex flex-row items-start justify-between">
-                    <div>
-                        <CardTitle className="flex items-center gap-2">
-                            <Table2 className="h-6 w-6 text-primary" />
-                            Reporte: Resumen de Solicitudes por Región
-                        </CardTitle>
-                        <CardDescription>
-                            Total de solicitudes por región, desglosado por estado.
-                        </CardDescription>
+        <div className="space-y-6">
+            <Card>
+                <CardHeader>
+                    <div className="flex flex-row items-start justify-between">
+                        <div>
+                            <CardTitle className="flex items-center gap-2">
+                                <Table2 className="h-6 w-6 text-primary" />
+                                Reporte: Resumen de Solicitudes por Región
+                            </CardTitle>
+                            <CardDescription>
+                                Total de solicitudes por región, desglosado por estado.
+                            </CardDescription>
+                        </div>
+                        <div className="flex gap-2">
+                            <Button variant="outline" asChild>
+                                <Link href="/backoffice_oirs/reportes">
+                                    <ArrowLeft className="mr-2 h-4 w-4" />
+                                    Volver a Reportes
+                                </Link>
+                            </Button>
+                            <Button onClick={handleDownload}>
+                                <FileDown className="mr-2 h-4 w-4" />
+                                Descargar Excel
+                            </Button>
+                        </div>
                     </div>
-                    <div className="flex gap-2">
-                        <Button variant="outline" asChild>
-                            <Link href="/backoffice_oirs/reportes">
-                                <ArrowLeft className="mr-2 h-4 w-4" />
-                                Volver a Reportes
-                            </Link>
-                        </Button>
-                        <Button onClick={handleDownload}>
-                            <FileDown className="mr-2 h-4 w-4" />
-                            Descargar Excel
+                    <div className="flex items-center gap-4 pt-4">
+                        <Popover>
+                            <PopoverTrigger asChild>
+                            <Button
+                                id="date"
+                                variant={"outline"}
+                                className={cn(
+                                    "w-[300px] justify-start text-left font-normal",
+                                    !date && "text-muted-foreground"
+                                )}
+                            >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {date?.from ? (
+                                date.to ? (
+                                    <>
+                                    {format(date.from, "LLL dd, y")} -{" "}
+                                    {format(date.to, "LLL dd, y")}
+                                    </>
+                                ) : (
+                                    format(date.from, "LLL dd, y")
+                                )
+                                ) : (
+                                <span>Seleccione un rango de fechas</span>
+                                )}
+                            </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                                initialFocus
+                                mode="range"
+                                defaultMonth={date?.from}
+                                selected={date}
+                                onSelect={setDate}
+                                numberOfMonths={2}
+                            />
+                            </PopoverContent>
+                        </Popover>
+                        <Button onClick={clearFilters} variant="ghost">
+                            <FilterX className="mr-2 h-4 w-4" />
+                            Limpiar Filtros
                         </Button>
                     </div>
-                </div>
-                <div className="flex items-center gap-4 pt-4">
-                     <Popover>
-                        <PopoverTrigger asChild>
-                        <Button
-                            id="date"
-                            variant={"outline"}
-                            className={cn(
-                                "w-[300px] justify-start text-left font-normal",
-                                !date && "text-muted-foreground"
-                            )}
-                        >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {date?.from ? (
-                            date.to ? (
-                                <>
-                                {format(date.from, "LLL dd, y")} -{" "}
-                                {format(date.to, "LLL dd, y")}
-                                </>
-                            ) : (
-                                format(date.from, "LLL dd, y")
-                            )
-                            ) : (
-                            <span>Seleccione un rango de fechas</span>
-                            )}
-                        </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                            initialFocus
-                            mode="range"
-                            defaultMonth={date?.from}
-                            selected={date}
-                            onSelect={setDate}
-                            numberOfMonths={2}
-                        />
-                        </PopoverContent>
-                    </Popover>
-                    <Button onClick={clearFilters} variant="ghost">
-                        <FilterX className="mr-2 h-4 w-4" />
-                        Limpiar Filtros
-                    </Button>
-                </div>
-            </CardHeader>
-            <CardContent>
-                <div className="overflow-x-auto rounded-md border">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="font-bold">Región</TableHead>
-                                <TableHead className="text-right font-bold">Total</TableHead>
-                                <TableHead className="text-right">Ingresada</TableHead>
-                                <TableHead className="text-right">En Proceso</TableHead>
-                                <TableHead className="text-right">Respondida</TableHead>
-                                <TableHead className="text-right">Cerrada</TableHead>
-                                <TableHead className="text-right">Cancelada</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                        {data.map((item) => (
-                            <TableRow key={item.region}>
-                                <TableCell className="font-medium">{item.region}</TableCell>
-                                <TableCell className="text-right font-bold">{item.total}</TableCell>
-                                <TableCell className="text-right">{item.ingresada}</TableCell>
-                                <TableCell className="text-right">{item.enProceso}</TableCell>
-                                <TableCell className="text-right">{item.respondida}</TableCell>
-                                <TableCell className="text-right">{item.cerrada}</TableCell>
-                                <TableCell className="text-right">{item.cancelada}</TableCell>
-                            </TableRow>
-                        ))}
-                        </TableBody>
-                        <TableFooter>
-                            <TableRow className="bg-muted/50 hover:bg-muted/80">
-                                <TableHead className="font-bold">Total Nacional</TableHead>
-                                <TableHead className="text-right font-bold">{totals.total}</TableHead>
-                                <TableHead className="text-right font-bold">{totals.ingresada}</TableHead>
-                                <TableHead className="text-right font-bold">{totals.enProceso}</TableHead>
-                                <TableHead className="text-right font-bold">{totals.respondida}</TableHead>
-                                <TableHead className="text-right font-bold">{totals.cerrada}</TableHead>
-                                <TableHead className="text-right font-bold">{totals.cancelada}</TableHead>
-                            </TableRow>
-                        </TableFooter>
-                    </Table>
-                </div>
-            </CardContent>
-        </Card>
+                </CardHeader>
+                <CardContent>
+                    <div className="overflow-x-auto rounded-md border">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="font-bold">Región</TableHead>
+                                    <TableHead className="text-right font-bold">Total</TableHead>
+                                    <TableHead className="text-right">Ingresada</TableHead>
+                                    <TableHead className="text-right">En Proceso</TableHead>
+                                    <TableHead className="text-right">Respondida</TableHead>
+                                    <TableHead className="text-right">Cerrada</TableHead>
+                                    <TableHead className="text-right">Cancelada</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                            {data.map((item) => (
+                                <TableRow key={item.region}>
+                                    <TableCell className="font-medium">{item.region}</TableCell>
+                                    <TableCell className="text-right font-bold">{item.total}</TableCell>
+                                    <TableCell className="text-right">{item.ingresada}</TableCell>
+                                    <TableCell className="text-right">{item.enProceso}</TableCell>
+                                    <TableCell className="text-right">{item.respondida}</TableCell>
+                                    <TableCell className="text-right">{item.cerrada}</TableCell>
+                                    <TableCell className="text-right">{item.cancelada}</TableCell>
+                                </TableRow>
+                            ))}
+                            </TableBody>
+                            <TableFooter>
+                                <TableRow className="bg-muted/50 hover:bg-muted/80">
+                                    <TableHead className="font-bold">Total Nacional</TableHead>
+                                    <TableHead className="text-right font-bold">{totals.total}</TableHead>
+                                    <TableHead className="text-right font-bold">{totals.ingresada}</TableHead>
+                                    <TableHead className="text-right font-bold">{totals.enProceso}</TableHead>
+                                    <TableHead className="text-right font-bold">{totals.respondida}</TableHead>
+                                    <TableHead className="text-right font-bold">{totals.cerrada}</TableHead>
+                                    <TableHead className="text-right font-bold">{totals.cancelada}</TableHead>
+                                </TableRow>
+                            </TableFooter>
+                        </Table>
+                    </div>
+                </CardContent>
+            </Card>
+            <ResumenNacionalPieChart data={totals} />
+        </div>
     );
 };
 
