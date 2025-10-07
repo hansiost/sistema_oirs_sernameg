@@ -10,7 +10,7 @@ export type Reporte = {
 export const mockReports: Reporte[] = [
     { 
         id: 'REP-001', 
-        nombre: 'Detalle de Solicitudes (Año en curso)', 
+        nombre: 'Detalle de Solicitudes', 
         descripcion: 'Tabla con el detalle de todas las solicitudes del año, con filtros y opción de descarga.',
         tipo: 'Tabla',
         link: '/backoffice_oirs/reportes/view/detalle-solicitudes'
