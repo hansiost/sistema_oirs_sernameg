@@ -60,17 +60,19 @@ export default function Home() {
                 <Icons.Login />
                 Ingresar con RUT
               </Button>
-              <Button asChild size="lg" className="font-bold text-lg" variant="outline">
-                <Link href="/preguntas-frecuentes">
-                  <HelpCircle className="mr-2" />
-                  Preguntas Frecuentes
-                </Link>
-              </Button>
           </div>
-          <div className="mt-4 text-center">
-            <p className="text-xs text-muted-foreground/80">
+          <div className="mt-6 text-center">
+            <p className="text-sm text-muted-foreground/80">
               Seleccione un método de ingreso para continuar.
             </p>
+          </div>
+          <div className="mt-4">
+            <Button asChild size="lg" className="font-bold text-lg" variant="outline">
+              <Link href="/preguntas-frecuentes">
+                <HelpCircle className="mr-2" />
+                Preguntas Frecuentes
+              </Link>
+            </Button>
           </div>
           <div className="mt-6 text-center border-t border-border pt-4 max-w-2xl mx-auto">
             <p className="text-sm text-muted-foreground">
