@@ -110,6 +110,7 @@ const getStatusVariant = (estado: string): BadgeProps['variant'] => {
 
 const formatDate = (dateString: string | null) => {
     if (!dateString) return '-';
+    // Check if the date string is in 'YYYY-MM-DD' format
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
     const [year, month, day] = dateString.split('-');
     return `${day}-${month}-${year}`;
@@ -121,7 +122,7 @@ const DetalleSolicitudesTable = () => {
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [filters, setFilters] = useState<Partial<Record<keyof Solicitud, string>>>({});
     const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'fechaEnvio', direction: 'descending' });
-    const [date, setDate] = useState<DateRange | undefined>({
+    const [dateRange, setDateRange] = useState<DateRange | undefined>({
         from: startOfYear(new Date(2025, 0, 1)),
         to: endOfYear(new Date(2025, 11, 31)),
       });
@@ -149,6 +150,12 @@ const DetalleSolicitudesTable = () => {
       setCurrentPage(1);
     };
 
+    const handleDateFilterChange = (date: Date | undefined, key: keyof Solicitud) => {
+        const formattedDate = date ? format(date, 'yyyy-MM-dd') : '';
+        setFilters(prev => ({ ...prev, [key]: formattedDate }));
+        setCurrentPage(1);
+    }
+
     const requestSort = (key: keyof Solicitud) => {
         let direction: 'ascending' | 'descending' = 'ascending';
         if (sortConfig && sortConfig.key === key && sortConfig.direction === 'ascending') {
@@ -160,20 +167,21 @@ const DetalleSolicitudesTable = () => {
     const filteredSolicitudes = useMemo(() => {
         let filtered = [...mockSolicitudes];
 
-        // Date filter
-        if (date?.from && date?.to) {
+        // Main DateRange filter
+        if (dateRange?.from && dateRange?.to) {
             filtered = filtered.filter(solicitud => {
                 const fecha = parse(solicitud.fechaEnvio, 'yyyy-MM-dd', new Date());
-                return fecha >= date.from! && fecha <= date.to!;
+                return fecha >= dateRange.from! && fecha <= dateRange.to!;
             });
         }
 
-        // Text filters
+        // Text filters from table header
         Object.entries(filters).forEach(([key, value]) => {
             if (value) {
                 filtered = filtered.filter(solicitud => {
                     const solValue = solicitud[key as keyof Solicitud];
-                    return solValue?.toString().toLowerCase().includes(value.toLowerCase());
+                    if (!solValue) return false;
+                    return solValue.toString().toLowerCase().includes(value.toLowerCase());
                 });
             }
         });
@@ -191,11 +199,11 @@ const DetalleSolicitudesTable = () => {
         }
 
         return filtered;
-    }, [filters, sortConfig, date]);
+    }, [filters, sortConfig, dateRange]);
     
     const clearFilters = () => {
         setFilters({});
-        setDate({ from: startOfYear(new Date(2025, 0, 1)), to: endOfYear(new Date(2025, 11, 31)) });
+        setDateRange({ from: startOfYear(new Date(2025, 0, 1)), to: endOfYear(new Date(2025, 11, 31)) });
         setCurrentPage(1);
         toast({ title: "Filtros limpiados", description: "Mostrando todas las solicitudes del año." });
     };
@@ -254,18 +262,18 @@ const DetalleSolicitudesTable = () => {
                             variant={"outline"}
                             className={cn(
                                 "w-[300px] justify-start text-left font-normal",
-                                !date && "text-muted-foreground"
+                                !dateRange && "text-muted-foreground"
                             )}
                         >
                             <CalendarIcon className="mr-2 h-4 w-4" />
-                            {date?.from ? (
-                            date.to ? (
+                            {dateRange?.from ? (
+                            dateRange.to ? (
                                 <>
-                                {format(date.from, "LLL dd, y")} -{" "}
-                                {format(date.to, "LLL dd, y")}
+                                {format(dateRange.from, "LLL dd, y")} -{" "}
+                                {format(dateRange.to, "LLL dd, y")}
                                 </>
                             ) : (
-                                format(date.from, "LLL dd, y")
+                                format(dateRange.from, "LLL dd, y")
                             )
                             ) : (
                             <span>Seleccione un rango de fechas</span>
@@ -276,9 +284,9 @@ const DetalleSolicitudesTable = () => {
                         <Calendar
                             initialFocus
                             mode="range"
-                            defaultMonth={date?.from}
-                            selected={date}
-                            onSelect={setDate}
+                            defaultMonth={dateRange?.from}
+                            selected={dateRange}
+                            onSelect={setDateRange}
                             numberOfMonths={2}
                         />
                         </PopoverContent>
@@ -325,6 +333,26 @@ const DetalleSolicitudesTable = () => {
                                                     ))}
                                                 </SelectContent>
                                             </Select>
+                                        ) : ['fechaEnvio', 'fechaRespuesta'].includes(header.key) ? (
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <Button
+                                                        variant="outline"
+                                                        className={cn("h-8 w-full justify-start text-left font-normal", !filters[header.key as keyof Solicitud] && "text-muted-foreground")}
+                                                    >
+                                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                                        {filters[header.key as keyof Solicitud] ? formatDate(filters[header.key as keyof Solicitud]!) : <span>Filtrar...</span>}
+                                                    </Button>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-auto p-0" align="start">
+                                                    <Calendar
+                                                        mode="single"
+                                                        selected={filters[header.key as keyof Solicitud] ? parse(filters[header.key as keyof Solicitud]!, 'yyyy-MM-dd', new Date()) : undefined}
+                                                        onSelect={(date) => handleDateFilterChange(date, header.key as keyof Solicitud)}
+                                                        initialFocus
+                                                    />
+                                                </PopoverContent>
+                                            </Popover>
                                         ) : (
                                             <Input
                                                 placeholder={`Filtrar ${header.label}...`}
