@@ -3,8 +3,16 @@ export type MaintainerItem = {
     value: string;
 };
 
+export type TipoSolicitudItem = {
+    id: string;
+    value: string;
+    tiempoMaximo: number;
+    diasCritico: number;
+    diasAtencion: number;
+};
+
 export type MockMaintainers = {
-    tiposSolicitud: MaintainerItem[];
+    tiposSolicitud: TipoSolicitudItem[];
     arbolTemas: MaintainerItem[];
     viasIngreso: MaintainerItem[];
     oficinasRegionales: MaintainerItem[];
@@ -17,11 +25,11 @@ export type MockMaintainers = {
 
 export const mockMaintainers: MockMaintainers = {
     tiposSolicitud: [
-        { id: 'ts-1', value: 'Reclamo' },
-        { id: 'ts-2', value: 'Consulta' },
-        { id: 'ts-3', value: 'Sugerencia' },
-        { id: 'ts-4', value: 'Queja' },
-        { id: 'ts-5', value: 'Felicitacion' },
+        { id: 'ts-1', value: 'Reclamo', tiempoMaximo: 20, diasCritico: 5, diasAtencion: 10 },
+        { id: 'ts-2', value: 'Consulta', tiempoMaximo: 15, diasCritico: 3, diasAtencion: 7 },
+        { id: 'ts-3', value: 'Sugerencia', tiempoMaximo: 20, diasCritico: 5, diasAtencion: 10 },
+        { id: 'ts-4', value: 'Queja', tiempoMaximo: 25, diasCritico: 7, diasAtencion: 15 },
+        { id: 'ts-5', value: 'Felicitacion', tiempoMaximo: 5, diasCritico: 1, diasAtencion: 3 },
     ],
     arbolTemas: [
         { id: 'at-1', value: 'Derechos de la mujer' },
