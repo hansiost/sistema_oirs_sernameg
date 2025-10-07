@@ -476,6 +476,11 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
         setCurrentPage(1);
     };
 
+    const handleSelectFilterChange = (value: string, key: keyof Solicitud) => {
+      setFilters(prev => ({...prev, [key]: value === 'all' ? '' : value }));
+      setCurrentPage(1);
+    };
+
     const requestSort = (key: keyof Solicitud) => {
         let direction: 'ascending' | 'descending' = 'ascending';
         if (sortConfig && sortConfig.key === key && sortConfig.direction === 'ascending') {
@@ -489,10 +494,20 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
 
         Object.entries(filters).forEach(([key, value]) => {
             if (value) {
-                filtered = filtered.filter(solicitud => {
-                    const solValue = solicitud[key as keyof Solicitud];
-                    return solValue?.toString().toLowerCase().includes(value.toLowerCase());
-                });
+                if (key === 'tiempoRestante') {
+                  filtered = filtered.filter(solicitud => {
+                    const variant = getTiempoRestanteVariant(solicitud.tiempoRestante);
+                    if (value === 'danger') return variant === 'danger';
+                    if (value === 'warning') return variant === 'warning';
+                    if (value === 'success') return variant === 'success';
+                    return true;
+                  });
+                } else {
+                  filtered = filtered.filter(solicitud => {
+                      const solValue = solicitud[key as keyof Solicitud];
+                      return solValue?.toString().toLowerCase().includes(value.toLowerCase());
+                  });
+                }
             }
         });
         
@@ -591,14 +606,31 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
                              <TableHead></TableHead>
                         </TableRow>
                         <TableRow>
-                            {tableHeaders.map(header => (
+                           {tableHeaders.map(header => (
                                 <TableHead key={`${header.key}-filter`}>
+                                  {header.key === 'tiempoRestante' && !isClosedTab ? (
+                                    <Select
+                                      value={filters.tiempoRestante || 'all'}
+                                      onValueChange={(value) => handleSelectFilterChange(value, 'tiempoRestante')}
+                                    >
+                                      <SelectTrigger className="h-8">
+                                        <SelectValue placeholder="Filtrar por urgencia..." />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="all">Todos</SelectItem>
+                                        <SelectItem value="danger">Crítico</SelectItem>
+                                        <SelectItem value="warning">Atención</SelectItem>
+                                        <SelectItem value="success">Normal</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  ) : (
                                     <Input
                                         placeholder={`Filtrar...`}
                                         value={filters[header.key] || ''}
                                         onChange={(e) => handleFilterChange(e, header.key)}
                                         className="h-8"
                                     />
+                                  )}
                                 </TableHead>
                             ))}
                         </TableRow>
