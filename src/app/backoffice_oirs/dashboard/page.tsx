@@ -551,7 +551,19 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
             case 'tiempoRestante':
                 const value = isClosedTab ? solicitud.tiempoResolucion : solicitud.tiempoRestante;
                 const variant = isClosedTab ? 'outline' : getTiempoRestanteVariant(solicitud.tiempoRestante);
-                return <Badge variant={variant}>{value}</Badge>;
+                
+                let text = value;
+                if (!isClosedTab && value !== '-') {
+                    if (variant === 'danger') {
+                        text = `${value} (crítico)`;
+                    } else if (variant === 'warning') {
+                        text = `${value} (atención)`;
+                    } else if (variant === 'success') {
+                        text = `${value} (normal)`;
+                    }
+                }
+                
+                return <Badge variant={variant}>{text}</Badge>;
             default:
                 return solicitud[key as keyof Solicitud];
         }
@@ -581,14 +593,12 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
                         <TableRow>
                             {tableHeaders.map(header => (
                                 <TableHead key={`${header.key}-filter`}>
-                                {header.key !== 'fechaRespuesta' ? (
-                                        <Input
-                                            placeholder={`Filtrar...`}
-                                            value={filters[header.key] || ''}
-                                            onChange={(e) => handleFilterChange(e, header.key)}
-                                            className="h-8"
-                                        />
-                                    ) : (<div />)}
+                                    <Input
+                                        placeholder={`Filtrar...`}
+                                        value={filters[header.key] || ''}
+                                        onChange={(e) => handleFilterChange(e, header.key)}
+                                        className="h-8"
+                                    />
                                 </TableHead>
                             ))}
                         </TableRow>
