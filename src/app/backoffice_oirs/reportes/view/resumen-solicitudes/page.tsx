@@ -27,7 +27,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { REGIONES_CHILE } from '@/lib/constants';
+import { REGIONES_CHILE, REQUEST_TYPES } from '@/lib/constants';
 import {
   ChartContainer,
   ChartTooltip,
@@ -58,6 +58,36 @@ const generateMockData = (): RegionSummary[] => {
   }));
 };
 
+type RegionTypeSummary = {
+    region: string;
+    total: number;
+    Reclamo: number;
+    Consulta: number;
+    Sugerencia: number;
+    Queja: number;
+    Felicitacion: number;
+}
+
+const generateMockTypeData = (): RegionTypeSummary[] => {
+    return REGIONES_CHILE.map(region => {
+        const reclamo = Math.floor(Math.random() * 40);
+        const consulta = Math.floor(Math.random() * 70);
+        const sugerencia = Math.floor(Math.random() * 30);
+        const queja = Math.floor(Math.random() * 20);
+        const felicitacion = Math.floor(Math.random() * 10);
+        return {
+            region,
+            total: reclamo + consulta + sugerencia + queja + felicitacion,
+            Reclamo: reclamo,
+            Consulta: consulta,
+            Sugerencia: sugerencia,
+            Queja: queja,
+            Felicitacion: felicitacion
+        }
+    });
+};
+
+
 const chartConfig = {
   total: { label: 'Total', color: 'hsl(var(--chart-1))' },
   ingresada: { label: 'Ingresadas', color: 'hsl(var(--chart-1))' },
@@ -65,6 +95,11 @@ const chartConfig = {
   respondida: { label: 'Respondidas', color: 'hsl(var(--chart-3))' },
   cerrada: { label: 'Cerradas', color: 'hsl(var(--chart-4))' },
   cancelada: { label: 'Canceladas', color: 'hsl(var(--chart-5))' },
+  Reclamo: { label: 'Reclamo', color: 'hsl(var(--chart-1))' },
+  Consulta: { label: 'Consulta', color: 'hsl(var(--chart-2))' },
+  Sugerencia: { label: 'Sugerencia', color: 'hsl(var(--chart-3))' },
+  Queja: { label: 'Queja', color: 'hsl(var(--chart-4))' },
+  Felicitacion: { label: 'Felicitación', color: 'hsl(var(--chart-5))' },
 } satisfies ChartConfig;
 
 
@@ -222,9 +257,57 @@ const ResumenRegionalPorEstadoBarChart = ({ data, dateRange }: { data: RegionSum
     );
 };
 
+const ResumenRegionalPorTipoBarChart = ({ data, dateRange }: { data: RegionTypeSummary[], dateRange?: DateRange }) => {
+    const chartData = data.map(item => ({
+        region: item.region,
+        ...item
+    }));
+
+    const dateRangeString = dateRange?.from && dateRange?.to
+        ? `Datos desde ${format(dateRange.from, "dd/MM/yy")} hasta ${format(dateRange.to, "dd/MM/yy")}.`
+        : 'Datos para todo el período.';
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5" />
+                    Desglose de Solicitudes por Región y Tipo
+                </CardTitle>
+                <CardDescription>
+                    {dateRangeString}
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <ChartContainer config={chartConfig} className="min-h-[400px] w-full">
+                    <BarChart data={chartData}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis
+                            dataKey="region"
+                            tickLine={false}
+                            axisLine={false}
+                            tickMargin={8}
+                            tickFormatter={(value) => value.slice(0, 3)}
+                        />
+                        <YAxis />
+                        <Tooltip content={<ChartTooltipContent />} cursor={false} />
+                        <Legend />
+                        <Bar dataKey="Reclamo" stackId="a" fill="var(--color-Reclamo)" radius={0} />
+                        <Bar dataKey="Consulta" stackId="a" fill="var(--color-Consulta)" radius={0} />
+                        <Bar dataKey="Sugerencia" stackId="a" fill="var(--color-Sugerencia)" radius={0} />
+                        <Bar dataKey="Queja" stackId="a" fill="var(--color-Queja)" radius={0} />
+                        <Bar dataKey="Felicitacion" stackId="a" fill="var(--color-Felicitacion)" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                </ChartContainer>
+            </CardContent>
+        </Card>
+    );
+};
+
 const ResumenSolicitudesReport = () => {
     const { toast } = useToast();
     const [data] = useState<RegionSummary[]>(generateMockData());
+    const [typeData] = useState<RegionTypeSummary[]>(generateMockTypeData());
     const [date, setDate] = useState<DateRange | undefined>({
         from: startOfYear(new Date(2025, 0, 1)),
         to: endOfYear(new Date(2025, 11, 31)),
@@ -370,6 +453,9 @@ const ResumenSolicitudesReport = () => {
             </div>
             <div className="mt-6">
                 <ResumenRegionalPorEstadoBarChart data={data} dateRange={date} />
+            </div>
+             <div className="mt-6">
+                <ResumenRegionalPorTipoBarChart data={typeData} dateRange={date} />
             </div>
         </div>
     );
