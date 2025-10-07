@@ -82,6 +82,10 @@ const mockSolicitudes: Solicitud[] = [
   { id: 'AC-17293', rut: '765.432-1', fechaEnvio: '2025-07-01', tipo: 'Reclamo', tema: 'Atención deficiente en servicio público', oficina: 'Los Lagos', ciudadano: 'Camila Espinoza', estado: 'En proceso', fechaRespuesta: null, tiempoRestante: '11 días' },
   { id: 'CE-28304', rut: '654.321-0', fechaEnvio: '2025-06-30', tipo: 'Queja', tema: 'Conducta de funcionario/a', oficina: 'Arica y Parinacota', ciudadano: 'Valentina Maldonado', estado: 'Respondida', fechaRespuesta: '2025-07-02', tiempoRestante: '-', tiempoResolucion: '2 días' },
   { id: 'EG-39415', rut: '543.210-9', fechaEnvio: '2025-06-29', tipo: 'Sugerencia', tema: 'Mejora de servicios de atención', oficina: 'Ñuble', ciudadano: 'Sofía Contreras', estado: 'Cerrada', fechaRespuesta: '2025-06-30', tiempoRestante: '-', tiempoResolucion: '1 día' },
+  { id: 'JP-11111', rut: '12.345.678-9', fechaEnvio: '2025-06-15', tipo: 'Consulta', tema: 'Asesoría legal', oficina: 'Metropolitana de Santiago', ciudadano: 'Juana Pérez', estado: 'Cerrada', fechaRespuesta: '2025-06-16', tiempoRestante: '-', tiempoResolucion: '1 día' },
+  { id: 'JP-22222', rut: '12.345.678-9', fechaEnvio: '2025-05-20', tipo: 'Reclamo', tema: 'Maltrato laboral', oficina: 'Metropolitana de Santiago', ciudadano: 'Juana Pérez', estado: 'Respondida', fechaRespuesta: '2025-05-25', tiempoRestante: '-', tiempoResolucion: '5 días' },
+  { id: 'JP-33333', rut: '12.345.678-9', fechaEnvio: '2025-04-10', tipo: 'Felicitacion', tema: 'Buena atención recibida', oficina: 'Metropolitana de Santiago', ciudadano: 'Juana Pérez', estado: 'Cerrada', fechaRespuesta: '2025-04-10', tiempoRestante: '-', tiempoResolucion: '0 días' },
+  { id: 'JP-44444', rut: '12.345.678-9', fechaEnvio: '2025-03-01', tipo: 'Sugerencia', tema: 'Nuevos programas o talleres', oficina: 'Metropolitana de Santiago', ciudadano: 'Juana Pérez', estado: 'Ingresada', fechaRespuesta: null, tiempoRestante: '12 días' },
 ];
 
 
