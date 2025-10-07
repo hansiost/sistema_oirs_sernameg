@@ -15,3 +15,45 @@ export const mockUsers: User[] = [
     { id: '4', rut: '13.456.789-K', nombre: 'Carlos López', email: 'carlos.lopez@sernameg.gob.cl', oficina: 'Nivel Central', estado: 'Activo', perfil: 'Encargado OIRS Nacional' },
     { id: '5', rut: '14.567.890-1', nombre: 'Luisa Martinez', email: 'luisa.martinez@sernameg.gob.cl', oficina: 'Los Lagos', estado: 'Activo', perfil: 'Encargado OIRS Regional' },
 ];
+
+// --- Permisos ---
+export type Profile = 'Administrador' | 'Encargado OIRS Regional' | 'Encargado OIRS Nacional';
+export type Permission = { id: string, label: string };
+export type PermissionCategory = { id: string, label: string, permissions: Permission[] };
+
+export const mockPermissions: Record<Profile, string[]> = {
+  Administrador: [
+    'solicitudes:crear',
+    'solicitudes:ver-todas',
+    'solicitudes:asignar',
+    'solicitudes:responder',
+    'reportes:ver',
+    'reportes:crear',
+    'documentos:ver',
+    'documentos:cargar',
+    'documentos:eliminar',
+    'contactos:ver',
+    'contactos:gestionar',
+    'admin:usuarios',
+    'admin:permisos',
+    'mantenedores:gestionar',
+  ],
+  'Encargado OIRS Nacional': [
+    'solicitudes:crear',
+    'solicitudes:ver-todas',
+    'solicitudes:asignar',
+    'solicitudes:responder',
+    'reportes:ver',
+    'reportes:crear',
+    'documentos:ver',
+    'contactos:ver',
+  ],
+  'Encargado OIRS Regional': [
+    'solicitudes:crear',
+    'solicitudes:ver-todas',
+    'solicitudes:responder',
+    'reportes:ver',
+    'documentos:ver',
+    'contactos:ver',
+  ],
+};
