@@ -2,6 +2,7 @@
 'use client';
 import { useState, useMemo, ChangeEvent, FC } from 'react';
 import Link from 'next/link';
+import { DateRange, DayPicker } from 'react-day-picker';
 import {
   Table,
   TableBody,
@@ -28,11 +29,14 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-import { ArrowUpDown, FilePenLine } from 'lucide-react';
+import { ArrowUpDown, FilePenLine, Calendar as CalendarIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { REQUEST_TYPES } from '@/lib/constants';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format, parse } from 'date-fns';
 
 
 type Solicitud = {
@@ -484,6 +488,12 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
       setCurrentPage(1);
     };
 
+    const handleDateFilterChange = (date: Date | undefined, key: keyof Solicitud) => {
+        const formattedDate = date ? format(date, 'yyyy-MM-dd') : '';
+        setFilters(prev => ({ ...prev, [key]: formattedDate }));
+        setCurrentPage(1);
+    }
+
     const requestSort = (key: keyof Solicitud) => {
         let direction: 'ascending' | 'descending' = 'ascending';
         if (sortConfig && sortConfig.key === key && sortConfig.direction === 'ascending') {
@@ -656,6 +666,26 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
                                         ))}
                                       </SelectContent>
                                     </Select>
+                                  ) : header.key === 'fechaEnvio' ? (
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                className={cn("h-8 w-full justify-start text-left font-normal", !filters.fechaEnvio && "text-muted-foreground")}
+                                            >
+                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                {filters.fechaEnvio ? formatDate(filters.fechaEnvio) : <span>Filtrar...</span>}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0" align="start">
+                                            <Calendar
+                                                mode="single"
+                                                selected={filters.fechaEnvio ? parse(filters.fechaEnvio, 'yyyy-MM-dd', new Date()) : undefined}
+                                                onSelect={(date) => handleDateFilterChange(date, 'fechaEnvio')}
+                                                initialFocus
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
                                   ) : (
                                     <Input
                                         placeholder={`Filtrar...`}
