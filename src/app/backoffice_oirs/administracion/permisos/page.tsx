@@ -11,57 +11,63 @@ import { useToast } from '@/hooks/use-toast';
 import { mockPermissions, type Profile, type PermissionCategory } from '@/lib/mock-data';
 
 const profiles: Profile[] = ['Administrador', 'Encargado OIRS Regional', 'Encargado OIRS Nacional'];
+
 const permissionCategories: PermissionCategory[] = [
-  { 
-    id: 'solicitudes', 
-    label: 'Gestión de Solicitudes', 
-    permissions: [
-      { id: 'solicitudes:crear', label: 'Crear nuevas solicitudes' },
-      { id: 'solicitudes:ver-todas', label: 'Ver todas las solicitudes de su región/nacional' },
-      { id: 'solicitudes:asignar', label: 'Asignar solicitudes a otros usuarios' },
-      { id: 'solicitudes:responder', label: 'Responder y cerrar solicitudes' },
-    ]
-  },
-  {
-    id: 'reportes',
-    label: 'Reportes',
-    permissions: [
-      { id: 'reportes:ver', label: 'Ver todos los reportes' },
-      { id: 'reportes:crear', label: 'Crear y editar reportes' },
-    ]
-  },
-  {
-    id: 'documentos',
-    label: 'Documentos',
-    permissions: [
-        { id: 'documentos:ver', label: 'Ver y descargar documentos' },
-        { id: 'documentos:cargar', label: 'Cargar y editar documentos' },
-        { id: 'documentos:eliminar', label: 'Eliminar documentos' },
-    ]
-  },
-  {
-    id: 'contactos',
-    label: 'Contactos',
-    permissions: [
-        { id: 'contactos:ver', label: 'Ver la red de contactos' },
-        { id: 'contactos:gestionar', label: 'Crear y editar contactos' },
-    ]
-  },
-  {
-    id: 'administracion',
-    label: 'Administración',
-    permissions: [
-      { id: 'admin:usuarios', label: 'Gestionar usuarios (crear, editar, eliminar)' },
-      { id: 'admin:permisos', label: 'Gestionar roles y permisos' },
-    ]
-  },
-  {
-    id: 'mantenedores',
-    label: 'Mantenedores',
-    permissions: [
-      { id: 'mantenedores:gestionar', label: 'Gestionar todos los mantenedores del sistema' },
-    ]
-  }
+    {
+        id: 'solicitudes',
+        label: 'Gestión de Solicitudes',
+        permissions: [
+            { id: 'solicitudes:crear-cualquier-region', label: 'Crear nuevas Solicitudes de cualquier región' },
+            { id: 'solicitudes:modificar-tipo', label: 'Permitir modificar el Tipo de Solicitud' },
+        ]
+    },
+    {
+        id: 'reportes',
+        label: 'Reportes',
+        permissions: [
+            { id: 'reportes:crear-editar', label: 'Crear y editar Reportes' },
+            { id: 'reportes:ver', label: 'Ver Reportes' },
+        ]
+    },
+    {
+        id: 'documentos',
+        label: 'Documentos',
+        permissions: [
+            { id: 'documentos:ver-descargar', label: 'Ver y descargar Documentos' },
+            { id: 'documentos:gestionar', label: 'Gestionar Documentos' },
+        ]
+    },
+    {
+        id: 'contactos',
+        label: 'Contactos',
+        permissions: [
+            { id: 'contactos:gestionar-cualquier-region', label: 'Crear y gestionar contactos de cualquier región' },
+        ]
+    },
+    {
+        id: 'administracion',
+        label: 'Administración',
+        permissions: [
+            { id: 'admin:gestionar-usuarios', label: 'Gestionar usuarios (crear, editar, eliminar)' },
+            { id: 'admin:gestionar-permisos', label: 'Gestionar permisos' },
+        ]
+    },
+    {
+        id: 'mantenedores',
+        label: 'Mantenedores',
+        permissions: [
+            { id: 'mantenedores:tipos-solicitud', label: 'Acceso a Mantenedor: Tipos de Solicitudes' },
+            { id: 'mantenedores:arbol-temas', label: 'Acceso a Mantenedor: Árbol de Temas' },
+            { id: 'mantenedores:vias-ingreso', label: 'Acceso a Mantenedor: Vías de Ingreso' },
+            { id: 'mantenedores:oficinas-regionales', label: 'Acceso a Mantenedor: Oficinas Regionales' },
+            { id: 'mantenedores:genero', label: 'Acceso a Mantenedor: Género' },
+            { id: 'mantenedores:pueblos-originarios', label: 'Acceso a Mantenedor: Pueblos Originarios' },
+            { id: 'mantenedores:estados-solicitud', label: 'Acceso a Mantenedor: Estados de Solicitud' },
+            { id: 'mantenedores:resultado-atencion', label: 'Acceso a Mantenedor: Resultado de Atención' },
+            { id: 'mantenedores:tipo-resolucion', label: 'Acceso a Mantenedor: Tipo Resolución' },
+            { id: 'mantenedores:preguntas-frecuentes', label: 'Acceso a Mantenedor: Preguntas Frecuentes' },
+        ]
+    }
 ];
 
 export default function PermisosPage() {
