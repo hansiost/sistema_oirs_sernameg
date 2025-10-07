@@ -24,9 +24,16 @@ export const mockReports: Reporte[] = [
     {
         id: 'REP-003',
         nombre: 'Resumen de Solicitudes por Región y Nacional',
-        descripcion: 'Tabla con el total de solicitudes por región, desglosado por estado. Incluye totales nacionales.',
+        descripcion: 'Tabla y gráficos con el total de solicitudes por región y su desglose por estado y tipo.',
         tipo: 'Tabla',
         link: '/backoffice_oirs/reportes/view/resumen-solicitudes',
+    },
+     {
+        id: 'REP-005',
+        nombre: 'Tiempos de Respuesta por Tipo de Solicitud',
+        descripcion: 'Tabla con el tiempo de respuesta promedio por tipo de solicitud para cada región.',
+        tipo: 'Tabla',
+        link: '/backoffice_oirs/reportes/view/tiempos-respuesta',
     },
     { 
         id: 'REP-004', 
