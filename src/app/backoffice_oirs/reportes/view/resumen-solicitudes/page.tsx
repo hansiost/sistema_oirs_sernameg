@@ -70,11 +70,14 @@ const chartConfig = {
 
 
 const ResumenNacionalPieChart = ({ data }: { data: Omit<RegionSummary, 'region' | 'total'> }) => {
-    const chartData = Object.entries(data).map(([key, value]) => ({
-        name: chartConfig[key as keyof typeof chartConfig].label,
-        value: value,
-        fill: chartConfig[key as keyof typeof chartConfig].color,
-    }));
+    const chartData = Object.entries(data)
+        .filter(([key]) => key in chartConfig) // Filtrar solo las claves que existen en chartConfig
+        .map(([key, value]) => ({
+            name: chartConfig[key as keyof typeof chartConfig].label,
+            value: value,
+            fill: chartConfig[key as keyof typeof chartConfig].color,
+        }));
+
 
     return (
         <Card>
