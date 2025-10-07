@@ -1,3 +1,4 @@
+
 export type Reporte = {
     id: string;
     nombre: string;
