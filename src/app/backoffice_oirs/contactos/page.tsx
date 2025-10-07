@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useMemo, ChangeEvent, FC } from 'react';
 import Link from 'next/link';
@@ -37,6 +38,8 @@ const ContactosTable = () => {
         { key: 'nombre', label: 'Nombre', sortable: true },
         { key: 'cargo', label: 'Rol o Cargo', sortable: true },
         { key: 'institucion', label: 'Institución', sortable: true },
+        { key: 'email', label: 'Email', sortable: true },
+        { key: 'fono', label: 'Fono', sortable: true },
     ];
 
     const handleFilterChange = (e: ChangeEvent<HTMLInputElement>, key: keyof Contacto) => {

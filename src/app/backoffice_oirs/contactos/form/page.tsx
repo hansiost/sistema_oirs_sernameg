@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
@@ -42,6 +43,8 @@ const formSchema = z.object({
   nombre: z.string().min(1, 'Nombre es obligatorio'),
   cargo: z.string().min(1, 'El cargo es obligatorio'),
   institucion: z.string().min(1, 'La institución es obligatoria'),
+  email: z.string().email('Email inválido'),
+  fono: z.string().min(8, 'El teléfono es obligatorio'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -62,6 +65,8 @@ const ContactFormContent = () => {
       nombre: '',
       cargo: '',
       institucion: '',
+      email: '',
+      fono: '',
     },
   });
 
@@ -179,6 +184,32 @@ const ContactFormContent = () => {
                     <FormLabel>Institución</FormLabel>
                     <FormControl>
                       <Input placeholder="Ej: Municipalidad de..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="contacto@institucion.cl" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="fono"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Fono</FormLabel>
+                    <FormControl>
+                      <Input placeholder="+56 X XXXX XXXX" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
