@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { DateRange } from 'react-day-picker';
 import { format, startOfYear, endOfYear } from 'date-fns';
-import { Pie, PieChart, Cell } from 'recharts';
+import { Pie, PieChart, Cell, Legend } from 'recharts';
 import {
   Table,
   TableBody,
