@@ -95,7 +95,7 @@ const ResumenNacionalPieChart = ({ data, dateRange }: { data: Omit<RegionSummary
             <CardContent>
                 <ChartContainer
                     config={chartConfig}
-                    className="mx-auto aspect-square h-[300px]"
+                    className="mx-auto aspect-square h-[350px]"
                 >
                     <PieChart>
                         <ChartTooltip
@@ -106,7 +106,6 @@ const ResumenNacionalPieChart = ({ data, dateRange }: { data: Omit<RegionSummary
                             data={chartData}
                             dataKey="value"
                             nameKey="name"
-                            innerRadius={60}
                             strokeWidth={5}
                             cy="50%"
                         >
