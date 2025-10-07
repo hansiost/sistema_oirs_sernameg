@@ -18,7 +18,7 @@ export const mockReports: Reporte[] = [
         id: 'REP-002',
         nombre: 'Resumen de Solicitudes por Región y Nacional',
         descripcion: 'Tabla y gráficos con el total de solicitudes por región y su desglose por estado y tipo.',
-        tipo: 'Tabla',
+        tipo: 'Dashboard',
         link: '/backoffice_oirs/reportes/view/resumen-solicitudes',
     },
      {
