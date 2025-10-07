@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { DateRange } from 'react-day-picker';
 import { format, startOfYear, endOfYear } from 'date-fns';
-import { Pie, PieChart, Cell, Legend } from 'recharts';
+import { Pie, PieChart, Cell, Legend, Tooltip } from 'recharts';
 import {
   Table,
   TableBody,
@@ -32,8 +32,6 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-  ChartLegend,
-  ChartLegendContent,
   type ChartConfig,
 } from '@/components/ui/chart';
 
@@ -110,14 +108,21 @@ const ResumenNacionalPieChart = ({ data, dateRange }: { data: Omit<RegionSummary
                             nameKey="name"
                             innerRadius={60}
                             strokeWidth={5}
+                            cy="50%"
                         >
                             {chartData.map((entry) => (
                                 <Cell key={entry.name} fill={entry.fill} />
                             ))}
                         </Pie>
-                         <ChartLegend
-                            content={<ChartLegendContent nameKey="name" />}
-                            className="-translate-y-[20px] flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
+                        <Legend
+                            verticalAlign="middle"
+                            layout="vertical"
+                            align="right"
+                            iconSize={10}
+                            wrapperStyle={{
+                                paddingLeft: '20px',
+                                lineHeight: '24px',
+                            }}
                         />
                     </PieChart>
                 </ChartContainer>
