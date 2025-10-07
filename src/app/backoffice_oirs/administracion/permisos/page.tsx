@@ -76,6 +76,7 @@ export default function PermisosPage() {
   const [permissions, setPermissions] = useState(mockPermissions);
   
   const handlePermissionChange = (permissionId: string, checked: boolean) => {
+    if (selectedProfile === 'Administrador') return;
     setPermissions(prev => {
       const newPermissions = new Set(prev[selectedProfile]);
       if (checked) {
@@ -91,6 +92,14 @@ export default function PermisosPage() {
   };
 
   const handleSave = () => {
+    if (selectedProfile === 'Administrador') {
+      toast({
+        variant: 'destructive',
+        title: 'Acción no permitida',
+        description: `Los permisos del perfil Administrador no se pueden modificar.`,
+      });
+      return;
+    }
     // In a real app, this would be an API call
     console.log("Guardando permisos:", { profile: selectedProfile, permissions: permissions[selectedProfile] });
     toast({
@@ -146,6 +155,7 @@ export default function PermisosPage() {
                       id={permission.id}
                       checked={permissions[selectedProfile].includes(permission.id)}
                       onCheckedChange={(checked) => handlePermissionChange(permission.id, !!checked)}
+                      disabled={selectedProfile === 'Administrador'}
                     />
                     <Label htmlFor={permission.id} className="font-normal cursor-pointer">
                       {permission.label}
@@ -158,7 +168,7 @@ export default function PermisosPage() {
           ))}
         </CardContent>
         <div className="p-6 pt-0 flex justify-end">
-            <Button onClick={handleSave}>
+            <Button onClick={handleSave} disabled={selectedProfile === 'Administrador'}>
                 <Save className="mr-2 h-4 w-4" />
                 Guardar Permisos
             </Button>
