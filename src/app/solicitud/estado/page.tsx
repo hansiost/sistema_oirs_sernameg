@@ -129,12 +129,6 @@ export default function EstadoSolicitudesPage({ searchParams }: { searchParams?:
             </Link>
           </Button>
           <div className="flex items-center gap-2">
-            <Button variant="outline" asChild>
-                <Link href="/preguntas-frecuentes">
-                    <HelpCircle className="mr-2 h-4 w-4" />
-                    Preguntas Frecuentes
-                </Link>
-            </Button>
             <Button asChild>
                 <Link href="/solicitud">
                 <PlusCircle className="mr-2 h-4 w-4" />

@@ -8,6 +8,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { LoginDialog } from '@/components/login-dialog';
 import { useState } from 'react';
 import Link from 'next/link';
+import { HelpCircle } from 'lucide-react';
 
 export default function Home() {
   const heroImage = PlaceHolderImages.find(img => img.id === 'hero-landing');
@@ -50,7 +51,7 @@ export default function Home() {
           <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-prose mx-auto">
             Bienvenida a nuestro portal de solicitudes. Aquí puede ingresar sus reclamos, consultas, sugerencias y felicitaciones de forma segura y directa.
           </p>
-          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center flex-wrap">
               <Button onClick={() => handleLoginClick('claveUnica')} size="lg" className="font-bold text-lg bg-blue-600 hover:bg-blue-700">
                 <Icons.Login />
                 Ingresar con ClaveÚnica
@@ -58,6 +59,12 @@ export default function Home() {
               <Button onClick={() => handleLoginClick('rut')} size="lg" className="font-bold text-lg" variant="secondary">
                 <Icons.Login />
                 Ingresar con RUT
+              </Button>
+              <Button asChild size="lg" className="font-bold text-lg" variant="outline">
+                <Link href="/preguntas-frecuentes">
+                  <HelpCircle className="mr-2" />
+                  Preguntas Frecuentes
+                </Link>
               </Button>
           </div>
           <div className="mt-4 text-center">
