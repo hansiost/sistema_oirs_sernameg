@@ -31,6 +31,7 @@ import {
 import { ArrowUpDown, FilePenLine } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 
 
 type Solicitud = {
@@ -419,18 +420,13 @@ type SortConfig = {
   direction: 'ascending' | 'descending';
 } | null;
 
-const getStatusVariant = (estado: string, tiempoRestante: string): BadgeProps['variant'] => {
-  if (estado === 'Ingresada' || estado === 'En proceso') {
-    const dias = parseInt(tiempoRestante.split(' ')[0], 10);
-    if (dias <= 2) return 'danger';
-    if (dias >= 3 && dias <= 5) return 'warning';
-    if (dias >= 6) return 'success';
-  }
-
-  if (estado === 'Respondida') return 'default';
-  if (estado === 'Cerrada') return 'secondary';
-  if (estado === 'Cancelada') return 'destructive';
-  return 'outline';
+const getTiempoRestanteClass = (tiempoRestante: string): string => {
+  if (tiempoRestante === '-') return '';
+  const dias = parseInt(tiempoRestante.split(' ')[0], 10);
+  if (dias <= 2) return 'text-red-600 dark:text-red-500'; // danger
+  if (dias >= 3 && dias <= 5) return 'text-yellow-600 dark:text-yellow-500'; // warning
+  if (dias >= 6) return 'text-green-600 dark:text-green-500'; // success
+  return '';
 };
 
 const formatDate = (dateString: string | null) => {
@@ -548,12 +544,14 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
                 );
             case 'estado':
                 return (
-                     <Badge variant={getStatusVariant(solicitud.estado, solicitud.tiempoRestante)}>
+                     <Badge variant="outline">
                         {solicitud.estado}
                     </Badge>
                 );
             case 'tiempoRestante':
-                return isClosedTab ? solicitud.tiempoResolucion : solicitud.tiempoRestante;
+                const value = isClosedTab ? solicitud.tiempoResolucion : solicitud.tiempoRestante;
+                const className = isClosedTab ? '' : getTiempoRestanteClass(solicitud.tiempoRestante);
+                return <span className={cn('font-semibold', className)}>{value}</span>;
             default:
                 return solicitud[key as keyof Solicitud];
         }
