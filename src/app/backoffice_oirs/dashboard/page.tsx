@@ -32,6 +32,7 @@ import { ArrowUpDown, FilePenLine } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
+import { REQUEST_TYPES } from '@/lib/constants';
 
 
 type Solicitud = {
@@ -443,6 +444,8 @@ interface SolicitudesTableProps {
     isClosedTab?: boolean;
 }
 
+const ESTADOS_SOLICITUD = ['Ingresada', 'En proceso', 'Respondida', 'Cancelada'];
+
 
 const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab = false }) => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -621,6 +624,36 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
                                         <SelectItem value="danger">Crítico</SelectItem>
                                         <SelectItem value="warning">Atención</SelectItem>
                                         <SelectItem value="success">Normal</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  ) : header.key === 'tipo' ? (
+                                    <Select
+                                      value={filters.tipo || 'all'}
+                                      onValueChange={(value) => handleSelectFilterChange(value, 'tipo')}
+                                    >
+                                      <SelectTrigger className="h-8">
+                                        <SelectValue placeholder="Filtrar por tipo..." />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="all">Todos</SelectItem>
+                                        {REQUEST_TYPES.map(type => (
+                                            <SelectItem key={type} value={type}>{type}</SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  ) : header.key === 'estado' ? (
+                                    <Select
+                                      value={filters.estado || 'all'}
+                                      onValueChange={(value) => handleSelectFilterChange(value, 'estado')}
+                                    >
+                                      <SelectTrigger className="h-8">
+                                        <SelectValue placeholder="Filtrar por estado..." />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="all">Todos</SelectItem>
+                                        {(isClosedTab ? ['Respondida', 'Cancelada'] : ['Ingresada', 'En proceso']).map(estado => (
+                                            <SelectItem key={estado} value={estado}>{estado}</SelectItem>
+                                        ))}
                                       </SelectContent>
                                     </Select>
                                   ) : (
