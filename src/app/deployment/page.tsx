@@ -23,11 +23,11 @@ export default function DeploymentPage() {
             </CardHeader>
             <CardContent className="text-center space-y-6">
                 
-                <Alert>
-                  <Info className="h-4 w-4" />
-                  <AlertTitle>¿Cómo funciona el despliegue?</AlertTitle>
-                  <AlertDescription>
-                    Actualmente, te encuentras en un entorno de desarrollo privado. Para obtener una URL pública y funcional, necesitas conectar tu proyecto a un repositorio de código (como GitHub), lo cual activa el despliegue continuo.
+                <Alert variant="default" className="text-left bg-green-50 border-green-200 text-green-900">
+                  <Info className="h-4 w-4 !text-green-700" />
+                  <AlertTitle className="text-green-900">¡Siguiente Paso: Sube tus Cambios!</AlertTitle>
+                  <AlertDescription className="text-green-800">
+                    Ahora que tu repositorio de GitHub está conectado, simplemente tienes que **hacer un `push` con tus cambios** a la rama principal. Esta acción iniciará automáticamente tu primer despliegue.
                   </AlertDescription>
                 </Alert>
 
@@ -35,19 +35,19 @@ export default function DeploymentPage() {
                     <CardHeader className="flex-row items-center gap-3">
                         <GitBranch className="h-8 w-8 text-primary" />
                         <div>
-                            <CardTitle>Conecta tu Repositorio de GitHub</CardTitle>
-                            <CardDescription>Sigue estos pasos en la Consola de Firebase:</CardDescription>
+                            <CardTitle>¿Cómo funciona el despliegue?</CardTitle>
+                            <CardDescription>Tu URL pública se activa con tu primer despliegue.</CardDescription>
                         </div>
                     </CardHeader>
                     <CardContent>
                         <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
+                            <li>Usa los comandos de Git (`git add`, `git commit`, `git push`) para subir el código de tu proyecto al repositorio que conectaste.</li>
                             <li>Ve a la <a href="https://console.firebase.google.com/" target="_blank" rel="noopener noreferrer" className="font-semibold underline text-primary">Consola de Firebase</a> y selecciona tu proyecto.</li>
-                            <li>En el menú de la izquierda, ve a <strong>Build &gt; App Hosting</strong>.</li>
-                            <li>En el dashboard de App Hosting, busca y haz clic en la opción para <strong>conectar un repositorio de GitHub</strong>.</li>
-                            <li>Sigue las instrucciones para autorizar y seleccionar tu repositorio.</li>
+                            <li>En el menú, ve a <strong>Build &gt; App Hosting</strong>. Podrás ver el progreso de la compilación y el despliegue.</li>
+                            <li>Una vez finalizado, tu aplicación estará disponible en la URL pública.</li>
                         </ol>
                          <p className="text-xs text-muted-foreground mt-4">
-                            Una vez conectado, cada `git push` a tu rama principal desplegará automáticamente los cambios a tu URL pública, que tendrá un formato como: <br/> <strong className="font-mono">https://[ID-DE-TU-PROYECTO].apphosting.dev</strong>
+                            La URL pública para este proyecto es: <br/> <strong className="font-mono">https://{process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "[ID-DE-TU-PROYECTO]"}.apphosting.dev</strong>
                         </p>
                     </CardContent>
                 </Card>
@@ -65,4 +65,3 @@ export default function DeploymentPage() {
     </div>
   );
 }
-
