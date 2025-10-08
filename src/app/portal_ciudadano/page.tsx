@@ -79,6 +79,19 @@ export default function Home() {
               Si eres de nacionalidad extranjera y no posees RUT chileno, puedes revisar la página Web de las Oficinas de Información, Reclamos y Sugerencias de SERNAMEG acá: <a href="https://www.sernameg.gob.cl/oirs/" className="text-primary underline hover:text-primary/80" target="_blank" rel="noopener noreferrer">https://www.sernameg.gob.cl/oirs/</a>.
             </p>
           </div>
+          <div className="mt-8 w-full max-w-2xl mx-auto">
+            <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden shadow-lg">
+                <iframe 
+                    className="w-full h-full"
+                    src="https://www.youtube.com/embed/hqpy5XhD9YI" 
+                    title="YouTube video player" 
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    referrerPolicy="strict-origin-when-cross-origin" 
+                    allowFullScreen>
+                </iframe>
+            </div>
+          </div>
         </div>
       </main>
 
