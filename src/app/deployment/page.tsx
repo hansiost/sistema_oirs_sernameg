@@ -15,22 +15,24 @@ export default function DeploymentPage() {
                 <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit mb-4">
                     <Rocket className="h-10 w-10 text-primary" />
                 </div>
-                <CardTitle className="text-3xl">Tu Aplicación está en Vivo</CardTitle>
+                <CardTitle className="text-3xl">Tu Aplicación está Lista para Desplegarse</CardTitle>
                 <CardDescription>
-                    Tu proyecto se despliega automáticamente con Firebase App Hosting cada vez que se realizan cambios.
+                    Tu proyecto se despliega automáticamente con Firebase App Hosting cada vez que se realizan cambios en tu repositorio de código.
                 </CardDescription>
             </CardHeader>
             <CardContent className="text-center space-y-6">
                 
                 <Alert>
                   <Info className="h-4 w-4" />
-                  <AlertTitle>¿Cómo compartir tu aplicación?</AlertTitle>
+                  <AlertTitle>¿Cómo funciona el despliegue público?</AlertTitle>
                   <AlertDescription>
-                    Para compartir una versión pública de tu aplicación, necesitas la URL que Firebase App Hosting genera para ti. Esta URL es diferente a la que usas para desarrollar.
+                    Actualmente, te encuentras en un entorno de desarrollo privado. Para compartir una versión pública de tu aplicación, necesitas desplegarla.
                     <br/><br/>
-                    La URL pública generalmente sigue el formato: <strong>https://[ID-DE-TU-PROYECTO].apphosting.dev</strong>
-                    <br/><br/>
-                    Puedes encontrar el ID de tu proyecto en la configuración de tu proyecto en la <a href="https://console.firebase.google.com/" target="_blank" rel="noopener noreferrer" className="font-semibold underline">Consola de Firebase</a>.
+                    El despliegue se activa cuando conectas tu proyecto de Firebase a un repositorio de código (como GitHub). Una vez conectado, cada cambio que subas se publicará automáticamente en tu URL pública, que será:
+                    <br/>
+                    <strong className="block my-2 p-2 bg-muted rounded-md">https://[ID-DE-TU-PROYECTO].apphosting.dev</strong>
+                    <br/>
+                    Podrás encontrar el ID de tu proyecto en la <a href="https://console.firebase.google.com/" target="_blank" rel="noopener noreferrer" className="font-semibold underline">Consola de Firebase</a>.
                   </AlertDescription>
                 </Alert>
 
