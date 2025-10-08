@@ -40,6 +40,21 @@ import { format, parse } from 'date-fns';
 import { SurveyDetailsDialog } from './survey-details-dialog';
 
 
+type SurveyRatings = {
+  amabilidad: number;
+  claridad: number;
+  tiempo: number;
+  resolucion: number;
+  accesibilidad: number;
+};
+
+type SurveyData = {
+  ratings: SurveyRatings;
+  promedio: number;
+  comments: string;
+};
+
+
 type Solicitud = {
     id: string;
     rut: string;
@@ -52,7 +67,7 @@ type Solicitud = {
     fechaRespuesta: string | null;
     tiempoRestante: string;
     tiempoResolucion?: string;
-    encuestaSatisfaccion?: { rating: number; comments: string; } | null;
+    encuestaSatisfaccion?: SurveyData | null;
 }
 
 const mockSolicitudes: Solicitud[] = [
@@ -92,7 +107,11 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-26',
     tiempoRestante: '-',
     tiempoResolucion: '1 día',
-    encuestaSatisfaccion: { rating: 4, comments: 'La respuesta fue rápida, pero podría haber sido un poco más detallada. Agradezco la gestión.' },
+    encuestaSatisfaccion: { 
+        ratings: { amabilidad: 4, claridad: 5, tiempo: 3, resolucion: 4, accesibilidad: 4 },
+        promedio: 4, 
+        comments: 'La respuesta fue rápida, pero podría haber sido un poco más detallada. Agradezco la gestión.' 
+    },
   },
   {
     id: 'GH-98765',
@@ -106,7 +125,11 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-25',
     tiempoRestante: '-',
     tiempoResolucion: '1 día',
-    encuestaSatisfaccion: { rating: 5, comments: 'Excelente iniciativa, se nota la preocupación.' },
+    encuestaSatisfaccion: { 
+        ratings: { amabilidad: 5, claridad: 5, tiempo: 5, resolucion: 5, accesibilidad: 5 },
+        promedio: 5,
+        comments: 'Excelente iniciativa, se nota la preocupación.'
+    },
   },
   {
     id: 'IJ-11223',
@@ -170,7 +193,11 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-22',
     tiempoRestante: '-',
     tiempoResolucion: '3 días',
-    encuestaSatisfaccion: { rating: 2, comments: 'La demora fue demasiada y la respuesta no solucionó mi problema de fondo.' },
+    encuestaSatisfaccion: { 
+        ratings: { amabilidad: 3, claridad: 2, tiempo: 1, resolucion: 2, accesibilidad: 3 },
+        promedio: 2,
+        comments: 'La demora fue demasiada y la respuesta no solucionó mi problema de fondo.'
+    },
   },
   {
     id: 'ST-10203',
@@ -222,7 +249,11 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-18',
     tiempoRestante: '-',
     tiempoResolucion: '3 días',
-    encuestaSatisfaccion: { rating: 1, comments: 'No obtuve ninguna respuesta útil. Pésimo servicio.' },
+    encuestaSatisfaccion: { 
+        ratings: { amabilidad: 1, claridad: 1, tiempo: 2, resolucion: 1, accesibilidad: 1 },
+        promedio: 1,
+        comments: 'No obtuve ninguna respuesta útil. Pésimo servicio.'
+    },
   },
   {
     id: 'BC-74869',
@@ -288,7 +319,11 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-13',
     tiempoRestante: '-',
     tiempoResolucion: '3 días',
-    encuestaSatisfaccion: { rating: 3, comments: 'El proceso fue confuso, pero finalmente se resolvió.' },
+    encuestaSatisfaccion: { 
+        ratings: { amabilidad: 4, claridad: 3, tiempo: 2, resolucion: 4, accesibilidad: 3 },
+        promedio: 3,
+        comments: 'El proceso fue confuso, pero finalmente se resolvió.'
+    },
   },
   {
     id: 'LM-39415',
@@ -352,7 +387,11 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-08',
     tiempoRestante: '-',
     tiempoResolucion: '3 días',
-    encuestaSatisfaccion: { rating: 3, comments: '' },
+    encuestaSatisfaccion: { 
+        ratings: { amabilidad: 4, claridad: 4, tiempo: 3, resolucion: 2, accesibilidad: 2 },
+        promedio: 3,
+        comments: ''
+    },
   },
   {
     id: 'VW-84960',
@@ -415,7 +454,11 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-02',
     tiempoRestante: '-',
     tiempoResolucion: '2 días',
-    encuestaSatisfaccion: { rating: 2, comments: 'No me sentí escuchada.' },
+    encuestaSatisfaccion: { 
+        ratings: { amabilidad: 2, claridad: 3, tiempo: 1, resolucion: 2, accesibilidad: 3 },
+        promedio: 2,
+        comments: 'No me sentí escuchada.'
+    },
   },
   {
     id: 'EG-39415',
@@ -620,7 +663,7 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
                     return (
                         <div className="flex items-center gap-2">
                            <div className="flex items-center gap-1">
-                               <span>{solicitud.encuestaSatisfaccion.rating}</span>
+                               <span>{solicitud.encuestaSatisfaccion.promedio.toFixed(1)}</span>
                                <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
                            </div>
                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleOpenSurveyDialog(solicitud.encuestaSatisfaccion)}>
