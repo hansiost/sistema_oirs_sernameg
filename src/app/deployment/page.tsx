@@ -16,18 +16,18 @@ export default function DeploymentPage() {
                 <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit mb-4">
                     <Rocket className="h-10 w-10 text-primary" />
                 </div>
-                <CardTitle className="text-3xl">Tu Aplicación está Lista para Desplegarse</CardTitle>
+                <CardTitle className="text-3xl">Despliegue Automático con App Hosting</CardTitle>
                 <CardDescription>
-                    Tu proyecto se despliega automáticamente con Firebase App Hosting cada vez que se realizan cambios en tu repositorio de código.
+                    Tu aplicación se despliega automáticamente en una URL pública cada vez que envías cambios a tu repositorio de GitHub conectado.
                 </CardDescription>
             </CardHeader>
             <CardContent className="text-center space-y-6">
                 
                 <Alert>
                   <Info className="h-4 w-4" />
-                  <AlertTitle>¿Cómo funciona el despliegue público?</AlertTitle>
+                  <AlertTitle>¿Cómo funciona el despliegue?</AlertTitle>
                   <AlertDescription>
-                    Actualmente, te encuentras en un entorno de desarrollo privado. Para obtener una URL pública y compartir tu aplicación, necesitas conectarla a un repositorio de código (como GitHub), lo cual activa el despliegue automático.
+                    Actualmente, te encuentras en un entorno de desarrollo privado. Para obtener una URL pública y funcional, necesitas conectar tu proyecto a un repositorio de código (como GitHub), lo cual activa el despliegue continuo.
                   </AlertDescription>
                 </Alert>
 
@@ -47,7 +47,7 @@ export default function DeploymentPage() {
                             <li>Sigue las instrucciones para autorizar y seleccionar tu repositorio.</li>
                         </ol>
                          <p className="text-xs text-muted-foreground mt-4">
-                            Una vez conectado, cada `git push` a tu rama principal desplegará automáticamente los cambios a tu URL pública: <br/> <strong className="font-mono">https://[ID-DE-TU-PROYECTO].apphosting.dev</strong>
+                            Una vez conectado, cada `git push` a tu rama principal desplegará automáticamente los cambios a tu URL pública, que tendrá un formato como: <br/> <strong className="font-mono">https://[ID-DE-TU-PROYECTO].apphosting.dev</strong>
                         </p>
                     </CardContent>
                 </Card>
@@ -65,3 +65,4 @@ export default function DeploymentPage() {
     </div>
   );
 }
+
