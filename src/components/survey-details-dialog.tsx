@@ -1,4 +1,3 @@
-
 'use client';
 
 import {
@@ -17,7 +16,7 @@ import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 
 
-type SurveyRatings = {
+export type SurveyRatings = {
   amabilidad: number;
   claridad: number;
   tiempo: number;
@@ -25,7 +24,7 @@ type SurveyRatings = {
   accesibilidad: number;
 };
 
-type SurveyData = {
+export type SurveyData = {
   ratings: SurveyRatings;
   promedio: number;
   comments: string;
@@ -73,7 +72,7 @@ export function SurveyDetailsDialog({ open, onOpenChange, survey }: SurveyDetail
         <DialogHeader>
           <DialogTitle className="text-2xl">Detalle de la Encuesta</DialogTitle>
           <DialogDescription>
-            Resultado de la encuesta de satisfacción enviada por el ciudadano.
+            Resultado de la encuesta de satisfacción enviada.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-6 py-4">
@@ -96,7 +95,7 @@ export function SurveyDetailsDialog({ open, onOpenChange, survey }: SurveyDetail
           <div className="space-y-2">
             <Label>Comentarios</Label>
             <Textarea
-              value={survey.comments || 'El ciudadano no dejó comentarios.'}
+              value={survey.comments || 'No se dejaron comentarios.'}
               readOnly
               className="min-h-[120px] bg-muted/50"
             />

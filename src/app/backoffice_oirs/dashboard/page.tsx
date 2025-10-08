@@ -37,22 +37,7 @@ import { REQUEST_TYPES } from '@/lib/constants';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { format, parse } from 'date-fns';
-import { SurveyDetailsDialog } from './survey-details-dialog';
-
-
-type SurveyRatings = {
-  amabilidad: number;
-  claridad: number;
-  tiempo: number;
-  resolucion: number;
-  accesibilidad: number;
-};
-
-type SurveyData = {
-  ratings: SurveyRatings;
-  promedio: number;
-  comments: string;
-};
+import { SurveyDetailsDialog, type SurveyData } from '@/components/survey-details-dialog';
 
 
 type Solicitud = {
@@ -512,7 +497,7 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [filters, setFilters] = useState<Partial<Record<keyof Solicitud, string>>>({});
     const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'fechaEnvio', direction: 'descending' });
-    const [selectedSurvey, setSelectedSurvey] = useState<Solicitud['encuestaSatisfaccion']>(null);
+    const [selectedSurvey, setSelectedSurvey] = useState<SurveyData>(null);
     const [isSurveyDialogOpen, setIsSurveyDialogOpen] = useState(false);
 
     const allHeaders: { key: keyof Solicitud, label: string, sortable: boolean }[] = [
@@ -534,7 +519,7 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
             return allHeaders;
         }
         return allHeaders.filter(header => header.key !== 'fechaRespuesta' && header.key !== 'encuestaSatisfaccion');
-    }, [isClosedTab]);
+    }, [isClosedTab, allHeaders]);
 
 
     const handleFilterChange = (e: ChangeEvent<HTMLInputElement>, key: keyof Solicitud) => {
@@ -616,7 +601,7 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
         setCurrentPage(1);
     };
 
-    const handleOpenSurveyDialog = (survey: Solicitud['encuestaSatisfaccion']) => {
+    const handleOpenSurveyDialog = (survey: SurveyData) => {
         if (survey) {
             setSelectedSurvey(survey);
             setIsSurveyDialogOpen(true);
@@ -627,7 +612,7 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
         switch (key) {
             case 'fechaEnvio':
             case 'fechaRespuesta':
-                return formatDate(solicitud[key]);
+                return formatDate(solicitud[key as 'fechaEnvio' | 'fechaRespuesta']);
             case 'id':
                 return (
                     <Button variant="link" asChild className="p-0 h-auto">
@@ -674,7 +659,8 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
                 }
                 return '-';
             default:
-                return solicitud[key as keyof Solicitud];
+                const cellValue = solicitud[key as keyof Solicitud];
+                return typeof cellValue === 'string' || typeof cellValue === 'number' ? cellValue : null;
         }
     };
 
@@ -689,7 +675,7 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
                                 {tableHeaders.map(header => (
                                     <TableHead key={header.key}>
                                         {header.sortable ? (
-                                            <Button variant="ghost" onClick={() => requestSort(header.key)}>
+                                            <Button variant="ghost" onClick={() => requestSort(header.key as keyof Solicitud)}>
                                                 {header.label}
                                                 <ArrowUpDown className="ml-2 h-4 w-4" />
                                             </Button>
@@ -771,8 +757,8 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
                                     ) : (header.key !== 'encuestaSatisfaccion' &&
                                         <Input
                                             placeholder={`Filtrar...`}
-                                            value={filters[header.key] || ''}
-                                            onChange={(e) => handleFilterChange(e, header.key)}
+                                            value={filters[header.key as keyof Solicitud] || ''}
+                                            onChange={(e) => handleFilterChange(e, header.key as keyof Solicitud)}
                                             className="h-8"
                                         />
                                     )}
@@ -785,7 +771,7 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
                             <TableRow key={solicitud.id} className="text-xs">
                                 {tableHeaders.map(header => (
                                     <TableCell key={header.key} className="font-medium">
-                                        {getCellValue(solicitud, header.key)}
+                                        {getCellValue(solicitud, header.key as keyof Solicitud)}
                                     </TableCell>
                                 ))}
                             </TableRow>

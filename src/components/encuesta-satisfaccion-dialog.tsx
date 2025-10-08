@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Icons } from './icons';
 import { Separator } from './ui/separator';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
+import { type SurveyData } from './survey-details-dialog';
 
 type Solicitud = {
   folio: string;
@@ -48,7 +49,7 @@ export function EncuestaSatisfaccionDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
   solicitud: Solicitud | null;
-  onSurveySubmit: (folio: string) => void;
+  onSurveySubmit: (folio: string, surveyData: SurveyData) => void;
 }) {
   const { toast } = useToast();
   const [ratings, setRatings] = useState<Record<string, string | undefined>>({});
@@ -90,18 +91,23 @@ export function EncuestaSatisfaccionDialog({
     setTimeout(() => {
       const numericRatings = Object.fromEntries(
         Object.entries(ratings).map(([key, value]) => [key, Number(value)])
-      );
+      ) as SurveyData['ratings'];
+      
       const totalRating = Object.values(numericRatings).reduce((acc, val) => acc + val, 0);
       const averageRating = totalRating / surveyQuestions.length;
 
+      const surveyData: SurveyData = {
+        ratings: numericRatings,
+        promedio: averageRating,
+        comments,
+      };
+
       console.log({
         solicitudId: solicitud.folio,
-        ratings: numericRatings,
-        average: averageRating.toFixed(1),
-        comments,
+        surveyData
       });
 
-      onSurveySubmit(solicitud.folio);
+      onSurveySubmit(solicitud.folio, surveyData);
       setIsSubmitting(false);
       onOpenChange(false);
       toast({

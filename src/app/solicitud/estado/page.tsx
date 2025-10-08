@@ -24,6 +24,7 @@ import { REQUEST_TYPES } from '@/lib/constants';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { EncuestaSatisfaccionDialog } from '@/components/encuesta-satisfaccion-dialog';
+import { SurveyDetailsDialog, type SurveyData } from '@/components/survey-details-dialog';
 
 type Solicitud = {
   folio: string;
@@ -31,6 +32,7 @@ type Solicitud = {
   fecha: string;
   descripcion: string;
   estado: string;
+  surveyData?: SurveyData;
 };
 
 const mockSolicitudes: Solicitud[] = [
@@ -40,6 +42,11 @@ const mockSolicitudes: Solicitud[] = [
     fecha: '2024-07-20',
     descripcion: 'Demora excesiva en la atención telefónica del centro de la mujer...',
     estado: 'Respondida',
+    surveyData: {
+        ratings: { amabilidad: 4, claridad: 5, tiempo: 3, resolucion: 4, accesibilidad: 4 },
+        promedio: 4, 
+        comments: 'La respuesta fue rápida, pero podría haber sido un poco más detallada. Agradezco la gestión.' 
+    },
   },
   {
     folio: '98123',
@@ -94,34 +101,39 @@ function EstadoSolicitudesContent() {
   const newFolio = searchParams.get('folio');
   const newTipo = searchParams.get('tipo');
 
-  let allSolicitudes = [...mockSolicitudes];
-
-  if (newFolio) {
-    const newRequest = {
-      folio: newFolio as string,
-      tipo: (newTipo as (typeof REQUEST_TYPES)[number]) || 'Consulta',
-      fecha: new Date().toISOString().split('T')[0],
-      descripcion: 'Nueva solicitud recién enviada...',
-      estado: 'Solicitud Enviada'
+  const [solicitudes, setSolicitudes] = useState<Solicitud[]>(() => {
+     let initialSolicitudes = [...mockSolicitudes];
+      if (newFolio && !initialSolicitudes.some(s => s.folio === newFolio)) {
+        const newRequest = {
+            folio: newFolio,
+            tipo: (newTipo as (typeof REQUEST_TYPES)[number]) || 'Consulta',
+            fecha: new Date().toISOString().split('T')[0],
+            descripcion: 'Nueva solicitud recién enviada...',
+            estado: 'Solicitud Enviada'
+        };
+        initialSolicitudes.unshift(newRequest);
     }
-     // Evita duplicados si la página se recarga
-    if (!allSolicitudes.some(s => s.folio === newFolio)) {
-        allSolicitudes = [newRequest, ...mockSolicitudes];
-    }
-  }
+    return initialSolicitudes;
+  });
   
   const [showSurveyDialog, setShowSurveyDialog] = useState(false);
+  const [showSurveyDetailsDialog, setShowSurveyDetailsDialog] = useState(false);
   const [selectedSolicitud, setSelectedSolicitud] = useState<Solicitud | null>(null);
-  const [submittedSurveys, setSubmittedSurveys] = useState<string[]>([]);
-
-
+  
   const handleOpenSurvey = (solicitud: Solicitud) => {
     setSelectedSolicitud(solicitud);
     setShowSurveyDialog(true);
   };
+  
+  const handleOpenSurveyDetails = (solicitud: Solicitud) => {
+    setSelectedSolicitud(solicitud);
+    setShowSurveyDetailsDialog(true);
+  };
 
-  const handleSurveySubmit = (folio: string) => {
-    setSubmittedSurveys(prev => [...prev, folio]);
+  const handleSurveySubmit = (folio: string, surveyData: SurveyData) => {
+     setSolicitudes(prev => 
+        prev.map(s => s.folio === folio ? {...s, surveyData: surveyData} : s)
+     );
   };
 
   return (
@@ -220,8 +232,8 @@ function EstadoSolicitudesContent() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {allSolicitudes.map((solicitud) => {
-                    const isSurveySubmitted = submittedSurveys.includes(solicitud.folio);
+                  {solicitudes.map((solicitud) => {
+                    const isSurveySubmitted = !!solicitud.surveyData;
                     const canSubmitSurvey = solicitud.estado === 'Respondida' && !isSurveySubmitted;
                     return (
                       <TableRow key={solicitud.folio}>
@@ -245,9 +257,9 @@ function EstadoSolicitudesContent() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              disabled
-                              aria-label="Encuesta ya realizada"
-                              className="text-green-500"
+                              onClick={() => handleOpenSurveyDetails(solicitud)}
+                              aria-label="Ver encuesta enviada"
+                              className="text-green-500 hover:text-green-600"
                             >
                               <CheckCircle className="h-4 w-4" />
                             </Button>
@@ -282,6 +294,13 @@ function EstadoSolicitudesContent() {
            solicitud={selectedSolicitud}
            onSurveySubmit={handleSurveySubmit}
          />
+       )}
+       {selectedSolicitud && (
+         <SurveyDetailsDialog
+            open={showSurveyDetailsDialog}
+            onOpenChange={setShowSurveyDetailsDialog}
+            survey={selectedSolicitud.surveyData}
+          />
        )}
     </>
   );
