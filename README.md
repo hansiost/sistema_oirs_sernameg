@@ -1,5 +1,3 @@
-# Firebase Studio
+# Sistema OIRS de SERNAMEG (Firebase Studio)
 
-This is a NextJS starter in Firebase Studio.
-
-To get started, take a look at src/app/page.tsx.
+Este es un proyecto Next.js iniciado en Firebase Studio para crear el sistema OIRS de SERNAMEG.
