@@ -16,23 +16,15 @@ export default function DeploymentPage() {
   const [publicUrl, setPublicUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    // This logic simulates fetching the public deployment URL.
-    // In a real Firebase App Hosting environment, this could be an environment variable.
-    if (typeof window !== 'undefined') {
-      // We construct the likely public URL from the development URL.
-      // Dev URL is usually like: [port]-[hash]-[region].web.app
-      // Public URL is the root: [project-id].web.app or .apphosting.dev
-      const devHost = window.location.hostname;
-      
-      // Heuristic to find the public URL. This is a placeholder for a more robust solution.
-      // Typically, the project ID is part of the hostname. We'll simulate this.
-      // Let's assume the project ID is part of the URL before the region-specific parts.
-      // Example dev: my-project-dev-us-central1.web.app -> Public: my-project.web.app
-      // This is a simplification. A real implementation would use environment variables set during build.
-      const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'tu-proyecto';
-      const publicHost = `${projectId}.apphosting.dev`;
-      setPublicUrl(`https://${publicHost}`);
-    }
+    // En un entorno real de App Hosting, esta variable de entorno estaría disponible.
+    // La estamos simulando aquí para la demostración.
+    // El ID real del proyecto se inyectaría durante el proceso de compilación de Firebase.
+    const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'tu-proyecto-id';
+    
+    // Las URLs de App Hosting suelen seguir este formato.
+    const url = `https://${projectId}.apphosting.dev`;
+    setPublicUrl(url);
+
   }, []);
 
   const handleCopyUrl = () => {
@@ -49,7 +41,7 @@ export default function DeploymentPage() {
         toast({
           variant: 'destructive',
           title: 'Error al copiar',
-          description: 'No se pudo copiar la URL. Por favor, cópiala manualmente.',
+          description: 'No se pudo copiar la URL. Por favor, cópiala manually.',
         });
       });
   };
