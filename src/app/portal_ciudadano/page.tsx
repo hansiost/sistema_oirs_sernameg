@@ -80,9 +80,9 @@ export default function Home() {
             </p>
           </div>
           <div className="mt-8 w-full max-w-2xl mx-auto">
-            <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden shadow-lg">
+            <div className="relative overflow-hidden shadow-lg rounded-lg" style={{ paddingTop: '56.25%' /* 16:9 Aspect Ratio */ }}>
                 <iframe 
-                    className="w-full h-full"
+                    className="absolute top-0 left-0 w-full h-full"
                     src="https://www.youtube.com/embed/hqpy5XhD9YI" 
                     title="YouTube video player" 
                     frameBorder="0" 
