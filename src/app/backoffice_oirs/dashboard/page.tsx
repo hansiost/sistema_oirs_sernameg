@@ -29,7 +29,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-import { ArrowUpDown, FilePenLine, Calendar as CalendarIcon, Star } from 'lucide-react';
+import { ArrowUpDown, FilePenLine, Calendar as CalendarIcon, Star, ClipboardList } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
@@ -37,6 +37,7 @@ import { REQUEST_TYPES } from '@/lib/constants';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { format, parse } from 'date-fns';
+import { SurveyDetailsDialog } from './survey-details-dialog';
 
 
 type Solicitud = {
@@ -51,7 +52,7 @@ type Solicitud = {
     fechaRespuesta: string | null;
     tiempoRestante: string;
     tiempoResolucion?: string;
-    encuestaSatisfaccion?: number | null;
+    encuestaSatisfaccion?: { rating: number; comments: string; } | null;
 }
 
 const mockSolicitudes: Solicitud[] = [
@@ -91,7 +92,7 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-26',
     tiempoRestante: '-',
     tiempoResolucion: '1 día',
-    encuestaSatisfaccion: 4,
+    encuestaSatisfaccion: { rating: 4, comments: 'La respuesta fue rápida, pero podría haber sido un poco más detallada. Agradezco la gestión.' },
   },
   {
     id: 'GH-98765',
@@ -105,7 +106,7 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-25',
     tiempoRestante: '-',
     tiempoResolucion: '1 día',
-    encuestaSatisfaccion: 5,
+    encuestaSatisfaccion: { rating: 5, comments: 'Excelente iniciativa, se nota la preocupación.' },
   },
   {
     id: 'IJ-11223',
@@ -169,7 +170,7 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-22',
     tiempoRestante: '-',
     tiempoResolucion: '3 días',
-    encuestaSatisfaccion: 2,
+    encuestaSatisfaccion: { rating: 2, comments: 'La demora fue demasiada y la respuesta no solucionó mi problema de fondo.' },
   },
   {
     id: 'ST-10203',
@@ -221,7 +222,7 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-18',
     tiempoRestante: '-',
     tiempoResolucion: '3 días',
-    encuestaSatisfaccion: 1,
+    encuestaSatisfaccion: { rating: 1, comments: 'No obtuve ninguna respuesta útil. Pésimo servicio.' },
   },
   {
     id: 'BC-74869',
@@ -287,7 +288,7 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-13',
     tiempoRestante: '-',
     tiempoResolucion: '3 días',
-    encuestaSatisfaccion: 3,
+    encuestaSatisfaccion: { rating: 3, comments: 'El proceso fue confuso, pero finalmente se resolvió.' },
   },
   {
     id: 'LM-39415',
@@ -351,7 +352,7 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-08',
     tiempoRestante: '-',
     tiempoResolucion: '3 días',
-    encuestaSatisfaccion: 3,
+    encuestaSatisfaccion: { rating: 3, comments: '' },
   },
   {
     id: 'VW-84960',
@@ -414,7 +415,7 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-02',
     tiempoRestante: '-',
     tiempoResolucion: '2 días',
-    encuestaSatisfaccion: 2,
+    encuestaSatisfaccion: { rating: 2, comments: 'No me sentí escuchada.' },
   },
   {
     id: 'EG-39415',
@@ -468,6 +469,8 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [filters, setFilters] = useState<Partial<Record<keyof Solicitud, string>>>({});
     const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'fechaEnvio', direction: 'descending' });
+    const [selectedSurvey, setSelectedSurvey] = useState<Solicitud['encuestaSatisfaccion']>(null);
+    const [isSurveyDialogOpen, setIsSurveyDialogOpen] = useState(false);
 
     const allHeaders: { key: keyof Solicitud, label: string, sortable: boolean }[] = [
         { key: 'id', label: 'N° Solicitud', sortable: true },
@@ -569,6 +572,13 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
         setItemsPerPage(Number(value));
         setCurrentPage(1);
     };
+
+    const handleOpenSurveyDialog = (survey: Solicitud['encuestaSatisfaccion']) => {
+        if (survey) {
+            setSelectedSurvey(survey);
+            setIsSurveyDialogOpen(true);
+        }
+    };
     
     const getCellValue = (solicitud: Solicitud, key: keyof Solicitud) => {
         switch (key) {
@@ -608,9 +618,14 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
             case 'encuestaSatisfaccion':
                 if (solicitud.encuestaSatisfaccion) {
                     return (
-                        <div className="flex items-center gap-1">
-                           <span>{solicitud.encuestaSatisfaccion}</span>
-                           <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                        <div className="flex items-center gap-2">
+                           <div className="flex items-center gap-1">
+                               <span>{solicitud.encuestaSatisfaccion.rating}</span>
+                               <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                           </div>
+                           <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleOpenSurveyDialog(solicitud.encuestaSatisfaccion)}>
+                               <ClipboardList className="h-4 w-4" />
+                           </Button>
                         </div>
                     );
                 }
@@ -622,158 +637,165 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
 
 
     return (
-        <div className="space-y-4">
-            <div className="overflow-x-auto">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            {tableHeaders.map(header => (
-                                <TableHead key={header.key}>
-                                    {header.sortable ? (
-                                        <Button variant="ghost" onClick={() => requestSort(header.key)}>
-                                            {header.label}
-                                            <ArrowUpDown className="ml-2 h-4 w-4" />
-                                        </Button>
-                                    ) : (
-                                        header.label
-                                    )}
-                                </TableHead>
-                            ))}
-                             <TableHead></TableHead>
-                        </TableRow>
-                        <TableRow>
-                           {tableHeaders.map(header => (
-                                <TableHead key={`${header.key}-filter`}>
-                                  {header.key === 'tiempoRestante' && !isClosedTab ? (
-                                    <Select
-                                      value={filters.tiempoRestante || 'all'}
-                                      onValueChange={(value) => handleSelectFilterChange(value, 'tiempoRestante')}
-                                    >
-                                      <SelectTrigger className="h-8">
-                                        <SelectValue placeholder="Filtrar por urgencia..." />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="all">Todos</SelectItem>
-                                        <SelectItem value="danger">Crítico</SelectItem>
-                                        <SelectItem value="warning">Atención</SelectItem>
-                                        <SelectItem value="success">Normal</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  ) : header.key === 'tipo' ? (
-                                    <Select
-                                      value={filters.tipo || 'all'}
-                                      onValueChange={(value) => handleSelectFilterChange(value, 'tipo')}
-                                    >
-                                      <SelectTrigger className="h-8">
-                                        <SelectValue placeholder="Filtrar por tipo..." />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="all">Todos</SelectItem>
-                                        {REQUEST_TYPES.map(type => (
-                                            <SelectItem key={type} value={type}>{type}</SelectItem>
-                                        ))}
-                                      </SelectContent>
-                                    </Select>
-                                  ) : header.key === 'estado' ? (
-                                    <Select
-                                      value={filters.estado || 'all'}
-                                      onValueChange={(value) => handleSelectFilterChange(value, 'estado')}
-                                    >
-                                      <SelectTrigger className="h-8">
-                                        <SelectValue placeholder="Filtrar por estado..." />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="all">Todos</SelectItem>
-                                        {(isClosedTab ? ['Respondida', 'Cancelada'] : ['Ingresada', 'En proceso']).map(estado => (
-                                            <SelectItem key={estado} value={estado}>{estado}</SelectItem>
-                                        ))}
-                                      </SelectContent>
-                                    </Select>
-                                  ) : header.key === 'fechaEnvio' ? (
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant="outline"
-                                                className={cn("h-8 w-full justify-start text-left font-normal", !filters.fechaEnvio && "text-muted-foreground")}
-                                            >
-                                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                                {filters.fechaEnvio ? formatDate(filters.fechaEnvio) : <span>Filtrar...</span>}
+        <>
+            <div className="space-y-4">
+                <div className="overflow-x-auto">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                {tableHeaders.map(header => (
+                                    <TableHead key={header.key}>
+                                        {header.sortable ? (
+                                            <Button variant="ghost" onClick={() => requestSort(header.key)}>
+                                                {header.label}
+                                                <ArrowUpDown className="ml-2 h-4 w-4" />
                                             </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0" align="start">
-                                            <Calendar
-                                                mode="single"
-                                                selected={filters.fechaEnvio ? parse(filters.fechaEnvio, 'yyyy-MM-dd', new Date()) : undefined}
-                                                onSelect={(date) => handleDateFilterChange(date, 'fechaEnvio')}
-                                                initialFocus
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                  ) : (header.key !== 'encuestaSatisfaccion' &&
-                                    <Input
-                                        placeholder={`Filtrar...`}
-                                        value={filters[header.key] || ''}
-                                        onChange={(e) => handleFilterChange(e, header.key)}
-                                        className="h-8"
-                                    />
-                                  )}
-                                </TableHead>
-                            ))}
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                    {currentSolicitudes.length > 0 ? currentSolicitudes.map((solicitud) => (
-                        <TableRow key={solicitud.id} className="text-xs">
-                             {tableHeaders.map(header => (
-                                <TableCell key={header.key} className="font-medium">
-                                    {getCellValue(solicitud, header.key)}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                    )) : (
-                        <TableRow>
-                            <TableCell colSpan={tableHeaders.length} className="h-24 text-center">
-                                No hay solicitudes para mostrar.
-                            </TableCell>
-                        </TableRow>
-                    )}
-                    </TableBody>
-                </Table>
-            </div>
-            <div className="flex justify-between w-full items-center">
-                <div className="text-xs text-muted-foreground">
-                    Mostrando {Math.min(itemsPerPage, currentSolicitudes.length)} de {filteredSolicitudes.length} solicitudes.
-                </div>
-                <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground">Items por página:</span>
-                        <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                            <SelectTrigger className="h-8 w-20">
-                                <SelectValue placeholder={itemsPerPage} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {[10, 20, 30, 40, 50].map(size => (
-                                    <SelectItem key={size} value={size.toString()}>{size}</SelectItem>
+                                        ) : (
+                                            header.label
+                                        )}
+                                    </TableHead>
                                 ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
+                                <TableHead></TableHead>
+                            </TableRow>
+                            <TableRow>
+                            {tableHeaders.map(header => (
+                                    <TableHead key={`${header.key}-filter`}>
+                                    {header.key === 'tiempoRestante' && !isClosedTab ? (
+                                        <Select
+                                        value={filters.tiempoRestante || 'all'}
+                                        onValueChange={(value) => handleSelectFilterChange(value, 'tiempoRestante')}
+                                        >
+                                        <SelectTrigger className="h-8">
+                                            <SelectValue placeholder="Filtrar por urgencia..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">Todos</SelectItem>
+                                            <SelectItem value="danger">Crítico</SelectItem>
+                                            <SelectItem value="warning">Atención</SelectItem>
+                                            <SelectItem value="success">Normal</SelectItem>
+                                        </SelectContent>
+                                        </Select>
+                                    ) : header.key === 'tipo' ? (
+                                        <Select
+                                        value={filters.tipo || 'all'}
+                                        onValueChange={(value) => handleSelectFilterChange(value, 'tipo')}
+                                        >
+                                        <SelectTrigger className="h-8">
+                                            <SelectValue placeholder="Filtrar por tipo..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">Todos</SelectItem>
+                                            {REQUEST_TYPES.map(type => (
+                                                <SelectItem key={type} value={type}>{type}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                        </Select>
+                                    ) : header.key === 'estado' ? (
+                                        <Select
+                                        value={filters.estado || 'all'}
+                                        onValueChange={(value) => handleSelectFilterChange(value, 'estado')}
+                                        >
+                                        <SelectTrigger className="h-8">
+                                            <SelectValue placeholder="Filtrar por estado..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">Todos</SelectItem>
+                                            {(isClosedTab ? ['Respondida', 'Cancelada'] : ['Ingresada', 'En proceso']).map(estado => (
+                                                <SelectItem key={estado} value={estado}>{estado}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                        </Select>
+                                    ) : header.key === 'fechaEnvio' ? (
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Button
+                                                    variant="outline"
+                                                    className={cn("h-8 w-full justify-start text-left font-normal", !filters.fechaEnvio && "text-muted-foreground")}
+                                                >
+                                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                                    {filters.fechaEnvio ? formatDate(filters.fechaEnvio) : <span>Filtrar...</span>}
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0" align="start">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={filters.fechaEnvio ? parse(filters.fechaEnvio, 'yyyy-MM-dd', new Date()) : undefined}
+                                                    onSelect={(date) => handleDateFilterChange(date, 'fechaEnvio')}
+                                                    initialFocus
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                    ) : (header.key !== 'encuestaSatisfaccion' &&
+                                        <Input
+                                            placeholder={`Filtrar...`}
+                                            value={filters[header.key] || ''}
+                                            onChange={(e) => handleFilterChange(e, header.key)}
+                                            className="h-8"
+                                        />
+                                    )}
+                                    </TableHead>
+                                ))}
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                        {currentSolicitudes.length > 0 ? currentSolicitudes.map((solicitud) => (
+                            <TableRow key={solicitud.id} className="text-xs">
+                                {tableHeaders.map(header => (
+                                    <TableCell key={header.key} className="font-medium">
+                                        {getCellValue(solicitud, header.key)}
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        )) : (
+                            <TableRow>
+                                <TableCell colSpan={tableHeaders.length} className="h-24 text-center">
+                                    No hay solicitudes para mostrar.
+                                </TableCell>
+                            </TableRow>
+                        )}
+                        </TableBody>
+                    </Table>
+                </div>
+                <div className="flex justify-between w-full items-center">
                     <div className="text-xs text-muted-foreground">
-                        Página {currentPage} de {totalPages}.
+                        Mostrando {Math.min(itemsPerPage, currentSolicitudes.length)} de {filteredSolicitudes.length} solicitudes.
                     </div>
-                    <Pagination>
-                        <PaginationContent>
-                            <PaginationItem>
-                                <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); handlePreviousPage(); }} aria-disabled={currentPage === 1} />
-                            </PaginationItem>
-                            <PaginationItem>
-                                <PaginationNext href="#" onClick={(e) => { e.preventDefault(); handleNextPage(); }} aria-disabled={currentPage === totalPages}/>
-                            </PaginationItem>
-                        </PaginationContent>
-                    </Pagination>
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs text-muted-foreground">Items por página:</span>
+                            <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+                                <SelectTrigger className="h-8 w-20">
+                                    <SelectValue placeholder={itemsPerPage} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {[10, 20, 30, 40, 50].map(size => (
+                                        <SelectItem key={size} value={size.toString()}>{size}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                            Página {currentPage} de {totalPages}.
+                        </div>
+                        <Pagination>
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); handlePreviousPage(); }} aria-disabled={currentPage === 1} />
+                                </PaginationItem>
+                                <PaginationItem>
+                                    <PaginationNext href="#" onClick={(e) => { e.preventDefault(); handleNextPage(); }} aria-disabled={currentPage === totalPages}/>
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
+                    </div>
                 </div>
             </div>
-        </div>
+            <SurveyDetailsDialog
+                open={isSurveyDialogOpen}
+                onOpenChange={setIsSurveyDialogOpen}
+                survey={selectedSurvey}
+            />
+        </>
     );
 };
 
