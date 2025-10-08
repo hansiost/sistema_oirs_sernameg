@@ -1,5 +1,6 @@
 'use client';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -88,19 +89,25 @@ const getStatusVariant = (estado: string) => {
   }
 };
 
-export default function EstadoSolicitudesPage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
-  const newFolio = searchParams?.folio;
+function EstadoSolicitudesContent() {
+  const searchParams = useSearchParams();
+  const newFolio = searchParams.get('folio');
+  const newTipo = searchParams.get('tipo');
+
   let allSolicitudes = [...mockSolicitudes];
 
   if (newFolio) {
     const newRequest = {
       folio: newFolio as string,
-      tipo: (searchParams.tipo as (typeof REQUEST_TYPES)[number]) || 'Consulta',
+      tipo: (newTipo as (typeof REQUEST_TYPES)[number]) || 'Consulta',
       fecha: new Date().toISOString().split('T')[0],
       descripcion: 'Nueva solicitud recién enviada...',
       estado: 'Solicitud Enviada'
     }
-    allSolicitudes = [newRequest, ...mockSolicitudes];
+     // Evita duplicados si la página se recarga
+    if (!allSolicitudes.some(s => s.folio === newFolio)) {
+        allSolicitudes = [newRequest, ...mockSolicitudes];
+    }
   }
   
   const [showSurveyDialog, setShowSurveyDialog] = useState(false);
@@ -116,7 +123,6 @@ export default function EstadoSolicitudesPage({ searchParams }: { searchParams?:
   const handleSurveySubmit = (folio: string) => {
     setSubmittedSurveys(prev => [...prev, folio]);
   };
-
 
   return (
     <>
@@ -278,5 +284,13 @@ export default function EstadoSolicitudesPage({ searchParams }: { searchParams?:
          />
        )}
     </>
+  );
+}
+
+export default function EstadoSolicitudesPage() {
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <EstadoSolicitudesContent />
+    </Suspense>
   );
 }
