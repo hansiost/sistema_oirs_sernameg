@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Rocket, ArrowLeft, Info, GitBranch } from 'lucide-react';
+import { Rocket, ArrowLeft, Info, GitBranch, AlertTriangle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function DeploymentPage() {
@@ -18,59 +18,47 @@ export default function DeploymentPage() {
                 </div>
                 <CardTitle className="text-3xl">¡Listo para Desplegar!</CardTitle>
                 <CardDescription>
-                   Has conectado tu repositorio. Ahora, cada vez que subas cambios a GitHub, tu aplicación se desplegará automáticamente.
+                   Has conectado tu repositorio de GitHub. Ahora, cada vez que subas cambios, tu aplicación se desplegará automáticamente.
                 </CardDescription>
             </CardHeader>
             <CardContent className="text-center space-y-6">
                 
-                <Alert variant="default" className="text-left bg-green-50 border-green-200 text-green-900">
-                  <Info className="h-4 w-4 !text-green-700" />
-                  <AlertTitle className="text-green-900">Tu Próximo Paso: Sube tus Cambios con Git</AlertTitle>
-                  <AlertDescription className="text-green-800">
-                    Tu primer despliegue se iniciará automáticamente cuando subas (`push`) el código de tu proyecto a la rama principal de tu repositorio de GitHub.
+                 <Alert variant="default" className="text-left bg-blue-50 border-blue-200 text-blue-900">
+                  <Info className="h-4 w-4 !text-blue-700" />
+                  <AlertTitle className="text-blue-900">Tu Próximo Paso: Inicia el Despliegue con `git push`</AlertTitle>
+                  <AlertDescription className="text-blue-800">
+                    Tu despliegue se iniciará (o se reintentará si falló) automáticamente cuando subas (`push`) el código de tu proyecto a la rama principal de tu repositorio de GitHub.
                   </AlertDescription>
                 </Alert>
 
-                <Card className="text-left">
-                    <CardHeader className="flex-row items-center gap-3">
-                        <GitBranch className="h-8 w-8 text-primary" />
-                        <div>
-                            <CardTitle>¿Cómo funciona el despliegue?</CardTitle>
-                            <CardDescription>Sigue estos pasos en la terminal de este entorno de desarrollo.</CardDescription>
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <ol className="list-decimal list-inside space-y-3 text-sm text-muted-foreground">
-                            <li>
-                                <strong>Agrega tus cambios:</strong> Abre la terminal y ejecuta el comando: <br/>
-                                <code className="font-mono bg-muted p-1 rounded-sm text-xs">git add .</code>
-                            </li>
-                             <li>
-                                <strong>Crea un commit:</strong> Registra tus cambios con un mensaje descriptivo: <br/>
-                                <code className="font-mono bg-muted p-1 rounded-sm text-xs">git commit -m "Versión inicial para despliegue"</code>
-                            </li>
-                             <li>
-                                <strong>Sube a GitHub:</strong> Ejecuta el siguiente comando para iniciar el despliegue: <br/>
-                                <code className="font-mono bg-muted p-1 rounded-sm text-xs">git push</code>
-                            </li>
-                             <li>
-                                <strong>Monitorea el despliegue:</strong> Ve a la <a href="https://console.firebase.google.com/" target="_blank" rel="noopener noreferrer" className="font-semibold underline text-primary">Consola de Firebase</a>, selecciona tu proyecto y en <strong>Build &gt; App Hosting</strong> podrás ver el progreso.
-                            </li>
-                        </ol>
-                         <p className="text-xs text-muted-foreground mt-4">
-                            Una vez finalizado, tu aplicación estará disponible en la URL pública: <br/> <strong className="font-mono">https://[ID-DE-TU-PROYECTO].apphosting.dev</strong>
-                        </p>
-                    </CardContent>
-                </Card>
+                <Alert>
+                  <GitBranch className="h-4 w-4" />
+                  <AlertTitle>¿Cómo funciona?</AlertTitle>
+                  <AlertDescription>
+                    <ol className="list-decimal list-inside space-y-2 mt-2">
+                        <li>Abre la terminal en Firebase Studio.</li>
+                        <li>Ejecuta `git add .`, `git commit -m "Mi mensaje"`, y `git push`.</li>
+                        <li>Firebase App Hosting detectará los cambios y comenzará a desplegar la nueva versión.</li>
+                        <li>Podrás ver el progreso del despliegue en la consola de Firebase, en la sección de App Hosting.</li>
+                    </ol>
+                  </AlertDescription>
+                </Alert>
 
-                 <div className="pt-4">
-                     <Button variant="outline" asChild>
-                        <Link href="/backoffice_oirs/dashboard">
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Volver al Backoffice
-                        </Link>
-                    </Button>
-                 </div>
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>¿Si el despliegue falla?</AlertTitle>
+                  <AlertDescription>
+                    Si la compilación vuelve a fallar, revisa los "Registros de Cloud Build" en la consola de Firebase para ver el detalle del error. Si es un error de código, corrígelo aquí y vuelve a hacer `git push`.
+                  </AlertDescription>
+                </Alert>
+
+                 <Button asChild variant="outline" className="mt-6">
+                    <Link href="/backoffice_oirs/dashboard">
+                        <ArrowLeft className="mr-2" />
+                        Volver al Dashboard
+                    </Link>
+                </Button>
+                
             </CardContent>
         </Card>
     </div>
