@@ -29,7 +29,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-import { ArrowUpDown, FilePenLine, Calendar as CalendarIcon } from 'lucide-react';
+import { ArrowUpDown, FilePenLine, Calendar as CalendarIcon, Star } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
@@ -51,6 +51,7 @@ type Solicitud = {
     fechaRespuesta: string | null;
     tiempoRestante: string;
     tiempoResolucion?: string;
+    encuestaSatisfaccion?: number | null;
 }
 
 const mockSolicitudes: Solicitud[] = [
@@ -90,6 +91,7 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-26',
     tiempoRestante: '-',
     tiempoResolucion: '1 día',
+    encuestaSatisfaccion: 4,
   },
   {
     id: 'GH-98765',
@@ -103,6 +105,7 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-25',
     tiempoRestante: '-',
     tiempoResolucion: '1 día',
+    encuestaSatisfaccion: 5,
   },
   {
     id: 'IJ-11223',
@@ -116,6 +119,7 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-23',
     tiempoRestante: '-',
     tiempoResolucion: '1 día',
+    encuestaSatisfaccion: null,
   },
   {
     id: 'KL-33445',
@@ -165,6 +169,7 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-22',
     tiempoRestante: '-',
     tiempoResolucion: '3 días',
+    encuestaSatisfaccion: 2,
   },
   {
     id: 'ST-10203',
@@ -178,6 +183,7 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-19',
     tiempoRestante: '-',
     tiempoResolucion: '1 día',
+    encuestaSatisfaccion: null,
   },
   {
     id: 'UV-21314',
@@ -215,6 +221,7 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-18',
     tiempoRestante: '-',
     tiempoResolucion: '3 días',
+    encuestaSatisfaccion: 1,
   },
   {
     id: 'BC-74869',
@@ -228,6 +235,7 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-14',
     tiempoRestante: '-',
     tiempoResolucion: '0 días',
+    encuestaSatisfaccion: null,
   },
   {
     id: 'DE-85970',
@@ -241,6 +249,7 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-14',
     tiempoRestante: '-',
     tiempoResolucion: '1 día',
+    encuestaSatisfaccion: null,
   },
   {
     id: 'FG-96081',
@@ -278,6 +287,7 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-13',
     tiempoRestante: '-',
     tiempoResolucion: '3 días',
+    encuestaSatisfaccion: 3,
   },
   {
     id: 'LM-39415',
@@ -341,6 +351,7 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-08',
     tiempoRestante: '-',
     tiempoResolucion: '3 días',
+    encuestaSatisfaccion: 3,
   },
   {
     id: 'VW-84960',
@@ -403,6 +414,7 @@ const mockSolicitudes: Solicitud[] = [
     fechaRespuesta: '2025-07-02',
     tiempoRestante: '-',
     tiempoResolucion: '2 días',
+    encuestaSatisfaccion: 2,
   },
   {
     id: 'EG-39415',
@@ -468,13 +480,14 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
         { key: 'estado', label: 'Estado', sortable: false },
         { key: 'fechaRespuesta', label: 'Fecha Respuesta', sortable: false },
         { key: 'tiempoRestante', label: isClosedTab ? 'Tiempo Resolución' : 'Tiempo Restante', sortable: false },
+        { key: 'encuestaSatisfaccion', label: 'Encuesta', sortable: false },
     ];
     
     const tableHeaders = useMemo(() => {
         if (isClosedTab) {
             return allHeaders;
         }
-        return allHeaders.filter(header => header.key !== 'fechaRespuesta');
+        return allHeaders.filter(header => header.key !== 'fechaRespuesta' && header.key !== 'encuestaSatisfaccion');
     }, [isClosedTab]);
 
 
@@ -592,6 +605,16 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
                 }
                 
                 return <Badge variant={variant}>{text}</Badge>;
+            case 'encuestaSatisfaccion':
+                if (solicitud.encuestaSatisfaccion) {
+                    return (
+                        <div className="flex items-center gap-1">
+                           <span>{solicitud.encuestaSatisfaccion}</span>
+                           <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                        </div>
+                    );
+                }
+                return '-';
             default:
                 return solicitud[key as keyof Solicitud];
         }
@@ -686,7 +709,7 @@ const SolicitudesTable: FC<SolicitudesTableProps> = ({ solicitudes, isClosedTab 
                                             />
                                         </PopoverContent>
                                     </Popover>
-                                  ) : (
+                                  ) : (header.key !== 'encuestaSatisfaccion' &&
                                     <Input
                                         placeholder={`Filtrar...`}
                                         value={filters[header.key] || ''}
