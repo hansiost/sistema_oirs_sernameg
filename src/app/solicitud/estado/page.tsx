@@ -19,7 +19,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, PlusCircle, CheckCircle, ClipboardList, HelpCircle } from 'lucide-react';
+import { ArrowLeft, PlusCircle, CheckCircle, ClipboardList } from 'lucide-react';
 import { REQUEST_TYPES } from '@/lib/constants';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
