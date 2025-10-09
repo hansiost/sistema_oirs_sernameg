@@ -1,4 +1,4 @@
-'use client';
+"use client"
 
 import {
   Dialog,
@@ -6,17 +6,17 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Icons } from '@/components/icons';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { z } from 'zod';
-import Link from 'next/link';
-import { Separator } from './ui/separator';
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Icons } from '@/components/icons'
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { z } from 'zod'
+import Link from 'next/link'
+import { Separator } from './ui/separator'
 
 const rutSchema = z
   .string()
@@ -24,50 +24,50 @@ const rutSchema = z
   .regex(
     /^[0-9]{1,2}\.?[0-9]{3}\.?[0-9]{3}-?[0-9kK]$/,
     'Formato de RUT no válido.'
-  );
+  )
 
 export function LoginDialog({
   open,
   onOpenChange,
-  type = 'claveUnica'
+  type = 'claveUnica',
 }: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  type: 'claveUnica' | 'rut';
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  type: 'claveUnica' | 'rut'
 }) {
-  const router = useRouter();
-  const [rut, setRut] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const router = useRouter()
+  const [rut, setRut] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [isLoggingIn, setIsLoggingIn] = useState(false)
 
   const handleLogin = (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    const rutValidation = rutSchema.safeParse(rut);
+    e.preventDefault()
+    const rutValidation = rutSchema.safeParse(rut)
     if (!rutValidation.success) {
-      setError('RUT inválido.');
-      return;
+      setError('RUT inválido.')
+      return
     }
     if (password.length < 4) {
-      setError('La clave es obligatoria.');
-      return;
+      setError('La clave es obligatoria.')
+      return
     }
-    setError('');
-    setIsLoggingIn(true);
+    setError('')
+    setIsLoggingIn(true)
     
     // Simulate API call
     setTimeout(() => {
       // On successful login, redirect based on login type
-      const destination = type === 'claveUnica' ? '/solicitud' : '/solicitud/estado';
-      router.push(destination);
-      setIsLoggingIn(false);
-      onOpenChange(false);
-    }, 1500);
-  };
+      const destination = type === 'claveUnica' ? '/solicitud' : '/solicitud/estado'
+      router.push(destination)
+      setIsLoggingIn(false)
+      onOpenChange(false)
+    }, 1500)
+  }
   
-  const title = type === 'claveUnica' ? 'Ingreso con ClaveÚnica' : 'Ingreso con RUT';
-  const buttonText = type === 'claveUnica' ? 'Ingresar con ClaveÚnica' : 'Ingresar';
-  const buttonClass = type === 'claveUnica' ? 'bg-blue-600 hover:bg-blue-700' : '';
+  const title = type === 'claveUnica' ? 'Ingreso con ClaveÚnica' : 'Ingreso con RUT'
+  const buttonText = type === 'claveUnica' ? 'Ingresar con ClaveÚnica' : 'Ingresar'
+  const buttonClass = type === 'claveUnica' ? 'bg-blue-600 hover:bg-blue-700' : ''
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -141,5 +141,5 @@ export function LoginDialog({
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
