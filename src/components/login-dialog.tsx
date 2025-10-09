@@ -18,13 +18,23 @@ import { z } from 'zod'
 import Link from 'next/link'
 import { Separator } from './ui/separator'
 
+const cleanRut = (rut: string) => rut.replace(/[^0-9kK]/g, '').toUpperCase();
+
 const rutSchema = z
   .string()
   .min(8, 'El RUT debe tener al menos 8 caracteres.')
-  .regex(
-    /^[0-9]{1,2}\.?[0-9]{3}\.?[0-9]{3}-?[0-9kK]$/,
-    'Formato de RUT no válido.'
-  )
+  .refine(
+    (value) => {
+      const cleaned = cleanRut(value);
+      if (cleaned.length < 2) return false;
+      const body = cleaned.slice(0, -1);
+      const dv = cleaned.slice(-1);
+      if (!/^[0-9]+$/.test(body)) return false;
+      return /^[0-9K]$/.test(dv);
+    },
+    'Formato de RUT no válido (ej: 12.345.678-9).'
+  );
+
 
 export function LoginDialog({
   open,
@@ -57,11 +67,18 @@ export function LoginDialog({
     
     // Simulate API call
     setTimeout(() => {
-      // On successful login, redirect based on login type
-      const destination = type === 'claveUnica' ? '/solicitud' : '/solicitud/estado'
-      router.push(destination)
-      setIsLoggingIn(false)
-      onOpenChange(false)
+      const cleanedRut = cleanRut(rut);
+      let destination = '/solicitud/estado'; // Default for existing users
+
+      // New user RUT (12.345.678-9) should go to registration
+      if (cleanedRut.startsWith('12345678')) {
+        destination = '/registro';
+      }
+      // Existing user RUT (11.478.406-0) goes to status page (default)
+      
+      router.push(destination);
+      setIsLoggingIn(false);
+      onOpenChange(false);
     }, 1500)
   }
   
@@ -95,7 +112,7 @@ export function LoginDialog({
             <Input
               id="rut"
               type="text"
-              placeholder="12.345.678-9"
+              placeholder="12.345.678-9 ó 11.478.406-0"
               value={rut}
               onChange={(e) => setRut(e.target.value)}
               disabled={isLoggingIn}
