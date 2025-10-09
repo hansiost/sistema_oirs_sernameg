@@ -82,6 +82,8 @@ export const mockMaintainers: MockMaintainers = {
     genero: [
         { id: 'g-1', value: 'Femenino' },
         { id: 'g-2', value: 'Masculino' },
+        { id: 'g-5', value: 'Transfemenino' },
+        { id: 'g-6', value: 'Transmasculino' },
         { id: 'g-3', value: 'No Binario' },
         { id: 'g-4', value: 'Prefiere no decirlo' },
     ],
