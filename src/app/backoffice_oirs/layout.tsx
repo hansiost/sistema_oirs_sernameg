@@ -17,7 +17,6 @@ import {
 import { Building2, LayoutDashboard, BarChart3, Settings, LogOut, UserCircle, KeyRound, ChevronDown, Users, FileText, Network, Waypoints, Wrench, Building, VenetianMask, Feather, ListChecks, CheckCheck, FileCheck, Database, Files, BookUser, HelpCircle, Rocket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { ChangePasswordDialog } from '@/components/change-password-dialog';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 
@@ -69,7 +68,6 @@ export default function BackofficeLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false);
   
   const isAdministracionActive = pathname.startsWith('/backoffice_oirs/administracion');
   const [isAdministracionOpen, setIsAdministracionOpen] = useState(isAdministracionActive);
@@ -206,10 +204,11 @@ export default function BackofficeLayout({
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>admin@sernameg.gob.cl</DropdownMenuItem>
-                         <DropdownMenuItem onSelect={() => setShowChangePasswordDialog(true)}>
-                           <KeyRound className="mr-2 h-4 w-4" />
-                           <span>Cambiar clave</span>
+                        <DropdownMenuItem asChild>
+                           <Link href="/backoffice_oirs/perfil">
+                             <UserCircle className="mr-2 h-4 w-4" />
+                             <span>Ver Perfil</span>
+                           </Link>
                          </DropdownMenuItem>
                         <DropdownMenuSeparator />
                          <DropdownMenuItem asChild>
@@ -226,7 +225,6 @@ export default function BackofficeLayout({
             {children}
         </main>
       </SidebarInset>
-      <ChangePasswordDialog open={showChangePasswordDialog} onOpenChange={setShowChangePasswordDialog} />
     </SidebarProvider>
   );
 }
