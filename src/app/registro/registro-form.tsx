@@ -68,11 +68,6 @@ const formSchema = z.object({
   region: z.string().min(3, 'La región es obligatoria.'),
   telefono: z.string().min(9, 'El teléfono debe tener al menos 9 dígitos.'),
   email: z.string().email('El e-mail no es válido.'),
-  password: z.string().min(8, 'La clave debe tener al menos 8 caracteres.'),
-  confirmPassword: z.string(),
-}).refine(data => data.password === data.confirmPassword, {
-  message: "Las claves no coinciden.",
-  path: ["confirmPassword"], // path of error
 });
 
 
@@ -148,8 +143,6 @@ export default function RegistroForm() {
       region: '',
       telefono: '',
       email: '',
-      password: '',
-      confirmPassword: '',
     },
   });
 
@@ -189,7 +182,7 @@ export default function RegistroForm() {
            toast({
             title: 'Usuario Encontrado',
             description:
-              'Sus datos personales han sido cargados. Por favor, cree una clave y complete su información de contacto.',
+              'Sus datos personales han sido cargados. Por favor, complete su información de contacto.',
           });
         }
       } else {
@@ -317,49 +310,12 @@ export default function RegistroForm() {
                 </div>
               </CardContent>
             </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>3. Cree su Clave</CardTitle>
-                 <CardDescription>
-                  Esta será su clave para ingresar al portal en el futuro.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid sm:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Clave *</FormLabel>
-                        <FormControl>
-                          <Input type="password" placeholder="********" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="confirmPassword"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Confirmar Clave *</FormLabel>
-                        <FormControl>
-                          <Input type="password" placeholder="********" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-              </CardContent>
-            </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle>4. Datos de Contacto</CardTitle>
+                <CardTitle>3. Datos de Contacto</CardTitle>
                 <CardDescription>
-                  Por favor, complete su información de contacto.
+                  Por favor, complete su información de contacto. Esta será utilizada para notificarle sobre sus solicitudes.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -466,5 +422,3 @@ export default function RegistroForm() {
     </Form>
   );
 }
-
-    
