@@ -23,7 +23,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Icons } from '@/components/icons';
 import { Separator } from '@/components/ui/separator';
-import { Save } from 'lucide-react';
+import { Save, KeyRound } from 'lucide-react';
 
 const profileFormSchema = z.object({
   nombre: z.string().min(3, 'El nombre debe tener al menos 3 caracteres.'),
